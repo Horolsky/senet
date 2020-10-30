@@ -22,12 +22,15 @@ class Game():
     def make_move(self, cell):        
         newState = self.state.move(cell)
         if newState is None:
-            return False
-        else:
-            self._sticks = throw_sticks()
-            newState.steps = self.steps
-            self._state = newState
-            return True
+            if len(self.state.moves) == 0:
+                newState = self.state.skip()
+            else:
+                return False
+        
+        self._sticks = throw_sticks()
+        newState.steps = self.steps
+        self._state = newState
+        return True
     @property
     def state(self):
         if self.running:
@@ -59,6 +62,8 @@ class Game():
         s = {
             "team": self.state.agent,
             "turn": self.state.turn,
-            "steps": self.state.steps
+            "steps": self.state.steps,
+            "bench": self.state.bench,
+            "event": self.state.event
         }
         return s

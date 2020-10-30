@@ -1,4 +1,4 @@
-import messages, game
+import messages, game, random
 GAME = game.Game()
 
 cli_msg = {
@@ -9,8 +9,6 @@ cli_msg = {
     "m": lambda: print(GAME.state.moves),
     "u": lambda: print(GAME.state.utility),
 }
-
-coordinate_modes = ("linear", "tabular")
 
 cli_options = {
     "crd": "tbl",
@@ -62,7 +60,13 @@ def init_loop():
                 elif len(tks) == 3:
                     toggle_option(tks[1:])
                     continue
-            
+        if cmd == 'auto':
+            cli_options['crd'] = 'lin'
+            while GAME.running:   
+                move = [0]
+                if len(GAME.state.moves) > 0:
+                    move = [random.choice(GAME.state.moves) + 1]
+                make_move(move)
         # default error msg
         print(messages.warn)
 
@@ -79,13 +83,13 @@ def make_move(tokens):
     mode = cli_options["crd"]
     cell, steps, r, c = [None for _ in range(4)]
     if mode == "lin" and len(tokens) == 1:
-        cell = tokens[0] - 1
+        cell = int(tokens[0]) - 1
     if mode == "tbl" and len(tokens) == 2:
         r, c = int(tokens[0])-1, int(tokens[1])-1
         cell = r * 10 + c
         if r == 1:
             cell = 19 - c
-    
+    success = False
     if cell is not None:
         success = GAME.make_move(cell)
         target = cell + GAME.steps
@@ -99,6 +103,13 @@ def make_move(tokens):
         print(f"player {GAME.player} moved from {r+1} {c+1} to {tr} {tc}")
     if success:
         print(render_board())
+        
+        if 5 in GAME.state.bench:
+            print(f"player {('V', 'X')[GAME.state.agent % 2]} won the game")
+            print("press S to start new game")
+            GAME._running = False
+        elif len(GAME.state.moves) == 0:
+            print("no possible moves this turn. To skip enter t 0 0")
     else:
         print("choosen movement is impossible")
 def toggle_option(tokens):
@@ -149,7 +160,15 @@ def render_board():
         #board = board + "\n" + line2 + "\n" + line3 
     s = GAME.status
     team = s['team'] - 1
-    stats = f"turn: {s['turn']}, team {['V', 'X'][team]} is moving for {s['steps']} steps"
+    #e = s['event']
+    #event_msg = f"{['V', 'X'][team % 2 + 1]} {['skipped','moved', 'attacked', 'drowed','attacked','escaped'].get(e[0])}"
+    #if e[0] not in [0, 3]:
+    #    event_msg = event_msg + f" from {e[1]+1} to {e[2]+1}"
+    stats = f"""
+    bench: V - {s['bench'][0]}, X - {s['bench'][1]}
+    turn: {s['turn']}, team {['V', 'X'][team]} is moving for {s['steps']} steps
+    possible moves: {', '.join(map(str, [x+1 for x in GAME.state.moves]))}
+    """
     return f"""
     {board}
     {stats}

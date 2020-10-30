@@ -7,25 +7,39 @@ def is_board(b):
         if c not in [0, 1, 2]:
             return False
     return True
-def throw_sticks():
-    return [r.randrange(2) for _ in range(4)]
+
 class GameState():
     def __init__(self, board, turn):
 
         if not is_board(board):
             raise ValueError("invalid board data")
-        #if type(steps) is not int:
-        #    raise ValueError("invalid steps number")
         if type(turn) is not int:
-            raise ValueError("invalid turn number")
+            raise TypeError("invalid turn number type")
 
         self._board = board
-        #self._steps = steps
-        self._steps = None
         self._turn = turn
+        self._steps = None
         self._moves = None
-        self._team = None
+        self._event = (0,0,0)
     #
+    @property
+    def event(self):
+        """
+        returns tuple with info on game event, caused by last move
+        (<eventcode>, <start>, <destination>)
+        codes:
+        0 - no movement
+        1 - moving to empty cell
+        2 - swaping
+        3 - drowing and reborning
+        4 - swaping on Houses with reborning
+        5 - escaping 
+        """
+        return self._event
+    @event.setter
+    def event(self, msg):
+        self._event = msg
+        print(msg)
     @property
     def steps(self):
         return self._steps
@@ -52,33 +66,14 @@ class GameState():
 
     #dependent cached data getters
     @property
-    def team(self):
-        """
-        returns indices of the current team
-        """
-        team = self._team
-        if team is not None:
-            return team
-        else: 
-            team = []
-        for c in range(30):
-            if self.board[c] == self.agent:
-                team.append(c)
-        self._team = team
-        return team
-    @property
-    def enemies(self):
-        """
-        returns indices of the current team
-        """
-        enemies = self._enemies
-        if enemies is not None:
-            return enemies
-        for c in range(30):
-            if self.board[c] == self.agent % 2 + 1:
-                enemies.append[c]
-        self._enemies = enemies
-        return enemies
+    def bench(self):
+        t1, t2 = 5, 5
+        for c in self.board:
+            if c == 1:
+                t1 -= 1
+            elif c == 2:
+                t2 -= 1
+        return (t1, t2)
     @property
     def moves(self):
         """
@@ -92,10 +87,13 @@ class GameState():
             return moves
         else:
             moves = []
-        for c in self.team: #c is cell index
-            b = self.board
-            s = self.steps
-            agent = self.agent
+        b = self.board
+        s = self.steps
+        agent = self.agent
+        for c in range(30): #c is cell index
+            if b[c] != agent:
+                continue
+            
             d = c + s #destination index
             #cell is not under control
             if b[c] != agent: 
@@ -107,9 +105,9 @@ class GameState():
             if c in [27,28] and d == 30: #correct escaping
                 moves.append(c)     
                 continue
-            if d > 25 and c != 24: #incorrect house arriving
+            if d > 25 and c != 25: #incorrect house arriving
                 continue
-            if d > 30: #incorrect escaping
+            if d > 29: #incorrect escaping
                 continue
             #target occupation cases
             target = b[d] #target cell value
@@ -151,7 +149,11 @@ class GameState():
         #avg_f = sum(friends) / len(friends)
         #avg_e = sum(enemies) / len(enemies)
         return (f_m, e_m)
-
+    def skip(self):
+        """
+        return the same state with incremented turn number
+        """
+        return GameState(self.board, self.turn + 1)
     def move(self, c):
         """
         move choosen paw
@@ -170,21 +172,37 @@ class GameState():
         #drowing in House of Water
         if t == 26: 
             b[c] = 0
-            b[14] = a
+            for i in range(14, -1, -1):
+                if b[i] == 0:
+                    b[i] = a
+                    self._event = (3, c, i)
+                    break
         #escaping
         elif c == 29: 
             b[29] = 0
+            self._event = (6, 29, -1)
         elif t == 30 and c == (30 - s):
             b[c] = 0
+            self._event = (3, c, -1)
         #attacking
         elif b[t] == e:
             if b[t-1] != e and b[t+1] != e:
                 b[t] = a
-                b[c] = e
+                if t > 26: #attacking Houses rule
+                    for i in range(14, -1, -1):
+                        if b[i] == 0:
+                            b[i] = e
+                            b[c] = 0
+                            self._event = (4, c, i)
+                            break
+                else:
+                    b[c] = e
+                    self._event = (4, c, t)
         #moving to empty target
         elif b[t] == 0:
             b[t] = a
             b[c] = 0
+            self._event = (1, c, t)
         else:
             raise ValueError(f"incorrect move logic, start: {c}")
         return GameState(b, self.turn + 1)
