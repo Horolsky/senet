@@ -60,7 +60,7 @@ class Game():
     @property
     def status(self):
         s = {
-            "team": self.state.agent,
+            "agent": self.state.agent,
             "turn": self.state.turn,
             "steps": self.state.steps,
             "bench": self.state.bench,

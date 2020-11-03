@@ -3,17 +3,32 @@ GAME = game.Game()
 
 cli_msg = {
     "h": lambda: print(messages.help),
-    "r": lambda: print(messages.rules),  
+    "r": lambda: print(messages.rules),
     "i": lambda: print(messages.info),
     "b": lambda: print(render_board()),
     "m": lambda: print(GAME.state.moves),
-    "u": lambda: print(GAME.state.utility),
+    "u": lambda: print(GAME.state.utility)
 }
 
 cli_options = {
     "crd": "tbl",
     "brd": "tbl"
 }
+
+def get_pos(index):
+    mode = cli_options["crd"]
+    if mode == "lin":
+        return str(index + 1)
+    elif mode == "tbl":
+        r = index // 10 + 1
+        c = index % 10 + 1
+        if r == 2:
+            c = 11 - c
+        return f"({r}, {c})"
+    
+#def get_index(tokens):
+
+
 
 def init_loop():
     print("Welcome to SENET Game")
@@ -159,19 +174,36 @@ def render_board():
         #line3 = " ".join(" " for _ in range(25)) + " a b c d e"
         #board = board + "\n" + line2 + "\n" + line3 
     s = GAME.status
-    team = s['team'] - 1
-    #e = s['event']
-    #event_msg = f"{['V', 'X'][team % 2 + 1]} {['skipped','moved', 'attacked', 'drowed','attacked','escaped'].get(e[0])}"
-    #if e[0] not in [0, 3]:
-    #    event_msg = event_msg + f" from {e[1]+1} to {e[2]+1}"
+    player =  ['V', 'X'][s['agent'] - 1]
+    #EVENT MSG
+    #code, start, destination, victim_destination = s['event']
+    code = s['event'][0]
+    start, destination, victim_destination = map(get_pos, s['event'][1:])
+    event = ['skipped','moved', 'attacked', 'drowed','attacked','escaped'][code]
+    event_msg = ""
+    
+    if GAME.state.turn == 0:
+        event_msg = "game starts"
+    else:
+        event_msg = {
+            0: f"skip",
+            1: f"{player} moved from {start} to {destination}",
+            2: f"{player} from {start} attacked enemy on {destination}",
+            3: f"{player} drawed in House of Waters and reborned on {destination}",
+            4: f"{player} from {start} attacked enemy on {destination}. His victim rebourned on {victim_destination}",
+            5: f"{player} from {start} has successfully escaped the board",
+        }.get(code)
+
     stats = f"""
+    {event_msg}
     bench: V - {s['bench'][0]}, X - {s['bench'][1]}
-    turn: {s['turn']}, team {['V', 'X'][team]} is moving for {s['steps']} steps
-    possible moves: {', '.join(map(str, [x+1 for x in GAME.state.moves]))}
+    turn: {s['turn']}, player {player} is moving for {s['steps']} steps
+    possible moves: {', '.join(map(get_pos, GAME.state.moves))}
     """
     return f"""
     {board}
     {stats}
     """
 
-            
+if __name__ == "__main__":
+    init_loop()

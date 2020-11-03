@@ -9,7 +9,7 @@ def is_board(b):
     return True
 
 class GameState():
-    def __init__(self, board, turn):
+    def __init__(self, board, turn, event = (0,0,0,0)):
 
         if not is_board(board):
             raise ValueError("invalid board data")
@@ -20,7 +20,7 @@ class GameState():
         self._turn = turn
         self._steps = None
         self._moves = None
-        self._event = (0,0,0)
+        self._event = event 
     #
     @property
     def event(self):
@@ -36,10 +36,6 @@ class GameState():
         5 - escaping 
         """
         return self._event
-    @event.setter
-    def event(self, msg):
-        self._event = msg
-        print(msg)
     @property
     def steps(self):
         return self._steps
@@ -154,57 +150,58 @@ class GameState():
         return the same state with incremented turn number
         """
         return GameState(self.board, self.turn + 1)
-    def move(self, c):
+    def move(self, cell):
         """
         move choosen paw
-        returns new state on success
+        returns a new state on success
         or None on failure
         """
         if self.steps is None:
             return None
-        elif c not in self.moves:
+        elif cell not in self.moves:
             return None
-        s = self.steps
-        t = c + s #target
-        b = self.board.copy()
-        a = self.agent
-        e = a % 2 + 1 # enemy
+        steps = self.steps
+        destination = cell + steps #target
+        board = self.board.copy()
+        agent = self.agent
+        enemy = agent % 2 + 1 # enemy
+        event = (0,0,0,0)
         #drowing in House of Water
-        if t == 26: 
-            b[c] = 0
+        if destination == 26: 
+            board[cell] = 0
             for i in range(14, -1, -1):
-                if b[i] == 0:
-                    b[i] = a
-                    self._event = (3, c, i)
+                if board[i] == 0:
+                    board[i] = agent
+                    event = (3, cell, destination, i)
                     break
         #escaping
-        elif c == 29: 
-            b[29] = 0
-            self._event = (6, 29, -1)
-        elif t == 30 and c == (30 - s):
-            b[c] = 0
-            self._event = (3, c, -1)
+        elif cell == 29: 
+            board[29] = 0
+            event = (6, 29, destination, -1)
+        elif destination == 30 and cell == (30 - steps):
+            board[cell] = 0
+            event = (6, cell, destination, -1)
         #attacking
-        elif b[t] == e:
-            if b[t-1] != e and b[t+1] != e:
-                b[t] = a
-                if t > 26: #attacking Houses rule
+        elif board[destination] == enemy:
+            if board[destination-1] != enemy and board[destination+1] != enemy:
+                board[destination] = agent                
+                if destination > 26: #attacking Houses rule
                     for i in range(14, -1, -1):
-                        if b[i] == 0:
-                            b[i] = e
-                            b[c] = 0
-                            self._event = (4, c, i)
+                        if board[i] == 0:
+                            board[i] = enemy
+                            board[cell] = 0
+                            event = (4, cell, destination, i)
                             break
                 else:
-                    b[c] = e
-                    self._event = (4, c, t)
+                    board[cell] = enemy
+                    event = (2, cell, destination, cell)
         #moving to empty target
-        elif b[t] == 0:
-            b[t] = a
-            b[c] = 0
-            self._event = (1, c, t)
+        elif board[destination] == 0:
+            board[destination] = agent
+            board[cell] = 0
+            event = (1, cell, destination, -1)
         else:
-            raise ValueError(f"incorrect move logic, start: {c}")
-        return GameState(b, self.turn + 1)
+            raise ValueError(f"incorrect move logic, start: {cell}")
+        return GameState(board, self.turn + 1, event)
         
          
