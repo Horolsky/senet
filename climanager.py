@@ -26,8 +26,17 @@ def get_pos(index):
             c = 11 - c
         return f"({r}, {c})"
     
-#def get_index(tokens):
-
+def get_index(tokens):
+    cell, steps, r, c = [None for _ in range(4)]
+    mode = cli_options["crd"]
+    if mode == "lin" and len(tokens) == 1:
+        cell = int(tokens[0]) - 1
+    if mode == "tbl" and len(tokens) == 2:
+        r, c = int(tokens[0])-1, int(tokens[1])-1
+        cell = r * 10 + c
+        if r == 1:
+            cell = 19 - c
+    return cell
 
 
 def init_loop():
@@ -62,7 +71,7 @@ def init_loop():
             start_game(tks)
             continue
         if cmd == 't' and len(tks) > 1 and GAME.running:
-            make_move(tks[1:])
+            make_move(get_index(tks[1:]))
             continue
         if cmd == 'o':
             if len(tks) == 1:
@@ -78,9 +87,9 @@ def init_loop():
         if cmd == 'auto':
             cli_options['crd'] = 'lin'
             while GAME.running:   
-                move = [0]
+                move = 0
                 if len(GAME.state.moves) > 0:
-                    move = [random.choice(GAME.state.moves) + 1]
+                    move = random.choice(GAME.state.moves)
                 make_move(move)
         # default error msg
         print(messages.warn)
@@ -94,37 +103,22 @@ def start_game(tokens):
     GAME.start_game(player)
 
 
-def make_move(tokens):
-    mode = cli_options["crd"]
-    cell, steps, r, c = [None for _ in range(4)]
-    if mode == "lin" and len(tokens) == 1:
-        cell = int(tokens[0]) - 1
-    if mode == "tbl" and len(tokens) == 2:
-        r, c = int(tokens[0])-1, int(tokens[1])-1
-        cell = r * 10 + c
-        if r == 1:
-            cell = 19 - c
-    success = False
-    if cell is not None:
-        success = GAME.make_move(cell)
-        target = cell + GAME.steps
-    if success and mode == "lin":
-        print(f"player {GAME.player} moved from {cell + 1} to {target + 1}")
-    elif success and mode == "tbl":
-        tr = target // 10 + 1
-        tc = target % 10 + 1
-        if tr == 2:
-            tc = 11 - tc
-        print(f"player {GAME.player} moved from {r+1} {c+1} to {tr} {tc}")
+def make_move(cell):
+    success = GAME.manage_move(cell)
     if success:
         print(render_board())
-        
+        #victory condition
         if 5 in GAME.state.bench:
             print(f"player {('V', 'X')[GAME.state.agent % 2]} won the game")
             print("press S to start new game")
             GAME._running = False
-        elif len(GAME.state.moves) == 0:
-            print("no possible moves this turn. To skip enter t 0 0")
+        #reverse move condition
+        elif GAME.state.steps == -1:
+            if len(GAME.state.moves) > 0:
+                print("no avalaible moves, player must move backwards")
+            else:
+                print("no avalaible backward moves, player skipping the turn")
+                success = GAME.manage_move(0)
     else:
         print("choosen movement is impossible")
 def toggle_option(tokens):
@@ -169,29 +163,25 @@ def render_board():
         {bottom}
         """
     elif cli_options["brd"] == "lin":
-        board = " ".join(map(symb, b))
-        #line2 = " ".join([str(x + 1) for x in range(30)])
-        #line3 = " ".join(" " for _ in range(25)) + " a b c d e"
-        #board = board + "\n" + line2 + "\n" + line3 
+        board = " ".join(map(symb, b)) 
+    #EVENT MSG
     s = GAME.status
     player =  ['V', 'X'][s['agent'] - 1]
-    #EVENT MSG
-    #code, start, destination, victim_destination = s['event']
-    code = s['event'][0]
-    start, destination, victim_destination = map(get_pos, s['event'][1:])
-    event = ['skipped','moved', 'attacked', 'drowed','attacked','escaped'][code]
     event_msg = ""
     
-    if GAME.state.turn == 0:
+    if GAME.turn == 0:
         event_msg = "game starts"
     else:
+        code = s['event'][0]
+        start, destination, victim_destination = map(get_pos, s['event'][1:])
         event_msg = {
-            0: f"skip",
-            1: f"{player} moved from {start} to {destination}",
-            2: f"{player} from {start} attacked enemy on {destination}",
-            3: f"{player} drawed in House of Waters and reborned on {destination}",
-            4: f"{player} from {start} attacked enemy on {destination}. His victim rebourned on {victim_destination}",
-            5: f"{player} from {start} has successfully escaped the board",
+            0: f"{player} skipped the turn",
+            1: f"{player} reversed from {start} to {destination}",
+            2: f"{player} moved from {start} to {destination}",
+            3: f"{player} from {start} attacked enemy on {destination}",
+            4: f"{player} drawed in House of Waters and reborned on {destination}",
+            5: f"{player} from {start} attacked enemy on {destination}. His victim rebourned on {victim_destination}",
+            6: f"{player} from {start} has successfully escaped the board",
         }.get(code)
 
     stats = f"""
@@ -200,10 +190,7 @@ def render_board():
     turn: {s['turn']}, player {player} is moving for {s['steps']} steps
     possible moves: {', '.join(map(get_pos, GAME.state.moves))}
     """
-    return f"""
-    {board}
-    {stats}
-    """
+    return f"{board}\n{stats}"
 
 if __name__ == "__main__":
     init_loop()

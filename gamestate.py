@@ -9,31 +9,36 @@ def is_board(b):
     return True
 
 class GameState():
-    def __init__(self, board, turn, event = (0,0,0,0)):
+    def __init__(self, board, agent, event = (0,0,0,0)):
 
         if not is_board(board):
             raise ValueError("invalid board data")
-        if type(turn) is not int:
-            raise TypeError("invalid turn number type")
-
+        if agent not in [1,2]:
+            raise ValueError("invalid agent number")
+        if type(event) is not tuple:
+            raise TypeError("invalid event data")
+        if len(event) != 4:
+            raise ValueError("invalid event data")
+        self._agent = agent
         self._board = board
-        self._turn = turn
+        self._event = event
         self._steps = None
         self._moves = None
-        self._event = event 
-    #
+        self._reverse_moves = None
+        
     @property
     def event(self):
         """
         returns tuple with info on game event, caused by last move
         (<eventcode>, <start>, <destination>)
         codes:
-        0 - no movement
-        1 - moving to empty cell
-        2 - swaping
-        3 - drowing and reborning
-        4 - swaping on Houses with reborning
-        5 - escaping 
+        0 - skip movement
+        1 - reverse movement
+        2 - moving to empty cell
+        3 - swaping
+        4 - drowing and reborning
+        5 - swaping on Houses with reborning
+        6 - escaping 
         """
         return self._event
     @property
@@ -43,11 +48,10 @@ class GameState():
     def steps(self, s):
         if type(s) is not int:
             raise TypeError("steps value must be int")
-        elif s not in range (1, 6):
+        elif s not in [-1,1,2,3,4,5]:
             raise ValueError("steps not in range")
         else:
             self._steps = s
-            self._moves = None
 
     #main data getters
     @property
@@ -55,21 +59,26 @@ class GameState():
         return self._board
     @property
     def agent(self): #current player number
-        return self.turn % 2 + 1 
+        return self._agent
+    @agent.setter
+    def sgent(self, newAg):
+        if newAg not in [1,2]:
+            raise ValueError("invalid agent number")
+        self._agent = newAg
     @property
-    def turn(self):
-        return self._turn
+    def enemy(self):
+        return self.agent % 2 + 1
 
     #dependent cached data getters
     @property
     def bench(self):
-        t1, t2 = 5, 5
-        for c in self.board:
-            if c == 1:
-                t1 -= 1
-            elif c == 2:
-                t2 -= 1
-        return (t1, t2)
+        team1, team2 = 5, 5
+        for cell in self.board:
+            if cell == 1:
+                team1 -= 1
+            elif cell == 2:
+                team2 -= 1
+        return (team1, team2)
     @property
     def moves(self):
         """
@@ -78,46 +87,119 @@ class GameState():
         """
         if self.steps is None:
             return None
+        #cache
         moves = self._moves
         if moves is not None:
             return moves
         else:
             moves = []
-        b = self.board
-        s = self.steps
+        #calculating
+        board = self.board
+        steps = self.steps
         agent = self.agent
-        for c in range(30): #c is cell index
-            if b[c] != agent:
-                continue
-            
-            d = c + s #destination index
+        enemy = self.enemy
+        for cell in range(30): #c is cell index
+            #filling array by exclusion:
             #cell is not under control
-            if b[c] != agent: 
+            if board[cell] != agent:
                 continue
+            destination = cell + steps #destination index
             #escaping cases
-            if c == 29: #always escaping 
-                moves.append(c)
+            if cell == 29: #always escaping 
+                moves.append(cell)
                 continue
-            if c in [27,28] and d == 30: #correct escaping
-                moves.append(c)     
+            if cell in [27,28] and destination == 30: #correct escaping
+                moves.append(cell)     
                 continue
-            if d > 25 and c != 25: #incorrect house arriving
+            if destination > 25 and cell != 25: #incorrect house arriving
                 continue
-            if d > 29: #incorrect escaping
+            if destination > 29: #incorrect escaping
                 continue
             #target occupation cases
-            target = b[d] #target cell value
-            enemy = agent % 2 + 1
+            target = board[destination] #target cell value
             if target == agent: #friendly occupation
                 continue
             elif target == enemy:
-                if b[d + 1] == enemy or b[d - 1] == enemy: #target is defended
+                if board[destination + 1] == enemy or board[destination - 1] == enemy: #target is defended
                     continue
             #final default case
-            moves.append(c)
+            moves.append(cell)
+        
+        #reverse moves
+        if len(moves) == 0:
+            self.steps = -1
+            for cell in range(28):
+                if board[cell] == 0 and board[cell + 1] == agent:
+                    moves.append(cell+1)
         self._moves = moves
         return moves               
-
+    def move(self, cell):
+        """
+        move choosen paw
+        returns a new state on success or None on failure
+        if no possible moves, returns the same state with swaped agent
+        """
+        if self.steps is None:
+            return None
+        elif self.steps > 0 and cell not in self.moves:
+            return None
+        steps = self.steps
+        destination = cell + steps #target
+        board = self.board.copy()
+        agent = self.agent
+        enemy = self.enemy
+        event = (0,0,0,0) #default event - skipping move
+        #reverse
+        if steps == -1:
+            if cell in self.moves:
+                if cell == 27: #reverse to House of Waters
+                    board[cell] = 0
+                    for i in range(14, -1, -1):
+                        if board[i] == 0:
+                            board[i] = agent
+                            event = (1, cell, i, -1)
+                            break
+                else:
+                    board[cell] = 0
+                    board[cell-1] = agent 
+                    event = (1, cell, cell-1, -1)          
+        #drowing in House of Water
+        elif destination == 26: 
+            board[cell] = 0
+            for i in range(14, -1, -1):
+                if board[i] == 0:
+                    board[i] = agent
+                    event = (4, cell, destination, i)
+                    break
+        #escaping
+        elif cell == 29: 
+            board[29] = 0
+            event = (6, 29, destination, -1)
+        elif destination == 30 and cell == (30 - steps):
+            board[cell] = 0
+            event = (6, cell, destination, -1)
+        #attacking
+        elif board[destination] == enemy:
+            if board[destination-1] != enemy and board[destination+1] != enemy:
+                board[destination] = agent                
+                if destination > 26: #attacking Houses rule
+                    for i in range(14, -1, -1):
+                        if board[i] == 0:
+                            board[i] = enemy
+                            board[cell] = 0
+                            event = (5, cell, destination, i)
+                            break
+                else:
+                    board[cell] = enemy
+                    event = (2, cell, destination, cell)
+        #moving to empty target
+        elif board[destination] == 0:
+            board[destination] = agent
+            board[cell] = 0
+            event = (2, cell, destination, -1)
+        else:
+            raise ValueError(f"incorrect move logic, start: {cell}")
+        return GameState(board, self.enemy, event)
     #utility func for minimax
     @property
     def utility(self):
@@ -145,63 +227,4 @@ class GameState():
         #avg_f = sum(friends) / len(friends)
         #avg_e = sum(enemies) / len(enemies)
         return (f_m, e_m)
-    def skip(self):
-        """
-        return the same state with incremented turn number
-        """
-        return GameState(self.board, self.turn + 1)
-    def move(self, cell):
-        """
-        move choosen paw
-        returns a new state on success
-        or None on failure
-        """
-        if self.steps is None:
-            return None
-        elif cell not in self.moves:
-            return None
-        steps = self.steps
-        destination = cell + steps #target
-        board = self.board.copy()
-        agent = self.agent
-        enemy = agent % 2 + 1 # enemy
-        event = (0,0,0,0)
-        #drowing in House of Water
-        if destination == 26: 
-            board[cell] = 0
-            for i in range(14, -1, -1):
-                if board[i] == 0:
-                    board[i] = agent
-                    event = (3, cell, destination, i)
-                    break
-        #escaping
-        elif cell == 29: 
-            board[29] = 0
-            event = (6, 29, destination, -1)
-        elif destination == 30 and cell == (30 - steps):
-            board[cell] = 0
-            event = (6, cell, destination, -1)
-        #attacking
-        elif board[destination] == enemy:
-            if board[destination-1] != enemy and board[destination+1] != enemy:
-                board[destination] = agent                
-                if destination > 26: #attacking Houses rule
-                    for i in range(14, -1, -1):
-                        if board[i] == 0:
-                            board[i] = enemy
-                            board[cell] = 0
-                            event = (4, cell, destination, i)
-                            break
-                else:
-                    board[cell] = enemy
-                    event = (2, cell, destination, cell)
-        #moving to empty target
-        elif board[destination] == 0:
-            board[destination] = agent
-            board[cell] = 0
-            event = (1, cell, destination, -1)
-        else:
-            raise ValueError(f"incorrect move logic, start: {cell}")
-        return GameState(board, self.turn + 1, event)
-        
-         
+    
