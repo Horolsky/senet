@@ -9,28 +9,34 @@ def is_board(b):
     return True
 
 class GameState():
-    def __init__(self, board, agent, event = (0,0,0,0)):
+    def __init__(self, board, agent, event = None):
 
         if not is_board(board):
             raise ValueError("invalid board data")
         if agent not in [1,2]:
             raise ValueError("invalid agent number")
-        if type(event) is not tuple:
-            raise TypeError("invalid event data")
-        if len(event) != 4:
-            raise ValueError("invalid event data")
+        
         self._agent = agent
         self._board = board
+        if event is None:
+            event = (agent, 0,0,0,0)
+        else:
+            if type(event) is not tuple:
+                raise TypeError("invalid event data")
+            if len(event) != 5:
+                raise ValueError("invalid event data")
+
         self._event = event
         self._steps = None
         self._moves = None
         self._reverse_moves = None
+        self._repeating = False
         
     @property
     def event(self):
         """
         returns tuple with info on game event, caused by last move
-        (<eventcode>, <start>, <destination>)
+        (<agent>, <eventcode>, <start>, <destination>, <victim's destination>)
         codes:
         0 - skip movement
         1 - reverse movement
@@ -52,6 +58,8 @@ class GameState():
             raise ValueError("steps not in range")
         else:
             self._steps = s
+            if s != -1:
+                self._repeating = s in [1,4,5]
 
     #main data getters
     @property
@@ -119,9 +127,12 @@ class GameState():
             target = board[destination] #target cell value
             if target == agent: #friendly occupation
                 continue
-            elif target == enemy:
-                if board[destination + 1] == enemy or board[destination - 1] == enemy: #target is defended
+            elif target == enemy: #defended target
+                if board[destination - 1] == enemy:
                     continue
+                if destination < 29:
+                    if board[destination + 1] == enemy:
+                        continue
             #final default case
             moves.append(cell)
         
@@ -148,7 +159,7 @@ class GameState():
         board = self.board.copy()
         agent = self.agent
         enemy = self.enemy
-        event = (0,0,0,0) #default event - skipping move
+        event = (agent, 0,0,0,0) #default event - skipping move
         #reverse
         if steps == -1:
             if cell in self.moves:
@@ -157,27 +168,27 @@ class GameState():
                     for i in range(14, -1, -1):
                         if board[i] == 0:
                             board[i] = agent
-                            event = (1, cell, i, -1)
+                            event = (agent, 1, cell, i, -1)
                             break
                 else:
                     board[cell] = 0
                     board[cell-1] = agent 
-                    event = (1, cell, cell-1, -1)          
+                    event = (agent, 1, cell, cell-1, -1)          
         #drowing in House of Water
         elif destination == 26: 
             board[cell] = 0
             for i in range(14, -1, -1):
                 if board[i] == 0:
                     board[i] = agent
-                    event = (4, cell, destination, i)
+                    event = (agent, 4, cell, destination, i)
                     break
         #escaping
         elif cell == 29: 
             board[29] = 0
-            event = (6, 29, destination, -1)
+            event = (agent, 6, 29, destination, -1)
         elif destination == 30 and cell == (30 - steps):
             board[cell] = 0
-            event = (6, cell, destination, -1)
+            event = (agent, 6, cell, destination, -1)
         #attacking
         elif board[destination] == enemy:
             if board[destination-1] != enemy and board[destination+1] != enemy:
@@ -187,19 +198,20 @@ class GameState():
                         if board[i] == 0:
                             board[i] = enemy
                             board[cell] = 0
-                            event = (5, cell, destination, i)
+                            event = (agent, 5, cell, destination, i)
                             break
                 else:
                     board[cell] = enemy
-                    event = (2, cell, destination, cell)
+                    event = (agent, 2, cell, destination, cell)
         #moving to empty target
         elif board[destination] == 0:
             board[destination] = agent
             board[cell] = 0
-            event = (2, cell, destination, -1)
+            event = (agent, 2, cell, destination, -1)
         else:
             raise ValueError(f"incorrect move logic, start: {cell}")
-        return GameState(board, self.enemy, event)
+        next_player = (self.enemy, self.agent)[self._repeating]
+        return GameState(board, next_player, event)
     #utility func for minimax
     @property
     def utility(self):
@@ -227,4 +239,6 @@ class GameState():
         #avg_f = sum(friends) / len(friends)
         #avg_e = sum(enemies) / len(enemies)
         return (f_m, e_m)
+
+
     

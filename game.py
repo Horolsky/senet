@@ -5,8 +5,8 @@ throw_sticks = lambda: [r.randrange(2) for _ in range(4)]
 class Game():
     def __init__(self):
         self._running = False
-        self._state = None
-        
+        self._state = None       
+         
     
     def start_game(self, player=1):
         self._player = player
@@ -18,10 +18,12 @@ class Game():
         print(board)
         self._state = GameState(board, player)
         self._state.steps = self.steps
-
         print("game started")
     
-    def manage_move(self, cell):   
+    def manage_move(self, cell):  
+        """
+        move pawe on a given index and 
+        """ 
         newState = self.state.move(cell)   
         if newState is None:
             return False  
@@ -34,10 +36,6 @@ class Game():
     def state(self):
         if self.running:
             return self._state
-
-    @property
-    def curr_team(self):
-        return self.state.agent
     @property
     def running(self):
         return self._running
@@ -63,6 +61,6 @@ class Game():
             "turn": self.turn,
             "steps": self.state.steps,
             "bench": self.state.bench,
-            "event": self.state.event
+            "event": self.state.event,
         }
         return s
