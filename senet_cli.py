@@ -1,5 +1,5 @@
-import messages, game, player
-GAME = game.Game()
+import messages, gamecore, player
+GAME = gamecore.Game()
 
 cli_msg = {
     "h": lambda: print(messages.help),
