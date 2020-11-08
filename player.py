@@ -1,8 +1,19 @@
 import random
 
-class Player:
-    def __init__(self, decision_function):
-        self._df = decision_function
+class ArtificialPlayer:
+    def __init__(self, df): 
+        """
+        df: decision function
+        or dummy code str ("random", "first", "last")
+        """
+        if type(df) is str:
+            self._df = {
+                "random": choose_random,
+                "first": choose_first,
+                "last": choose_last
+            }.get(df)
+        elif callable(df):
+            self._df = df
     
     def choose_movement(self, state):
         """

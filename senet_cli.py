@@ -1,4 +1,5 @@
-import messages, gamemanager, player
+import messages, gamemanager
+from player import ArtificialPlayer as AI
 GAME = gamemanager.Game()
 
 cli_msg = {
@@ -14,9 +15,9 @@ cli_options = {
     "crd": "tbl",
     "brd": "tbl"
 }
-dummy_player_f = player.Player(player.choose_first)
-dummy_player_l = player.Player(player.choose_last)
-dummy_player_r = player.Player(player.choose_last)
+dummy_player_f = AI("first")
+dummy_player_l = AI("last")
+dummy_player_r = AI("random")
 
 
 
@@ -107,12 +108,12 @@ def init_loop():
         print(messages.warn)
 
 def start_game(tokens):
-    player = 1
+    firstplayer = 1
     if len(tokens) > 1:
-        player = int(tokens[1])
-        if player not in [1,2]:
-            player = 1
-    GAME.start_game(player)
+        firstplayer = int(tokens[1])
+        if firstplayer not in [1,2]:
+            firstplayer = 1
+    GAME.start_game(firstplayer)
     print("\tGAME STARTED")
     print(render_board())
 
