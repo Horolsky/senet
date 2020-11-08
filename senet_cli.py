@@ -109,33 +109,28 @@ def start_game(tokens):
         if player not in [1,2]:
             player = 1
     GAME.start_game(player)
-
+    print("\tGAME STARTED")
+    print(render_board())
 
 
 def make_move(cell):
-    success = GAME.manage_move(cell)
+    success = GAME.manage_movement(cell)
     if success:
         print(render_board())
         #victory condition
         if 5 in GAME.state.bench:
             print(f"player {('V', 'X')[GAME.state.event[0]-1]} won the game")
             print("press S to start new game")
-            GAME._running = False
-        #reverse move condition
-        elif GAME.state.steps == -1:
-            if len(GAME.state.moves) == 0:
-                success = GAME.manage_move(0)
-                #print("no avalaible moves, player must move backwards")
-            #selse:
-                #print("no avalaible backward moves, player skipping the turn")
-                #success = GAME.manage_move(0)
+            GAME.stop_game()
+        #skipping move
+        elif GAME.state.mobility == 0:
+            success = GAME.manage_movement(0)
     else:
         print("choosen movement is impossible")
 def toggle_option(tokens):
     option, value = tokens
     if option not in ["brd", "crd"] or value not in ["lin", "tbl"]:
-        #raise ValueError("invalid option arguments")
-        return
+        raise ValueError("invalid option arguments")
     cli_options[option] = value
     print(f"option {option} set to {value}")
     
@@ -177,7 +172,6 @@ def render_board():
     #EVENT MSG
     agent =  ('V', 'X')[GAME.state.agent-1]
     event_msg = ""
-    
     if GAME.turn == 0:
         event_msg = "game starts"
     else:
@@ -193,19 +187,18 @@ def render_board():
             5: f"{previous} from {start} attacked enemy on {destination}. His victim rebourned on {victim_destination}",
             6: f"{previous} from {start} has successfully escaped the board",
         }.get(code)
-    rvrs = ""
+    #MOVES MSG
+    moves_msg = {
+        1: f"possible moves: {', '.join(map(get_pos, GAME.state.moves))}",
+        -1: f"player cannot move forward, possible reverse moves: {', '.join(map(get_pos, GAME.state.moves))}",
+        0: "no avaliable moves, player skips the turn"
+        }.get(GAME.state.mobility)
     
-    if len(GAME.state.moves) == 0:
-        rvrs = "no avaliable moves, player skip the turn"
-    elif GAME.state.steps == -1:
-        rvrs = "player moves backwards"
-
     stats = f"""
     {event_msg}
     bench: V - {GAME.state.bench[0]}, X - {GAME.state.bench[1]}
     turn: {GAME.turn}, player {agent} is moving for {GAME.state.steps} steps
-    possible moves: {', '.join(map(get_pos, GAME.state.moves))}
-    {rvrs}
+    {moves_msg}
     """
     return f"{board}\n{stats}"
 

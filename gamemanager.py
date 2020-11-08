@@ -1,52 +1,57 @@
 import random as r
 from gamestate import GameState
-throw_sticks = lambda: [r.randrange(2) for _ in range(4)] 
+
 
 class Game():
     def __init__(self):
-        self._running = False
-        self._state = None       
-         
+        self.__running = False
+        self.__state = None       
+        self.__sticks = None
+        self.__turn = None
     
     def start_game(self, firstplayer=1):
-        self._running = True
-        self._turn = 0
+        self.__running = True
+        self.__turn = 0
+        self.__sticks = Game.throw_sticks()
         board = [x+1 for _ in range(5) for x in range(2)] + [0 for _ in range(20)]
-        
-        self._sticks = throw_sticks()
-        print(board)
-        self._state = GameState(board, firstplayer)
-        self._state.steps = self.steps
-        print("game started")
-    
-    def manage_move(self, cell):  
+        self.__state = GameState(board, firstplayer, self.steps)
+    def stop_game(self):
+        self.__running = False
+    def manage_movement(self, cell):  
         """
-        move pawe on a given index and 
+        move pawn on a given index 
         """ 
-        newState = self.state.move(cell)   
-        if newState is None:
+        newsticks = Game.throw_sticks()
+        newstate = self.state.increment(cell, Game.__get_steps(newsticks))   
+        if newstate is None:
             return False  
-        self._sticks = throw_sticks()
-        newState.steps = self.steps
-        self._turn += 1
-        self._state = newState
-        return True
+        else:
+            self.__sticks = newsticks
+            self.__state = newstate
+            self.__turn += 1
+            return True
     @property
     def state(self):
         if self.running:
-            return self._state
+            return self.__state
     @property
     def running(self):
-        return self._running
+        return self.__running
     @property
     def turn(self):
-        return self._turn
+        return self.__turn
     @property
     def sticks(self):
-        return self._sticks
+        return self.__sticks
     @property
     def steps(self):        
-        s = sum(self.sticks)
+        return Game.__get_steps(self.sticks)
+    @staticmethod
+    def throw_sticks():
+        return [r.randrange(2) for _ in range(4)] 
+    @staticmethod
+    def __get_steps(sticks):
+        s = sum(sticks)
         if s == 0:
             s = 5
         return s

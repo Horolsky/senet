@@ -13,11 +13,11 @@ Basic controls:
 
 How to play:
  Press s to start new game. 
- To make a turn enter a cell coordinates with your paw in form
+ To make a turn enter a cell coordinates with your pawn in form
  r c
  where r stands for number of row (1-3) 
  and c - for column (1-10, from left to right).
- Note that on the second row paws are moving from right to left,
+ Note that on the second row pawns are moving from right to left,
  but that does not affect the cell coordinates. 
  """
 
@@ -42,8 +42,8 @@ options = """
 List of avaliable options:
 
   COORDINATES MODE. There are two options:
-  - linear: to make move enter a number of cell with controlled paw (1-30)
-  - tabular: to make move enter a row and column of cell with controlled paw. This is default option.
+  - linear: to make move enter a number of cell with controlled pawn (1-30)
+  - tabular: to make move enter a row and column of cell with controlled pawn. This is default option.
   Note that the movement direction in the second row does not affect the column numbering, which tarts from left. 
   Commands:
     o crd tbl - toggle tabular mode (t <row> <column>)

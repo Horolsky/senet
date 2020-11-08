@@ -1,4 +1,4 @@
-def is_board(b):
+def is__board(b):
     if type(b) is not list:
         return False
     if len(b) != 30:
@@ -9,15 +9,15 @@ def is_board(b):
     return True
 
 class GameState():
-    def __init__(self, board, agent, event = None):
-
-        if not is_board(board):
+    def __init__(self, board, agent, steps, event = None):
+        if not is__board(board):
             raise ValueError("invalid board data")
+        self.__board = board
         if agent not in [1,2]:
             raise ValueError("invalid agent number")
+        self.__agent = agent
+        self.__enemy = agent % 2 + 1
         
-        self._agent = agent
-        self._board = board
         if event is None:
             event = (agent, 0,0,0,0)
         else:
@@ -25,12 +25,35 @@ class GameState():
                 raise TypeError("invalid event data")
             if len(event) != 5:
                 raise ValueError("invalid event data")
-
-        self._event = event
-        self._steps = None
-        self._moves = None
-        self._repeating = False
-        
+        self.__event = event
+        if steps not in [1,2,3,4,5]:
+            raise ValueError("invalid steps value")
+        self.__steps = steps
+        self.__am = steps in [1,4,5] #additional move
+        self.__bench = GameState.get_bench(board)
+        #cached data
+        self.__moves = None
+        self.__mobility = None
+        self.__utility = None
+    #main data getters
+    @property
+    def board(self):
+        return self.__board.copy()
+    @property
+    def agent(self): #current player number
+        return self.__agent
+    @property
+    def enemy(self):
+        return self.__enemy
+    @property
+    def bench(self):
+        return self.__bench
+    @property
+    def steps(self):
+        return self.__steps
+    @property
+    def additional_move(self):
+        return self.__am
     @property
     def event(self):
         """
@@ -45,134 +68,50 @@ class GameState():
         5 - swaping on Houses with reborning
         6 - escaping 
         """
-        return self._event
-    @property
-    def steps(self):
-        return self._steps
-    @steps.setter
-    def steps(self, s):
-        if type(s) is not int:
-            raise TypeError("steps value must be int")
-        elif s not in [-1,1,2,3,4,5]:
-            raise ValueError("steps not in range")
-        else:
-            self._steps = s
-            if s != -1:
-                self._repeating = s in [1,4,5]
-
-    #main data getters
-    @property
-    def board(self):
-        return self._board
-    @property
-    def agent(self): #current player number
-        return self._agent
-    @agent.setter
-    def sgent(self, newAg):
-        if newAg not in [1,2]:
-            raise ValueError("invalid agent number")
-        self._agent = newAg
-    @property
-    def enemy(self):
-        return self.agent % 2 + 1
-
-    #dependent cached data getters
-    @property
-    def bench(self):
-        team1, team2 = 5, 5
-        for cell in self.board:
-            if cell == 1:
-                team1 -= 1
-            elif cell == 2:
-                team2 -= 1
-        return (team1, team2)
+        return self.__event
     @property
     def moves(self):
+        if self.__moves is None:
+            self.__set_cached_data()
+        return self.__moves.copy()
+    @property
+    def mobility(self):
+        if self.__mobility is None:
+            self.__set_cached_data()
+        return self.__mobility
+    def increment(self, cell, newsteps):
         """
-        returns possible moves of the current state
-        if the steps value is set
-        """
-        if self.steps is None:
-            return None
-        #cache
-        moves = self._moves
-        if moves is not None:
-            return moves
-        else:
-            moves = []
-        #calculating
-        board = self.board
-        steps = self.steps
-        agent = self.agent
-        enemy = self.enemy
-        for cell in range(30): #c is cell index
-            #filling array by exclusion:
-            #cell is not under control
-            if board[cell] != agent:
-                continue
-            destination = cell + steps #destination index
-            #escaping cases
-            if cell == 29: #always escaping 
-                moves.append(cell)
-                continue
-            if cell in [27,28] and destination == 30: #correct escaping
-                moves.append(cell)     
-                continue
-            if destination > 25 and cell != 25: #incorrect house arriving
-                continue
-            if destination > 29: #incorrect escaping
-                continue
-            #target occupation cases
-            target = board[destination] #target cell value
-            if target == agent: #friendly occupation
-                continue
-            elif target == enemy: #defended target
-                if board[destination - 1] == enemy:
-                    continue
-                if destination < 29:
-                    if board[destination + 1] == enemy:
-                        continue
-            #final default case
-            moves.append(cell)
-        
-        #reverse moves
-        if len(moves) == 0:
-            self.steps = -1
-            for cell in range(28):
-                if board[cell] == 0 and board[cell + 1] == agent:
-                    moves.append(cell+1)
-        self._moves = moves
-        return moves               
-    def move(self, cell):
-        """
-        move choosen paw
+        move choosen pawn
         returns a new state on success or None on failure
         if no possible moves, returns the same state with swaped agent
         """
-        if self.steps is None:
+        next_player = (self.enemy, self.__agent)[self.__am]
+        # skipping move
+        if self.__mobility == 0:
+            return GameState(self.__board, next_player, newsteps, self.__event)
+        # incorrect cell index
+        if cell not in self.__moves:
             return None
-        elif self.steps > 0 and cell not in self.moves:
-            return None
-        steps = self.steps
+        # movement cases
+        steps = self.__steps
         destination = cell + steps #target
-        board = self.board.copy()
-        agent = self.agent
+        board = self.__board
+        agent = self.__agent
         enemy = self.enemy
-        event = (agent, 0,0,0,0) #default event - skipping move
+        event = self.__event 
         #reverse
-        if steps == -1:
-            if cell in self.moves:
-                if cell == 27: #reverse to House of Waters
-                    board[cell] = 0
-                    for i in range(14, -1, -1):
-                        if board[i] == 0:
-                            board[i] = agent
-                            event = (agent, 1, cell, i, -1)
-                            break
-                else:
-                    board[cell] = 0
-                    board[cell-1] = agent 
-                    event = (agent, 1, cell, cell-1, -1)          
+        if self.__mobility == -1:
+            if cell == 27: #reverse to House of Waters
+                board[cell] = 0
+                for i in range(14, -1, -1):
+                    if board[i] == 0:
+                        board[i] = agent
+                        event = (agent, 1, cell, i, -1)
+                        break
+            else:
+                board[cell] = 0
+                board[cell-1] = agent 
+                event = (agent, 1, cell, cell-1, -1)          
         #drowing in House of Water
         elif destination == 26: 
             board[cell] = 0
@@ -209,8 +148,22 @@ class GameState():
             event = (agent, 2, cell, destination, -1)
         else:
             raise ValueError(f"incorrect move logic, start: {cell}")
-        next_player = (self.enemy, self.agent)[self._repeating]
-        return GameState(board, next_player, event)
+        return GameState(board, next_player, newsteps, event)
+
+    def __set_cached_data(self):
+        mobility = 1 # 1 for normal movement, -1 for reverse, 0 for skipping
+        no_direct_moves, no_reverse_moves = False, False
+        moves = GameState.get_moves(self.__board, self.__agent, self.__steps)
+        no_direct_moves = len(moves) == 0
+        if no_direct_moves:
+            mobility = -1
+            moves = GameState.get_moves(self.__board, self.__agent, -1)
+            no_reverse_moves = len(moves) == 0
+            if no_reverse_moves:
+                mobility = 0
+        self.__moves = moves
+        self.__mobility = mobility
+
     #utility func for minimax
     @property
     def utility(self):
@@ -239,5 +192,58 @@ class GameState():
         #avg_e = sum(enemies) / len(enemies)
         return (f_m, e_m)
 
-
+    @staticmethod
+    def get_moves(board, agent, steps):
+        """
+        returns list of possible moves 
+        """
+        if steps not in [-1,1,2,3,4,5] or agent not in [1,2] or not is__board(board):
+            raise ValueError("corrupted data")
+        moves = []
+        enemy = agent % 2 +1
+        #reverse moves
+        if steps == -1:
+            for cell in range(28):
+                if board[cell] == 0 and board[cell + 1] == agent:
+                    moves.append(cell+1)
+            return moves
+        #else: normal moves, filling array by exclusion:
+        for cell in range(30): #cell index
+            #cell is not under control
+            if board[cell] != agent:
+                continue
+            destination = cell + steps #destination index
+            #escaping cases
+            if cell == 29: #always escaping 
+                moves.append(cell)
+                continue
+            if cell in [27,28] and destination == 30: #correct escaping
+                moves.append(cell)     
+                continue
+            if destination > 25 and cell != 25: #incorrect house arriving
+                continue
+            if destination > 29: #incorrect escaping
+                continue
+            #target occupation cases
+            target = board[destination] #target cell value
+            if target == agent: #friendly occupation
+                continue
+            elif target == enemy: #defended target
+                if board[destination - 1] == enemy:
+                    continue
+                if destination < 29:
+                    if board[destination + 1] == enemy:
+                        continue
+            #final default case
+            moves.append(cell)
+        return moves  
     
+    @staticmethod
+    def get_bench(board):
+        team1, team2 = 5, 5
+        for cell in board:
+            if cell == 1:
+                team1 -= 1
+            elif cell == 2:
+                team2 -= 1
+        return (team1, team2)
