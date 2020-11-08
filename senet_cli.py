@@ -45,7 +45,11 @@ def get_index(tokens):
 
 
 def init_loop():
-    print("Welcome to SENET Game")
+    print("""
+//////////////////////////////    
+    Welcome to SENET Game
+//////////////////////////////
+    """)
     cli_msg['h']()
 
     while True:
@@ -57,7 +61,7 @@ def init_loop():
         if cmd == "q": #or cmd == "Q":
             if GAME.running:
                 conf = input(messages.confirm_q)
-                if conf != "Y": #and conf != "y":
+                if conf != "Y" and conf != "y":
                     continue
             break
         # messages request
