@@ -29,13 +29,12 @@ class GameState():
         self._event = event
         self._steps = None
         self._moves = None
-        self._reverse_moves = None
         self._repeating = False
         
     @property
     def event(self):
         """
-        returns tuple with info on game event, caused by last move
+        tuple with info on game event, caused by last move
         (<agent>, <eventcode>, <start>, <destination>, <victim's destination>)
         codes:
         0 - skip movement

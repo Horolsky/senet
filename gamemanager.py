@@ -8,15 +8,14 @@ class Game():
         self._state = None       
          
     
-    def start_game(self, player=1):
-        self._player = player
+    def start_game(self, firstplayer=1):
         self._running = True
         self._turn = 0
         board = [x+1 for _ in range(5) for x in range(2)] + [0 for _ in range(20)]
         
         self._sticks = throw_sticks()
         print(board)
-        self._state = GameState(board, player)
+        self._state = GameState(board, firstplayer)
         self._state.steps = self.steps
         print("game started")
     
@@ -40,9 +39,6 @@ class Game():
     def running(self):
         return self._running
     @property
-    def player(self):
-        return self._player
-    @property
     def turn(self):
         return self._turn
     @property
@@ -53,14 +49,4 @@ class Game():
         s = sum(self.sticks)
         if s == 0:
             s = 5
-        return s
-    @property
-    def status(self):
-        s = {
-            "agent": self.state.agent,
-            "turn": self.turn,
-            "steps": self.state.steps,
-            "bench": self.state.bench,
-            "event": self.state.event,
-        }
         return s

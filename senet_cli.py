@@ -1,5 +1,5 @@
-import messages, gamecore, player
-GAME = gamecore.Game()
+import messages, gamemanager, player
+GAME = gamemanager.Game()
 
 cli_msg = {
     "h": lambda: print(messages.help),
@@ -175,16 +175,15 @@ def render_board():
     elif cli_options["brd"] == "lin":
         board = " ".join(map(symb, b)) 
     #EVENT MSG
-    s = GAME.status
-    agent =  ['V', 'X'][s['agent'] - 1]
+    agent =  ('V', 'X')[GAME.state.agent-1]
     event_msg = ""
     
     if GAME.turn == 0:
         event_msg = "game starts"
     else:
-        code = s['event'][1]
-        previous = ['V', 'X'][s['event'][0] - 1]
-        start, destination, victim_destination = map(get_pos, s['event'][2:])
+        code = GAME.state.event[1]
+        previous = ('V', 'X')[GAME.state.event[0]-1]
+        start, destination, victim_destination = map(get_pos, GAME.state.event[2:])
         event_msg = {
             0: f"{previous} skipped the turn",
             1: f"{previous} reversed from {start} to {destination}",
@@ -203,8 +202,8 @@ def render_board():
 
     stats = f"""
     {event_msg}
-    bench: V - {s['bench'][0]}, X - {s['bench'][1]}
-    turn: {s['turn']}, player {agent} is moving for {s['steps']} steps
+    bench: V - {GAME.state.bench[0]}, X - {GAME.state.bench[1]}
+    turn: {GAME.turn}, player {agent} is moving for {GAME.state.steps} steps
     possible moves: {', '.join(map(get_pos, GAME.state.moves))}
     {rvrs}
     """
