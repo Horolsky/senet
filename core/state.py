@@ -8,6 +8,17 @@ def is__board(b):
             return False
     return True
 
+def is_defended(board, pos):
+    if not is__board(board):
+        raise TypeError("invalid board arg")
+    if board[pos] == 0:
+        return False
+    if pos > 0 and board[pos - 1] == board[pos]:
+        return True
+    if pos < 29 and board[pos + 1] == board[pos]:
+        return True
+    return False
+
 class state():
     def __init__(self, board, agent, steps, event = None):
         """
@@ -181,7 +192,7 @@ class state():
             event = (agent, 6, cell, destination, -1)
         #attacking
         elif board[destination] == enemy:
-            if board[destination-1] != enemy and board[destination+1] != enemy:
+            if is_defended(board, destination):
                 board[destination] = agent                
                 if destination > 26: #attacking Houses rule
                     for i in range(14, -1, -1):
@@ -277,12 +288,8 @@ class state():
             target = board[destination] #target cell value
             if target == agent: #friendly occupation
                 continue
-            elif target == enemy: #defended target
-                if board[destination - 1] == enemy:
-                    continue
-                if destination < 29:
-                    if board[destination + 1] == enemy:
-                        continue
+            elif target == enemy and is_defended(board, destination): #defended target
+                continue
             #final default case
             moves.append(cell)
         return tuple(moves)  
