@@ -8,8 +8,15 @@ def is__board(b):
             return False
     return True
 
-class GameState():
+class state():
     def __init__(self, board, agent, steps, event = None):
+        """
+        immutable game state class
+        @param board: list
+        @param agent: int
+        @param steps: int
+        @param event: tuple
+        """
         if not is__board(board):
             raise ValueError("invalid board data")
         self.__board = board
@@ -30,7 +37,7 @@ class GameState():
             raise ValueError("invalid steps value")
         self.__steps = steps
         self.__am = steps in [1,4,5] #additional move
-        self.__bench = GameState.get_bench(board)
+        self.__bench = state.get_bench(board)
         #cached data
         self.__moves = None
         self.__mobility = None
@@ -88,7 +95,7 @@ class GameState():
         next_player = (self.enemy, self.__agent)[self.__am]
         # skipping move
         if self.__mobility == 0:
-            return GameState(self.__board, next_player, newsteps, self.__event)
+            return state(self.__board, next_player, newsteps, self.__event)
         # incorrect cell index
         if cell not in self.__moves:
             return None
@@ -148,16 +155,16 @@ class GameState():
             event = (agent, 2, cell, destination, -1)
         else:
             raise ValueError(f"incorrect move logic, start: {cell}")
-        return GameState(board, next_player, newsteps, event)
+        return state(board, next_player, newsteps, event)
 
     def __set_cached_data(self):
         mobility = 1 # 1 for normal movement, -1 for reverse, 0 for skipping
         no_direct_moves, no_reverse_moves = False, False
-        moves = GameState.get_moves(self.__board, self.__agent, self.__steps)
+        moves = state.get_moves(self.__board, self.__agent, self.__steps)
         no_direct_moves = len(moves) == 0
         if no_direct_moves:
             mobility = -1
-            moves = GameState.get_moves(self.__board, self.__agent, -1)
+            moves = state.get_moves(self.__board, self.__agent, -1)
             no_reverse_moves = len(moves) == 0
             if no_reverse_moves:
                 mobility = 0

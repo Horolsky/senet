@@ -1,6 +1,6 @@
 import random
 
-class ArtificialPlayer:
+class agent:
     def __init__(self, df): 
         """
         df: decision function

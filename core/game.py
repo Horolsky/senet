@@ -1,9 +1,12 @@
 import random as r
-from gamestate import GameState
+from .state import state
 
 
-class Game():
+class game():
     def __init__(self):
+        """
+        game logic manager
+        """
         self.__running = False
         self.__state = None       
         self.__sticks = None
@@ -12,17 +15,17 @@ class Game():
     def start_game(self, firstplayer=1):
         self.__running = True
         self.__turn = 0
-        self.__sticks = Game.throw_sticks()
+        self.__sticks = game.throw_sticks()
         board = [x+1 for _ in range(5) for x in range(2)] + [0 for _ in range(20)]
-        self.__state = GameState(board, firstplayer, self.steps)
+        self.__state = state(board, firstplayer, self.steps)
     def stop_game(self):
         self.__running = False
     def manage_movement(self, cell):  
         """
         move pawn on a given index 
         """ 
-        newsticks = Game.throw_sticks()
-        newstate = self.state.increment(cell, Game.__get_steps(newsticks))   
+        newsticks = game.throw_sticks()
+        newstate = self.state.increment(cell, game.__get_steps(newsticks))   
         if newstate is None:
             return False  
         else:
@@ -45,7 +48,7 @@ class Game():
         return self.__sticks
     @property
     def steps(self):        
-        return Game.__get_steps(self.sticks)
+        return game.__get_steps(self.sticks)
     @staticmethod
     def throw_sticks():
         return [r.randrange(2) for _ in range(4)] 
