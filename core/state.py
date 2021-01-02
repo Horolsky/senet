@@ -1,5 +1,5 @@
 def is__board(b):
-    if type(b) is not list:
+    if type(b) not in (list, tuple):
         return False
     if len(b) != 30:
         return False
@@ -19,7 +19,7 @@ class state():
         """
         if not is__board(board):
             raise ValueError("invalid board data")
-        self.__board = board
+        self.__board = tuple(board)
         if agent not in [1,2]:
             raise ValueError("invalid agent number")
         self.__agent = agent
@@ -45,7 +45,7 @@ class state():
     #main data getters
     @property
     def board(self):
-        return self.__board.copy()
+        return self.__board
     @property
     def agent(self): #current player number
         return self.__agent
@@ -102,9 +102,9 @@ class state():
         # movement cases
         steps = self.__steps
         destination = cell + steps #target
-        board = self.__board
+        board = list(self.__board) #copy
         agent = self.__agent
-        enemy = self.enemy
+        enemy = self.__enemy
         event = self.__event 
         #reverse
         if self.__mobility == -1:
@@ -159,14 +159,11 @@ class state():
 
     def __set_cached_data(self):
         mobility = 1 # 1 for normal movement, -1 for reverse, 0 for skipping
-        no_direct_moves, no_reverse_moves = False, False
         moves = state.get_moves(self.__board, self.__agent, self.__steps)
-        no_direct_moves = len(moves) == 0
-        if no_direct_moves:
+        if len(moves) == 0: #no direct moves
             mobility = -1
             moves = state.get_moves(self.__board, self.__agent, -1)
-            no_reverse_moves = len(moves) == 0
-            if no_reverse_moves:
+            if len(moves) == 0: #no reverse moves
                 mobility = 0
         self.__moves = moves
         self.__mobility = mobility
