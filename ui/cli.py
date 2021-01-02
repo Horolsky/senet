@@ -1,7 +1,7 @@
 from core import game
 from agent import agent
 from .msg_cli import messages as msg
-from ui import rules
+from ui.rules import rules
 
 msgout = {
     "h": lambda: print(msg["help"]),
