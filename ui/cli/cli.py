@@ -1,69 +1,94 @@
-from core import game
-from agent import agent
-from .msg_cli import messages as msg
+from core import game, state, agent
+from .msg_cli import msgout#messages as msg
 from ui.rules import rules
-
-msgout = {
-    "h": lambda: print(msg["help"]),
-    "r": lambda: print(rules),
-    "i": lambda: print(msg["info"]),
-    "b": lambda: print(render_board()),
-    "m": lambda: print(self.game.state.moves),
-    "u": lambda: print(self.game.state.utility)
-}
 
 dummy_player_f = agent("first")
 dummy_player_l = agent("last")
 dummy_player_r = agent("random")
 
+
 class cli:
     def __init__(self):
-        self.__game = game()
+        self.__game = game(self._on_move, self._on_victory)
         self.__options = { "crd": "tbl", "brd": "tbl" }
 
     @property
     def game(self):
         return self.__game
+   
     @property
     def options(self):
         return self.__options
     
     def init(self):
         print("Welcome to SENET Game")
-        msgout['h']()
+        self.msgout('h')
+        self.ask_human()
+
+    def start(self, tokens):
+        """
+        @param tokens: list
+        0: <cmd>    "s"
+        1: <agent1> "human", "ai", "dummy"
+        2: <agent2> "human", "ai", "dummy"
+        3: <first>  1, 2
+        """
+        if type(tokens) is not list or len(tokens) < 3:
+            return
+        #agents
+        agents = {
+            "human": agent(self.ask_human),
+            "ai": dummy_player_r, #TODO
+            "dummy": dummy_player_r 
+            }
+        agent1, agent2 = tokens[1:3]
+        if type(agent1) is str:
+            agent1 = agents.get(agent1)
+        if type(agent2) is str:
+            agent2 = agents.get(agent2)
+        if not (type(agent1) is type(agent2) is agent):
+            return
+        #default first player pawns
+        first = 1
+        if len(tokens) == 4:
+            first = int(tokens[3])
+            if first not in [1,2]:
+                first = 1
+        self.msgout("\tGAME STARTED")
+        #self.msgout(self.stringify_board())
+        self.game.start(agent1, agent2, first)
+    
+    def ask_human(self, state=0):
+        """
+        @return: int
+        manage cli io-loop
+        if cmd is turn and game is running,
+        return cell number
+        """
+        movement = -1 #default invalid move
         while True:
-            tks = input("senet: ").lower().split(None, 2)
+            tks = input("human: ").lower().split(None, 2)
             if len(tks) < 1:
                 continue
             cmd = tks[0]
             # terminating loop
             if cmd == "q": #or cmd == "Q":
                 if self.game.running:
-                    conf = input(msg["confirm_q"])
+                    self.msgout("confirm_q")
+                    conf = input("human: ")
                     if conf != "Y" and conf != "y":
                         continue
                 break
             # msg request
             if cmd in ['h', 'r', 'i', 'g']:
-                msgout[cmd]()
+                self.msgout(cmd)
                 continue
             if cmd in [ 'b', 'm', 'u' ] and self.game.running:
-                msgout[cmd]()
-                continue
-            # actions
-            if cmd == 's':
-                if self.game.running:
-                    conf = input(msg["confirm_s"]).lower()
-                    if conf != "y": #or conf == "y":
-                        continue
-                self.start(tks)
-                continue
-            if cmd == 't' and len(tks) > 1 and self.game.running:
-                self.make_move(self.get_index(tks[1:]))
+                self.msgout(cmd)
                 continue
             if cmd == 'o':
                 if len(tks) == 1:
-                    print(msg["options"])
+                    self.msgout("options")
                     continue
                 elif len(tks) > 1:
                     if tks[1] == "list":
@@ -72,57 +97,74 @@ class cli:
                     elif len(tks) == 3:
                         self.toggle_option(tks[1:])
                         continue
+            
             if cmd == 'auto':
-                if not self.game.running:
-                    continue
-                while self.game.running:   
-                    move = 0
-                    dummy = [dummy_player_r, dummy_player_f][self.game.state.agent - 1]
-                    if len(self.game.state.moves) > 0:
-                        move = dummy.choose_movement(self.game.state)
-                    self.make_move(move)
+                if self.game.running:
+                    self.msgout("to start autoplay terminate current game")
+                else:
+                    self.start(["s", "dummy", "dummy", 1])
+                    #break
                 continue
-            # default error msg
-            print(msg["warn"])
+            # actions
+            if cmd == 's':
+                if self.game.running:
+                    self.msgout("confirm_s")
+                    conf = input("human: ").lower()
+                    if conf == "y": 
+                        self.game.stop()
+                else:
+                    self.start(tks)
+                #break
+            if cmd[0] in "0123456789" and self.game.running:
+                m = self.get_index(tks)
+                if m in self.game.state.moves:
+                    movement = m
+                    break
+                else:
+                    self.msgout("choosen movement is impossible")
+                    continue
+        return movement
 
-    def start(self, tokens):
-        firstplayer = 1
-        if len(tokens) > 1:
-            firstplayer = int(tokens[1])
-            if firstplayer not in [1,2]:
-                firstplayer = 1
-        self.game.start_game(firstplayer)
-        print("\tGAME STARTED")
-        print(self.render_board())
+    def _on_victory(self, agent):
+        """
+        @param agent: int (1, 2)
+        """
+        self.msgout(f"player {('V', 'X')[agent-1]} won the game")
+        self.msgout("press S to start new game")
+    
+    def _on_move(self):
+        """
+        @param agent: int (1, 2)
+        """
+        self.msgout("b")
 
-    def make_move(self, cell):
-        success = self.game.manage_movement(cell)
-        if success:
-            print(self.render_board())
-            #victory condition
-            if 5 in self.game.state.bench:
-                print(f"player {('V', 'X')[self.game.state.event[0]-1]} won the game")
-                print("press S to start new game")
-                self.game.stop_game()
-            #skipping move
-            elif self.game.state.mobility == 0:
-                success = self.game.manage_movement(0)
+    def msgout(self, msg):
+        reqmsg = {
+            "h": lambda: msgout("help"),
+            "r": lambda: msgout(rules),
+            "i": lambda: msgout("info"),
+            "b": lambda: msgout(self.stringify_board()),
+            "m": lambda: msgout(self.game.state.moves),
+            "u": lambda: msgout(self.game.state.utility)
+            }
+        if msg in reqmsg:
+            reqmsg[msg]()
         else:
-            print("choosen movement is impossible")
-
+            msgout(msg)
+    
     def toggle_option(self, tokens):
         option, value = tokens
         if option not in ["brd", "crd"] or value not in ["lin", "tbl"]:
             raise ValueError("invalid option arguments")
         self.options[option] = value
-        print(f"option {option} set to {value}")
+        self.msgout(f"option {option} set to {value}")
         
     def print_options(self):
-        print("self.game OPTIONS STATE:")
+        self.msgout("OPTIONS STATE:")
         for option in self.options:
-            print(f"{option}: {self.options[option]}")
+            self.msgout(f"{option}: {self.options[option]}")
 
-    def render_board(self):
+    def stringify_board(self):
         b = self.game.state.board
         board = ""
         def symb(n):
@@ -178,14 +220,13 @@ class cli:
             }.get(self.game.state.mobility)
         
         stats = f"""
-        {event_msg}
-        bench: V - {self.game.state.bench[0]}, X - {self.game.state.bench[1]}
-        turn: {self.game.turn}, player {agent} is moving for {self.game.state.steps} steps
+        player {agent} is moving for {self.game.state.steps} steps
         {moves_msg}
+        bench: V - {self.game.state.bench[0]}, X - {self.game.state.bench[1]}
         """
-        return f"{board}\n{stats}"
+        return f"turn: {self.game.turn}, {event_msg}\n{board}\n{stats}"
 
-    def get_pos(self, index):#FIXME
+    def get_pos(self, index):
         mode = self.options["crd"]
         if mode == "lin":
             return str(index + 1)
