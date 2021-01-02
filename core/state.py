@@ -12,7 +12,7 @@ class state():
     def __init__(self, board, agent, steps, event = None):
         """
         immutable game state class
-        @param board: list
+        @param board: list or tuple
         @param agent: int
         @param steps: int
         @param event: tuple
@@ -42,29 +42,62 @@ class state():
         self.__moves = None
         self.__mobility = None
         self.__utility = None
+    
     #main data getters
     @property
     def board(self):
+        """
+        a tuple of numbers, representing game board
+        0 is for an empty cell
+        1 and is for a pawn of a corresponding agent
+        """
         return self.__board
+    
     @property
-    def agent(self): #current player number
+    def agent(self): 
+        """
+        current player number
+        1 or 2
+        """
         return self.__agent
+    
     @property
     def enemy(self):
+        """
+        current player's enemy number
+        1 or 2
+        """
         return self.__enemy
+    
     @property
     def bench(self):
+        """
+        a tuple with number of escaped pawns for both teams
+        """
         return self.__bench
+
     @property
     def steps(self):
+        """
+        number of steps to move forward,
+        calculated from thrown sticks.
+        if mobility is 0 or -1,
+        this value stays unchanged
+        """
         return self.__steps
+    
     @property
     def additional_move(self):
+        """
+        1 if next move belongs to the same agent
+        0 otherwise
+        """
         return self.__am
+    
     @property
     def event(self):
         """
-        tuple with info on game event, caused by previous move
+        a tuple with info on the previous turn event
         (<agent>, <eventcode>, <start>, <destination>, <victim's destination>)
         codes:
         0 - skip movement
@@ -76,16 +109,28 @@ class state():
         6 - escaping 
         """
         return self.__event
+    
     @property
     def moves(self):
+        """
+        if no possible moves for current steps,
+        reverse moves will be calculated
+        """
         if self.__moves is None:
             self.__set_cached_data()
-        return self.__moves.copy()
+        return self.__moves
+    
     @property
     def mobility(self):
+        """
+        1 for normal movement
+        0 for no possible moves
+        -1 for reverse movement
+        """
         if self.__mobility is None:
             self.__set_cached_data()
         return self.__mobility
+    
     def increment(self, cell, newsteps):
         """
         move choosen pawn
@@ -199,7 +244,7 @@ class state():
     @staticmethod
     def get_moves(board, agent, steps):
         """
-        returns list of possible moves 
+        returns list of possible moves for a given state
         """
         if steps not in [-1,1,2,3,4,5] or agent not in [1,2] or not is__board(board):
             raise ValueError("corrupted data")
@@ -240,7 +285,7 @@ class state():
                         continue
             #final default case
             moves.append(cell)
-        return moves  
+        return tuple(moves)  
     
     @staticmethod
     def get_bench(board):

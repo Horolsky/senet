@@ -2,9 +2,9 @@ messages = {
   "help" : """
     Basic controls:
       q - quit game
-      s - start new game or restart running one
-      g - show game status
-      b - render game board
+      s - start new game or stop the running one
+      a - start autoplay
+      b - render the game board
       h - show help info
       r - show rules
       i - detailed info about the game
@@ -14,17 +14,21 @@ messages = {
     All commands are case insensitive
 
     How to play:
-    Press s to start new game. 
-    Pawns are represented as V and X for 1st and 2nd player
-    To make a turn enter a T command with coordinates of choosen pawn to move, 
-    in form T <row> <cell>, for tabular mode, or
-    T <index> for linear mode.
+    Pawns of two players are represented on the board as V and X
+    To start new game enter next command with desired options:
+      s <player 1> <player 2> <first> 
+    options for this command:
+      <player #> - choose "human", "ai" or "dummy"
+      <first> - choose pawns troupe (1 or 2) for the first player
+      if omitted, first player will start with Y by default
+      
+    To make a turn enter a coordinates of choosen pawn to move, 
+    in form <row> <cell> for tabular mode, 
+    or <index> for linear mode.
     In both modes indexation starts from 1.
 
     Note that on the second row pawns are moving from right to left,
     but that does not affect the cell coordinates in tabular mode. 
-
-    to test the game without manual control enter "auto" after the game start
     """,
 
   "info" : """
@@ -65,6 +69,6 @@ messages = {
 
 def msgout(msg):
   if msg in messages:
-    print("senet: " + messages[msg])
+    print("\nsenet: " + messages[msg])
   else:
-    print("senet: " + msg)
+    print("\nsenet: " + msg)

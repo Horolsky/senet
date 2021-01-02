@@ -3,7 +3,7 @@ import random
 class agent:
     def __init__(self, dfunc): 
         """
-        df: decision function
+        dfunc: decision function
         or dummy code str ("random", "first", "last")
         """
         if dfunc in ("random", "first", "last"):
@@ -19,7 +19,7 @@ class agent:
     
     def choose_movement(self, state):
         """
-        accepts a GameState object
+        accepts a core.state object
         return an index of a choosen movement
         decision is based on initial decision_function
         """

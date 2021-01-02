@@ -14,24 +14,30 @@ class cli:
 
     @property
     def game(self):
+        """
+        instance of a core.game class
+        """
         return self.__game
    
     @property
     def options(self):
+        """
+        dict
+        """
         return self.__options
     
     def init(self):
-        print("Welcome to SENET Game")
+        self.msgout("Welcome to SENET Game")
         self.msgout('h')
         self.ask_human()
 
     def start(self, tokens):
         """
         @param tokens: list
-        0: <cmd>    "s"
-        1: <agent1> "human", "ai", "dummy"
-        2: <agent2> "human", "ai", "dummy"
-        3: <first>  1, 2
+        0: <cmd>        "s"
+        1: <player 1>   "human", "ai", "dummy"
+        2: <player 2>   "human", "ai", "dummy"
+        3: <first>      1, 2
         """
         if type(tokens) is not list or len(tokens) < 3:
             return
@@ -60,10 +66,10 @@ class cli:
     
     def ask_human(self, state=0):
         """
-        @return: int
         manage cli io-loop
+        also serves as dfunc for human controlled core.agent instance
         if cmd is turn and game is running,
-        return cell number
+        return integer cell number
         """
         movement = -1 #default invalid move
         while True:
@@ -98,7 +104,7 @@ class cli:
                         self.toggle_option(tks[1:])
                         continue
             
-            if cmd == 'auto':
+            if cmd == 'a':
                 if self.game.running:
                     self.msgout("to start autoplay terminate current game")
                 else:
@@ -127,6 +133,7 @@ class cli:
 
     def _on_victory(self, agent):
         """
+        callback for core.game victory event
         @param agent: int (1, 2)
         """
         self.msgout(f"player {('V', 'X')[agent-1]} won the game")
@@ -134,11 +141,15 @@ class cli:
     
     def _on_move(self):
         """
+        callback for core.game turn event
         @param agent: int (1, 2)
         """
         self.msgout("b")
 
     def msgout(self, msg):
+        """
+        alias for ui.cli.msg 
+        """
         reqmsg = {
             "h": lambda: msgout("help"),
             "r": lambda: msgout(rules),
@@ -165,6 +176,9 @@ class cli:
             self.msgout(f"{option}: {self.options[option]}")
 
     def stringify_board(self):
+        """
+        return stringified representation of a current game board, event info and stats
+        """
         b = self.game.state.board
         board = ""
         def symb(n):
@@ -177,21 +191,13 @@ class cli:
         if self.options["brd"] == "tbl":
             r1 = [0 for _ in range(10)]
             r2, r3 = r1.copy(), r1.copy()
-
             for i in range(10):
                 c1, c2, c3 = b[i], b[19-i], b[i+20]
                 r1[i], r2[i], r3[i] = symb(c1), symb(c2), symb(c3)
-
             r1, r2, r3 = " ".join(r1), " ".join(r2), " ".join(r3)
             top = " ".join(str(i+1) for i in range(10))
             bottom = " ".join(" " for _ in range(5)) + " a b c d e"
-            board = f"""    
-            {top}
-            {r1} 1
-            {r2} 2
-            {r3} 3
-            {bottom}
-            """
+            board = f"\t{top}\n\t{r1} 1\n\t{r2} 2\n\t{r3} 3\n\t{bottom}\n"
         elif self.options["brd"] == "lin":
             board = " ".join(map(symb, b)) 
         #EVENT MSG
@@ -212,21 +218,23 @@ class cli:
                 5: f"{previous} from {start} attacked enemy on {destination}. His victim rebourned on {victim_destination}",
                 6: f"{previous} from {start} has successfully escaped the board",
             }.get(code)
-        #MOVES MSG
-        moves_msg = {
-            1: f"possible moves: {', '.join(map(self.get_pos, self.game.state.moves))}",
-            -1: f"player cannot move forward, possible reverse moves: {', '.join(map(self.get_pos, self.game.state.moves))}",
-            0: "no avaliable moves, player skips the turn"
+        #STATS MSG
+        stats = f"\tplayer {agent} is moving for {self.game.state.steps} steps\n"
+        stats += {
+            1: f"\tpossible moves: {', '.join(map(self.get_pos, self.game.state.moves))}\n",
+            -1: f"\tplayer cannot move forward, possible reverse moves: {', '.join(map(self.get_pos, self.game.state.moves))}\n",
+            0: "\tno avaliable moves, player skips the turn\n"
             }.get(self.game.state.mobility)
         
-        stats = f"""
-        player {agent} is moving for {self.game.state.steps} steps
-        {moves_msg}
-        bench: V - {self.game.state.bench[0]}, X - {self.game.state.bench[1]}
-        """
-        return f"turn: {self.game.turn}, {event_msg}\n{board}\n{stats}"
+        stats += f"\tbench: V - {self.game.state.bench[0]}, X - {self.game.state.bench[1]}"
+            
+        return f"turn {self.game.turn}, {event_msg}\n{board}\n{stats}"
 
     def get_pos(self, index):
+        """
+        convert given input index to 0-based index
+        depending on coordinate options
+        """
         mode = self.options["crd"]
         if mode == "lin":
             return str(index + 1)
@@ -238,6 +246,10 @@ class cli:
             return f"({r}, {c})"
         
     def get_index(self, tokens):
+        """
+        convert given 0-based index to output index
+        depending on coordinate options
+        """
         cell, steps, r, c = [None for _ in range(4)]
         mode = self.options["crd"]
         if mode == "lin" and len(tokens) == 1:
