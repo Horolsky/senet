@@ -1,24 +1,3 @@
-def is__board(b):
-    if type(b) not in (list, tuple):
-        return False
-    if len(b) != 30:
-        return False
-    for c in b:
-        if c not in [0, 1, 2]:
-            return False
-    return True
-
-def is_defended(board, pos):
-    if not is__board(board):
-        raise TypeError("invalid board arg")
-    if board[pos] == 0:
-        return False
-    if pos > 0 and board[pos - 1] == board[pos]:
-        return True
-    if pos < 29 and board[pos + 1] == board[pos]:
-        return True
-    return False
-
 class state():
     def __init__(self, board, agent, steps, event = None):
         """
@@ -28,7 +7,7 @@ class state():
         @param steps: int
         @param event: tuple
         """
-        if not is__board(board):
+        if not state.board_valid(board):
             raise ValueError("invalid board data")
         self.__board = tuple(board)
         if agent not in [1,2]:
@@ -192,7 +171,7 @@ class state():
             event = (agent, 6, cell, destination, -1)
         #attacking
         elif board[destination] == enemy:
-            if is_defended(board, destination):
+            if state.cell_defended(board, destination):
                 board[destination] = agent                
                 if destination > 26: #attacking Houses rule
                     for i in range(14, -1, -1):
@@ -257,7 +236,7 @@ class state():
         """
         returns list of possible moves for a given state
         """
-        if steps not in [-1,1,2,3,4,5] or agent not in [1,2] or not is__board(board):
+        if steps not in [-1,1,2,3,4,5] or agent not in [1,2] or not state.board_valid(board):
             raise ValueError("corrupted data")
         moves = []
         enemy = agent % 2 +1
@@ -288,7 +267,7 @@ class state():
             target = board[destination] #target cell value
             if target == agent: #friendly occupation
                 continue
-            elif target == enemy and is_defended(board, destination): #defended target
+            elif target == enemy and state.cell_defended(board, destination): #defended target
                 continue
             #final default case
             moves.append(cell)
@@ -303,3 +282,25 @@ class state():
             elif cell == 2:
                 team2 -= 1
         return (team1, team2)
+    
+    @staticmethod
+    def board_valid(b):
+        if type(b) not in (list, tuple):
+            return False
+        if len(b) != 30:
+            return False
+        for c in b:
+            if c not in [0, 1, 2]:
+                return False
+        return True
+    @staticmethod
+    def cell_defended(board, pos):
+        if not state.board_valid(board):
+            raise TypeError("invalid board arg")
+        if board[pos] == 0:
+            return False
+        if pos > 0 and board[pos - 1] == board[pos]:
+            return True
+        if pos < 29 and board[pos + 1] == board[pos]:
+            return True
+        return False
