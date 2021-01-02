@@ -1,19 +1,21 @@
 import random
 
 class agent:
-    def __init__(self, df): 
+    def __init__(self, dfunc): 
         """
         df: decision function
         or dummy code str ("random", "first", "last")
         """
-        if type(df) is str:
-            self._df = {
+        if dfunc in ("random", "first", "last"):
+            self._dfunc = {
                 "random": choose_random,
                 "first": choose_first,
                 "last": choose_last
-            }.get(df)
-        elif callable(df):
-            self._df = df
+            }.get(dfunc)
+        elif callable(dfunc):
+            self._dfunc = dfunc
+        else:
+            raise TypeError("invalid decision function")
     
     def choose_movement(self, state):
         """
@@ -21,7 +23,7 @@ class agent:
         return an index of a choosen movement
         decision is based on initial decision_function
         """
-        return self._df(state)
+        return self._dfunc(state)
 
 def choose_first(state):
     if len(state.moves) > 0:
