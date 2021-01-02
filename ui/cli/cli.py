@@ -32,7 +32,7 @@ class cli:
         print("Welcome to SENET Game")
         msgout['h']()
         while True:
-            tks = input(">>> ").lower().split(None, 2)
+            tks = input("senet: ").lower().split(None, 2)
             if len(tks) < 1:
                 continue
             cmd = tks[0]
@@ -53,7 +53,7 @@ class cli:
             # actions
             if cmd == 's':
                 if self.game.running:
-                    conf = input(msg["confirm_s"])
+                    conf = input(msg["confirm_s"]).lower()
                     if conf != "y": #or conf == "y":
                         continue
                 self.start(tks)
