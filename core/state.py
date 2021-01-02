@@ -29,9 +29,9 @@ class state():
             event = (agent, 0,0,0,0)
         else:
             if type(event) is not tuple:
-                raise TypeError("invalid event data")
+                raise TypeError("invalid event type")
             if len(event) != 5:
-                raise ValueError("invalid event data")
+                raise ValueError("corrupted event data")
         self.__event = event
         if steps not in [1,2,3,4,5]:
             raise ValueError("invalid steps value")
@@ -64,7 +64,7 @@ class state():
     @property
     def event(self):
         """
-        tuple with info on game event, caused by last move
+        tuple with info on game event, caused by previous move
         (<agent>, <eventcode>, <start>, <destination>, <victim's destination>)
         codes:
         0 - skip movement
@@ -147,7 +147,7 @@ class state():
                             break
                 else:
                     board[cell] = enemy
-                    event = (agent, 2, cell, destination, cell)
+                    event = (agent, 3, cell, destination, cell)
         #moving to empty target
         elif board[destination] == 0:
             board[destination] = agent
