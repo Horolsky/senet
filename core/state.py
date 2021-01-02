@@ -171,7 +171,7 @@ class state():
             event = (agent, 6, cell, destination, -1)
         #attacking
         elif board[destination] == enemy:
-            if state.cell_defended(board, destination):
+            if self.cell_defended(destination):
                 board[destination] = agent                
                 if destination > 26: #attacking Houses rule
                     for i in range(14, -1, -1):
@@ -194,10 +194,10 @@ class state():
 
     def __set_cached_data(self):
         mobility = 1 # 1 for normal movement, -1 for reverse, 0 for skipping
-        moves = state.get_moves(self.__board, self.__agent, self.__steps)
+        moves = self.__get_moves(self.__agent, self.__steps)
         if len(moves) == 0: #no direct moves
             mobility = -1
-            moves = state.get_moves(self.__board, self.__agent, -1)
+            moves = self.__get_moves(self.__agent, -1)
             if len(moves) == 0: #no reverse moves
                 mobility = 0
         self.__moves = moves
@@ -210,36 +210,64 @@ class state():
         returns maximin for current agent
         - approximation of total of estimated moves
         - n of possible moves
-        - n of defenced groups
-        - positions 22-23 occupation
+        - n of defenced cells
+        - 
         """
-        #friends, enemies = [], []
-        f_m, e_m = 0, 0 # total estimated moves to escape
-        b = self.board
+        # DATA COLLECTING
+        board = self.board
+        ag_pws, en_pws = 0, 0 # num of pawns
+        ag_em, en_em = 0, 0 # estimated moves to escape
+        ag_def, en_def = 0, 0 # defended cells
+        
         for c in range(30):
-            if b[c] == 0:
+            if board[c] == 0:
                 continue
             m = (30 - c) // 3 # estimated moves to escape
             #(lambda: enemies.append(c), lambda: friends.append(c))[b[c] == self.agent]()
-            if b[c] == self.agent:
-                f_m += m
+            if board[c] == self.agent:
+                ag_pws += 1
+                ag_em += m
+                if self.cell_defended(c):
+                    ag_def += c
             else:
-                e_m += m
-            #(incr_e, incr_f)[b[c] == self.agent](m)
+                en_pws += 1
+                en_em += m
+                if self.cell_defended(c):
+                    en_def += c
+        #SUMMANDS DETERMINING
+        # EM - estimated moves ratio (agent to enemy)
+        # DF - defended cells factor
+        # MF - movement freedom ratio (free to total)
+        # AM - additional move factor
+        # MB - mobility factor
+        EM = 1
+        if (ag_em + en_em != 0):
+            EM = 1 - ag_em / (ag_em + en_em)
+        
+        DF = 1
+        if (ag_def + en_def != 0):
+            DF = ag_def / (ag_def + en_def)
+        
+        MF = len(self.moves) / ag_pws
+        AM = int(self.additional_move)
+        MB = (0,1,0.5)[self.mobility] #check coef for -1 
 
-        #avg_f = sum(friends) / len(friends)
-        #avg_e = sum(enemies) / len(enemies)
-        return (f_m, e_m)
+        S = (EM, DF, MF, AM, MB)
+        C = (10,5,3,3,1)
+        RES = sum([S[i] * C[i] for i in range(5)]) / (sum(C) * 5)
+        
+        return (RES, EM, DF, MF, AM, MB)
 
-    @staticmethod
-    def get_moves(board, agent, steps):
+    def __get_moves(self, agent, steps):
         """
         returns list of possible moves for a given state
         """
-        if steps not in [-1,1,2,3,4,5] or agent not in [1,2] or not state.board_valid(board):
+        if steps not in [-1,1,2,3,4,5] or agent not in [1,2]:
             raise ValueError("corrupted data")
+        board = self.__board
         moves = []
         enemy = agent % 2 +1
+        
         #reverse moves
         if steps == -1:
             for cell in range(28):
@@ -267,12 +295,22 @@ class state():
             target = board[destination] #target cell value
             if target == agent: #friendly occupation
                 continue
-            elif target == enemy and state.cell_defended(board, destination): #defended target
+            elif target == enemy and self.cell_defended(destination): #defended target
                 continue
             #final default case
             moves.append(cell)
         return tuple(moves)  
     
+    def cell_defended(self, pos):
+        board = self.board
+        if board[pos] == 0:
+            return False
+        if pos > 0 and board[pos - 1] == board[pos]:
+            return True
+        if pos < 29 and board[pos + 1] == board[pos]:
+            return True
+        return False
+        
     @staticmethod
     def get_bench(board):
         team1, team2 = 5, 5
@@ -293,14 +331,4 @@ class state():
             if c not in [0, 1, 2]:
                 return False
         return True
-    @staticmethod
-    def cell_defended(board, pos):
-        if not state.board_valid(board):
-            raise TypeError("invalid board arg")
-        if board[pos] == 0:
-            return False
-        if pos > 0 and board[pos - 1] == board[pos]:
-            return True
-        if pos < 29 and board[pos + 1] == board[pos]:
-            return True
-        return False
+    
