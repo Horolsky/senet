@@ -86,7 +86,7 @@ class cli:
                         continue
                 break
             # msg request
-            if cmd in ['h', 'r', 'i', 'g']:
+            if cmd in ['h', 'r', 'i']:
                 self.msgout(cmd)
                 continue
             if cmd in [ 'b', 'm', 'u' ] and self.game.running:
@@ -156,7 +156,7 @@ class cli:
             "i": lambda: msgout("info"),
             "b": lambda: msgout(self.stringify_board()),
             "m": lambda: msgout(self.game.state.moves),
-            "u": lambda: msgout(self.game.state.utility)
+            "u": lambda: msgout("utility: " + str(self.game.state.utility))
             }
         if msg in reqmsg:
             reqmsg[msg]()
@@ -228,7 +228,7 @@ class cli:
         
         stats += f"\tbench: V - {self.game.state.bench[0]}, X - {self.game.state.bench[1]}"
             
-        return f"turn {self.game.turn}, {event_msg}\n{board}\n{stats}"
+        return f"turn {self.game.turn}, {event_msg}\n\n{board}\n{stats}"
 
     def get_pos(self, index):
         """

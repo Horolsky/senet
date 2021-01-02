@@ -5,6 +5,7 @@ messages = {
       s - start new game or stop the running one
       a - start autoplay
       b - render the game board
+      u - show current state utility
       h - show help info
       r - show rules
       i - detailed info about the game
@@ -71,4 +72,4 @@ def msgout(msg):
   if msg in messages:
     print("\nsenet: " + messages[msg])
   else:
-    print("\nsenet: " + msg)
+    print("\nsenet: " + str(msg))
