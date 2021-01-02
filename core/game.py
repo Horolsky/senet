@@ -30,6 +30,8 @@ class game():
         self.__state = state(board, first, self.steps)
 
         self.__onmove()
+        self.__run()
+    def __run(self):
         while self.__running:
             self.__running = self.move()
             self.__onmove()
