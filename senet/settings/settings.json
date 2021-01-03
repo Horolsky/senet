@@ -1,16 +1,30 @@
 {
-    "development": {
-        "gamelogs": "True"
+    "dev": {
+        "gamelogs": {
+            "value": "True",
+            "options": [ "True", "False" ]
+        }
     }, 
     "rules": {
-        "additional_move": [1, 4, 5]
+        "addmove": {
+            "value": [1, 4, 5],
+            "options": [1,2,3,4,5]
+        }
     }, 
     "cli": {
-        "crd": "tbl", 
-        "brd": "tbl"
+        "crd": {
+            "value": "tbl",
+            "options": [ "tbl", "lin" ]
+        }, 
+        "brd": {
+            "value": "tbl",
+            "options": [ "tbl", "lin" ]
+        } 
     }, 
     "ai": {
-        "levels": ["dummy", "june", "middle", "senior"], 
-        "level": 1
+        "level": {
+            "value": "dummy",
+            "options": ["dummy", "june", "middle", "senior"]
+        }
     }
 }

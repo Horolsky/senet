@@ -37,22 +37,39 @@ class settings(metaclass=singleton):
         settings = load(f) 
         f.close()
         group, st = path.split("/")
-        if settings.get(group) is not None:
-            return settings[group].get(st)
+        try:
+            return settings[group][st]["value"]
+        except:
+            return None
     def set(self, path, value):
         """
         pass a setting path in form "group/setting"
         and a new value
         """
         if type(path) is not str or "/" not in path:
-            return None
+            return False
         
         f = open(self._fpath, "r") 
         settings = load(f) 
         f.close()
         group, st = path.split("/")
+        oldval = None
         try:
-            settings[group][st] = value
+            oldval = settings[group][st]["value"] 
+        
+            if type(oldval) is list and type(value) is not list:
+                value = value.replace(" ", "").replace(",", "")
+                value = [int(c) for c in value]
+                options = settings[group][st]["options"]
+                if len(set(value) - set(options)) != 0:
+                    return False
+            else:
+                value = type(oldval)(value)
+                if value not in settings[group][st]["options"]:
+                    return False
+
+            
+            settings[group][st]["value"] = value
             settings = dumps(settings)
             f = open(self._fpath, "w")
             f.write(str(settings)) 
