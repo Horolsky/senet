@@ -2,6 +2,9 @@ from senet.core import game, state, agent
 from .msg_cli import msgout#messages as msg
 from senet.ui.rules import rules
 from senet.utils import singleton
+import senet.settings 
+
+SETTINGS = senet.settings.settings()
 
 dummy_player_f = agent("first")
 dummy_player_l = agent("last")
@@ -11,7 +14,6 @@ dummy_player_r = agent("random")
 class cli(metaclass=singleton):
     def __init__(self):
         self.__game = game(self._on_move, self._on_victory)
-        self.__options = { "crd": "tbl", "brd": "tbl" }
 
     @property
     def game(self):
@@ -19,13 +21,6 @@ class cli(metaclass=singleton):
         instance of a core.game class
         """
         return self.__game
-   
-    @property
-    def options(self):
-        """
-        dict
-        """
-        return self.__options
     
     def init(self):
         self.msgout('h')
@@ -166,15 +161,31 @@ class cli(metaclass=singleton):
     
     def toggle_option(self, tokens):
         option, value = tokens
-        if option not in ["brd", "crd"] or value not in ["lin", "tbl"]:
-            raise ValueError("invalid option arguments")
-        self.options[option] = value
-        self.msgout(f"option {option} set to {value}")
+        settings = SETTINGS.get("all")
+        success = False
+        for group in settings:
+            if option in settings[group]:
+                success = SETTINGS.set(f"{group}/{option}", value)
+                break
+        if success:
+            self.msgout(f"{option} has been set to {value}")
+        else:
+            self.msgout("warn")
         
     def print_options(self):
-        self.msgout("OPTIONS STATE:")
-        for option in self.options:
-            self.msgout(f"{option}: {self.options[option]}")
+        settings = SETTINGS.get("all")
+        msg = f"\n\t{'='*34} SETTINGS {'='*34}\n"
+        msg += f"\n\tKEY{' '*15}VALUE{' '*13}OPTIONS\n" 
+
+        for group in settings:
+            msg += f"\n\t{group.upper()} {'`'*(75-len(group))}\n"
+            for option in settings[group]:
+                value = settings[group][option]['value']
+                options = settings[group][option]['options']
+                ws1 = " " * (16 - len(option))#whitespase
+                ws2 = " " * (16 - len(str(value)))#whitespase
+                msg += f"\t- {option}:{ws1}{value}{ws2}{options}\n"
+        self.msgout(msg)
 
     def stringify_board(self):
         """
@@ -189,7 +200,8 @@ class cli(metaclass=singleton):
                 2: "X"
             }.get(n)
 
-        if self.options["brd"] == "tbl":
+        brd = SETTINGS.get("cli/brd")
+        if brd == "tbl":
             r1 = [0 for _ in range(10)]
             r2, r3 = r1.copy(), r1.copy()
             for i in range(10):
@@ -199,7 +211,7 @@ class cli(metaclass=singleton):
             top = " ".join(str(i+1) for i in range(10))
             bottom = " ".join(" " for _ in range(5)) + " a b c d e"
             board = f"\t{top}\n\t{r1} 1\n\t{r2} 2\n\t{r3} 3\n\t{bottom}\n"
-        elif self.options["brd"] == "lin":
+        elif brd == "lin":
             board = " ".join(map(symb, b)) 
         #EVENT MSG
         agent =  ('V', 'X')[self.game.state.agent-1]
@@ -228,15 +240,16 @@ class cli(metaclass=singleton):
             }.get(self.game.state.mobility)
         
         stats += f"\tbench: V - {self.game.state.bench[0]}, X - {self.game.state.bench[1]}"
-            
-        return f"turn {self.game.turn}, {event_msg}\n\n{board}\n{stats}"
+        head = f"turn {self.game.turn}, {event_msg}"
+        emb = "=" * (80 - len(head))
+        return f"{head} {emb}\n\n{board}\n{stats}"
 
     def get_pos(self, index):
         """
         convert given input index to 0-based index
         depending on coordinate options
         """
-        mode = self.options["crd"]
+        mode = SETTINGS.get("cli/crd")
         if mode == "lin":
             return str(index + 1)
         elif mode == "tbl":
@@ -252,7 +265,7 @@ class cli(metaclass=singleton):
         depending on coordinate options
         """
         cell, steps, r, c = [None for _ in range(4)]
-        mode = self.options["crd"]
+        mode = SETTINGS.get("cli/crd")
         if mode == "lin" and len(tokens) == 1:
             cell = int(tokens[0]) - 1
         if mode == "tbl" and len(tokens) == 2:
