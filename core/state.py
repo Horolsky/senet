@@ -1,3 +1,4 @@
+from json import dumps
 class state():
     def __init__(self, board, agent, steps, event = None):
         """
@@ -121,6 +122,17 @@ class state():
             self.__set_cached_data()
         return self.__mobility
     
+    def to_json(self, util=False):
+        data = {
+            "board": self.board,
+            "agent": self.agent,
+            "steps": self.steps,
+            "moves": self.moves,
+            "event": self.event
+        }
+        return dumps(data)
+
+
     def increment(self, cell, newsteps):
         """
         move choosen pawn
@@ -203,6 +215,59 @@ class state():
         self.__moves = moves
         self.__mobility = mobility
 
+    def __get_moves(self, agent, steps):
+        """
+        returns list of possible moves for a given state
+        """
+        if steps not in [-1,1,2,3,4,5] or agent not in [1,2]:
+            raise ValueError("corrupted data")
+        board = self.__board
+        moves = []
+        enemy = agent % 2 +1
+        
+        #reverse moves
+        if steps == -1:
+            for cell in range(28):
+                if board[cell] == 0 and board[cell + 1] == agent:
+                    moves.append(cell+1)
+            return moves
+        #else: normal moves, filling array by exclusion:
+        for cell in range(30): #cell index
+            #cell is not under control
+            if board[cell] != agent:
+                continue
+            destination = cell + steps #destination index
+            #escaping cases
+            if cell == 29: #always escaping 
+                moves.append(cell)
+                continue
+            if cell in [27,28] and destination == 30: #correct escaping
+                moves.append(cell)     
+                continue
+            if destination > 25 and cell != 25: #incorrect house arriving
+                continue
+            if destination > 29: #incorrect escaping
+                continue
+            #target occupation cases
+            target = board[destination] #target cell value
+            if target == agent: #friendly occupation
+                continue
+            elif target == enemy and self.cell_defended(destination): #defended target
+                continue
+            #final default case
+            moves.append(cell)
+        return tuple(moves)  
+    
+    def cell_defended(self, pos):
+        board = self.board
+        if board[pos] == 0:
+            return False
+        if pos > 0 and board[pos - 1] == board[pos]:
+            return True
+        if pos < 29 and board[pos + 1] == board[pos]:
+            return True
+        return False
+        
     #utility func for minimax
     @property
     def utility(self):
@@ -258,59 +323,6 @@ class state():
         
         return (RES, EM, DF, MF, AM, MB)
 
-    def __get_moves(self, agent, steps):
-        """
-        returns list of possible moves for a given state
-        """
-        if steps not in [-1,1,2,3,4,5] or agent not in [1,2]:
-            raise ValueError("corrupted data")
-        board = self.__board
-        moves = []
-        enemy = agent % 2 +1
-        
-        #reverse moves
-        if steps == -1:
-            for cell in range(28):
-                if board[cell] == 0 and board[cell + 1] == agent:
-                    moves.append(cell+1)
-            return moves
-        #else: normal moves, filling array by exclusion:
-        for cell in range(30): #cell index
-            #cell is not under control
-            if board[cell] != agent:
-                continue
-            destination = cell + steps #destination index
-            #escaping cases
-            if cell == 29: #always escaping 
-                moves.append(cell)
-                continue
-            if cell in [27,28] and destination == 30: #correct escaping
-                moves.append(cell)     
-                continue
-            if destination > 25 and cell != 25: #incorrect house arriving
-                continue
-            if destination > 29: #incorrect escaping
-                continue
-            #target occupation cases
-            target = board[destination] #target cell value
-            if target == agent: #friendly occupation
-                continue
-            elif target == enemy and self.cell_defended(destination): #defended target
-                continue
-            #final default case
-            moves.append(cell)
-        return tuple(moves)  
-    
-    def cell_defended(self, pos):
-        board = self.board
-        if board[pos] == 0:
-            return False
-        if pos > 0 and board[pos - 1] == board[pos]:
-            return True
-        if pos < 29 and board[pos + 1] == board[pos]:
-            return True
-        return False
-        
     @staticmethod
     def get_bench(board):
         team1, team2 = 5, 5
