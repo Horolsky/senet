@@ -1,7 +1,7 @@
 import random as r
 from .state import state
 from .agent import agent
-from senet.report import report
+from senet.utils import report
 
 class game():
     def __init__(self, onmove, onvictory):
