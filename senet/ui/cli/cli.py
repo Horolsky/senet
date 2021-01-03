@@ -1,13 +1,14 @@
 from senet.core import game, state, agent
 from .msg_cli import msgout#messages as msg
 from senet.ui.rules import rules
+from senet.utils import singleton
 
 dummy_player_f = agent("first")
 dummy_player_l = agent("last")
 dummy_player_r = agent("random")
 
 
-class cli:
+class cli(metaclass=singleton):
     def __init__(self):
         self.__game = game(self._on_move, self._on_victory)
         self.__options = { "crd": "tbl", "brd": "tbl" }
