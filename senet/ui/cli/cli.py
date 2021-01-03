@@ -1,6 +1,6 @@
-from core import game, state, agent
+from senet.core import game, state, agent
 from .msg_cli import msgout#messages as msg
-from ui.rules import rules
+from senet.ui.rules import rules
 
 dummy_player_f = agent("first")
 dummy_player_l = agent("last")
@@ -62,7 +62,7 @@ class cli:
                 first = 1
         self.msgout("\tGAME STARTED")
         #self.msgout(self.stringify_board())
-        self.game.start(agent1, agent2, first)
+        self.game.start(agent1, agent2, first, True)
     
     def ask_human(self, state=0):
         """

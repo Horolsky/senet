@@ -1,6 +1,7 @@
 import random as r
 from .state import state
 from .agent import agent
+from senet.report import report
 
 class game():
     def __init__(self, onmove, onvictory):
@@ -17,13 +18,15 @@ class game():
     def stop(self): #stop_game
         self.__running = False
     
-    def start(self, agent1, agent2,  first=1): #start_game
+    def start(self, agent1, agent2,  first=1, log=False): #start_game
         """
         start new or restart current game
         @param first: int
         @param agent1: agent
         @param agent2: agent
         """
+        self.__log = log
+        
         self.__agent1 = agent1
         self.__agent2 = agent2
         self.__running = True
@@ -31,18 +34,27 @@ class game():
         self.__sticks = game.throw_sticks()
         board = [x+1 for _ in range(5) for x in range(2)] + [0 for _ in range(20)]
         self.__state = state(board, first, self.steps)
-
+        if log:
+            self._report = report("game", "json", "logs/games")
         self.__onmove()
         self.__run()
     
     def __run(self):
+        if self.__log:
+            self._report.write(f'\n"{self.__turn}":' + self.state.to_json())
+            
         while self.__running:
+            if self.__log:
+                self._report.write(f',\n"{self.__turn}":' + self.state.to_json())
             self.__running = self.__move()
             self.__onmove()
             #END GAME CONDITION
             if 5 in self.state.bench:
                 self.__onvictory(self.state.event[0]) #sending agent n to callback
                 self.stop()
+                if self.__log:
+                    self._report.write("\n}")
+                    self._report.close()
 
     def __move(self):  #manage_movement
         """
