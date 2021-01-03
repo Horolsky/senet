@@ -1,5 +1,12 @@
 messages = {
+  "init" : """
+///////////////////////
+      SENET GAME
+///////////////////////
+  """,
+  
   "help" : """
+
     Basic controls:
       q - quit game
       s - start new game or stop the running one
@@ -33,23 +40,19 @@ messages = {
     """,
 
   "info" : """
+
     designed by A. Horolsky as a CS study project
     development in progress
     """,
 
-  "confirm_q" : """
-    The game is running. Tonfirm quit enter Y,
-    to continue press ENTER
-    """,
+  "confirm_q" : "The game is running. Ton confirm quit enter Y, to continue press any key",
 
-  "confirm_s" : """
-    The game is running. To confirm restart enter Y,
-    to continue press ENTER
-    """,
+  "confirm_s" : "The game is running. To confirm restart enter Y, to continue press any key",
 
   "warn": "invalid input, try again or press h for help",
 
   "options" : """
+
     List of avaliable options:
 
       COORDINATES MODE. There are two options:

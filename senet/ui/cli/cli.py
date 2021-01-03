@@ -28,7 +28,6 @@ class cli(metaclass=singleton):
         return self.__options
     
     def init(self):
-        self.msgout("Welcome to SENET Game")
         self.msgout('h')
         self.ask_human()
 
@@ -85,6 +84,7 @@ class cli(metaclass=singleton):
                     conf = input("human: ")
                     if conf != "Y" and conf != "y":
                         continue
+                self.msgout("cli is terminated")
                 break
             # msg request
             if cmd in ['h', 'r', 'i']:
@@ -137,7 +137,7 @@ class cli(metaclass=singleton):
         callback for core.game victory event
         @param agent: int (1, 2)
         """
-        self.msgout(f"player {('V', 'X')[agent-1]} won the game")
+        self.msgout(f"VICTORY! Player {('V', 'X')[agent-1]} won the game")
         self.msgout("press S to start new game")
     
     def _on_move(self):

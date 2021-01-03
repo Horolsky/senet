@@ -1,4 +1,7 @@
 rules = """
+
+ABOUT GAME:
+
 Goal
   Win by moving all of your Pawns off the board and into the afterlife.
 
