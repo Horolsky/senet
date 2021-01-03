@@ -1,0 +1,16 @@
+{
+    "development": {
+        "gamelogs": "True"
+    }, 
+    "rules": {
+        "additional_move": [1, 4, 5]
+    }, 
+    "cli": {
+        "crd": "tbl", 
+        "brd": "tbl"
+    }, 
+    "ai": {
+        "levels": ["dummy", "june", "middle", "senior"], 
+        "level": 1
+    }
+}

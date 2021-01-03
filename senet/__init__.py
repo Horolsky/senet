@@ -1,4 +1,5 @@
 from senet.ui import cli, msg_cli
+from .settings import settings
 """
 senet game
 """    
