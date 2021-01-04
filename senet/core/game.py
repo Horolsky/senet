@@ -3,6 +3,7 @@ from .state import state
 from .agent import agent
 from senet.utils import report
 from senet.settings import SETTINGS
+from json import dumps
 
 def is_agent(agent):
     for attr in ("choose_movement", "_number", "_name"):
@@ -51,7 +52,8 @@ class game():
         if self.__log:
             self._report = report(
                 "game", "json", "logs/games", 
-                f'{{\n"players": "1 - {agent1._name}, 2 - {agent2._name}",\n"game": [\n')
+                f'{{\n"players": "1 - {agent1._name}, 2 - {agent2._name}",\n"rules":{dumps(rules)},\n"game": [\n'
+                )
         self.__onmove()
         self.__run()
     
