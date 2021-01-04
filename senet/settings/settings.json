@@ -2,29 +2,53 @@
     "dev": {
         "gamelogs": {
             "value": true,
-            "options": [ true, false ]
+            "options": [ true, false ],
+            "descr": [
+                "saving game log to json file",
+                "files are stored in logs/games"
+            ]
         }
     }, 
     "rules": {
         "addmove": {
             "value": [1, 4, 5],
-            "options": [1,2,3,4,5]
+            "options": [1,2,3,4,5],
+            "descr": [
+                "number of steps that gives additional move",
+                "original: 1, 4, 5",
+                "array input"
+            ]
         }
     }, 
     "cli": {
         "crd": {
             "value": "tbl",
-            "options": [ "tbl", "lin" ]
+            "options": [ "tbl", "lin" ],
+            "descr": [
+                "cell coordinates mode",
+                "- lin (linear):   stepwise index coordinate (1-30)",
+                "- tbl (tabular):  row-column cell coordinate",
+                "2nd row keeps LtR direction in tbl mode"
+            ]
         }, 
         "brd": {
             "value": "tbl",
-            "options": [ "tbl", "lin" ]
+            "options": [ "tbl", "lin" ],
+            "descr": [
+                "board cli rendering mode",
+                "- lin (linear):   single line array",
+                "- tbl (tabular):  3x10 table (original)",
+                "this option does not affect the crd mode"
+            ]
         } 
     }, 
     "ai": {
         "level": {
             "value": "dummy",
-            "options": ["dummy", "june", "middle", "senior"]
+            "options": ["dummy", "june", "middle", "senior"],
+            "descr": [
+                "level of ai efficiency"
+            ]
         }
     }
 }
