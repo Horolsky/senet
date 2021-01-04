@@ -3,12 +3,14 @@ class state():
     def __init__(self, board, agent, steps, event = None):
         """
         immutable game state class
-        @param board: list or tuple
+        @param board: list or tuple (pass None for initial state)
         @param agent: int
         @param steps: int
         @param event: tuple
         """
-        if not state.board_valid(board):
+        if board is None:
+            board = [x+1 for _ in range(5) for x in range(2)] + [0 for _ in range(20)]
+        elif not state.board_valid(board):
             raise ValueError("invalid board data")
         self.__board = tuple(board)
         if agent not in [1,2]:

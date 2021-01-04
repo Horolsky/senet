@@ -29,13 +29,15 @@ class game():
         self.__log = SETTINGS.get("dev/gamelogs")
         #settings changes not affect the running game
 
+        #agents duck typing
+        if not hasattr(agent1, "choose_movement") or not hasattr(agent2, "choose_movement"):
+            raise TypeError("invalid agent objects") 
         self.__agent1 = agent1
         self.__agent2 = agent2
         self.__running = True
         self.__turn = 0
         self.__sticks = game.throw_sticks()
-        board = [x+1 for _ in range(5) for x in range(2)] + [0 for _ in range(20)]
-        self.__state = state(board, first, self.steps)
+        self.__state = state(None, first, self.steps)
         if self.__log:
             self._report = report("game", "json", "logs/games", "{")
         self.__onmove()
@@ -65,9 +67,7 @@ class game():
         returns True on success,
         False on failure
         """ 
-        cell = 0
-        if self.state.mobility != 0:
-            cell = self.agent.choose_movement(self.state)
+        cell = self.agent.choose_movement(self.state)
         newsticks = game.throw_sticks()
         newstate = self.state.increment(cell, game.get_steps(newsticks)) 
         if newstate is None:
