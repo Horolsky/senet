@@ -88,15 +88,10 @@ class cli(metaclass=singleton):
                 continue
             if cmd == 'o':
                 if len(tks) == 1:
-                    self.msgout("options")
-                    continue
+                    self.print_options()
                 elif len(tks) > 1:
-                    if tks[1] == "list":
-                        self.print_options()
-                        continue
-                    elif len(tks) == 3:
-                        self.toggle_option(tks[1:])
-                        continue
+                    self.toggle_option(tks[1:])
+                continue
             
             if cmd == 'a':
                 if self.game.running:
@@ -172,17 +167,24 @@ class cli(metaclass=singleton):
         
     def print_options(self):
         settings = SETTINGS.get("all")
-        msg = f"\n\t{'='*34} SETTINGS {'='*34}\n"
-        msg += f"\n\tKEY{' '*15}VALUE{' '*13}OPTIONS\n" 
-
+        msg = f"\n  {'='*55} SETTINGS {'='*55}\n"
+        msg += f"\n  KEY{' '*10}VALUE{' '*7}OPTIONS{' '*36}DESCRIPTION\n" 
+        msg += f"  {'='*120}\n\n"
         for group in settings:
-            msg += f"\n\t{group.upper()} {'`'*(75-len(group))}\n"
+            msg += f"  {group.upper()}:\n  {'`'*120}\n" #group separator
+
             for option in settings[group]:
                 value = settings[group][option]['value']
                 options = settings[group][option]['options']
-                ws1 = " " * (16 - len(option))#whitespase
-                ws2 = " " * (16 - len(str(value)))#whitespase
-                msg += f"\t- {option}:{ws1}{value}{ws2}{options}\n"
+                descr = settings[group][option]['descr']
+                dlines = descr[0] + "\n"
+                for line in descr[1:]:
+                    dlines += " " * 70 + line + "\n"
+                ws1 = " " * (12 - len(option))#whitespase
+                ws2 = " " * (12 - len(str(value)))#whitespase
+                ws3 = " " * (43 - len(str(options)))#whitespase
+                msg += f"  {option}:{ws1}{value}{ws2}{options}{ws3}{dlines}\n"
+        msg += f"  {'='*120}\n"
         self.msgout(msg)
 
     def stringify_board(self):
