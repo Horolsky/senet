@@ -2,6 +2,7 @@ import random as r
 from .state import state
 from .agent import agent
 from senet.utils import report
+from senet.settings import SETTINGS
 
 class game():
     def __init__(self, onmove, onvictory):
@@ -18,15 +19,16 @@ class game():
     def stop(self): #stop_game
         self.__running = False
     
-    def start(self, agent1, agent2,  first=1, log=False): #start_game
+    def start(self, agent1, agent2,  first=1): #start_game
         """
         start new or restart current game
         @param first: int
         @param agent1: agent
         @param agent2: agent
         """
-        self.__log = log
-        
+        self.__log = SETTINGS.get("dev/gamelogs")
+        #settings changes not affect the running game
+
         self.__agent1 = agent1
         self.__agent2 = agent2
         self.__running = True
@@ -34,8 +36,8 @@ class game():
         self.__sticks = game.throw_sticks()
         board = [x+1 for _ in range(5) for x in range(2)] + [0 for _ in range(20)]
         self.__state = state(board, first, self.steps)
-        if log:
-            self._report = report("game", "json", "logs/games")
+        if self.__log:
+            self._report = report("game", "json", "logs/games", "{")
         self.__onmove()
         self.__run()
     
