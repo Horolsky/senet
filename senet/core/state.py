@@ -272,17 +272,12 @@ class state():
     @property
     def utility(self):
         """
-        returns maximin for current agent
-        - approximation of total of estimated moves
-        - n of possible moves
-        - n of defenced cells
-        - 
+        returns maximin utility for current state:
+        normalised ratio of agent's TEM (total estimated moves) to enemy's TEM 
         """
         # DATA COLLECTING
         board = self.board
-        ag_pws, en_pws = 0, 0 # num of pawns
-        ag_em, en_em = 0, 0 # estimated moves to escape
-        ag_def, en_def = 0, 0 # defended cells
+        a_tem, e_tem = 0, 0 # estimated moves to escape
         
         for c in range(30):
             if board[c] == 0:
@@ -290,38 +285,15 @@ class state():
             m = (30 - c) // 3 # estimated moves to escape
             #(lambda: enemies.append(c), lambda: friends.append(c))[b[c] == self.agent]()
             if board[c] == self.agent:
-                ag_pws += 1
-                ag_em += m
-                if self.cell_defended(c):
-                    ag_def += c
+                a_tem += m
             else:
-                en_pws += 1
-                en_em += m
-                if self.cell_defended(c):
-                    en_def += c
-        #SUMMANDS DETERMINING
-        # EM - estimated moves ratio (agent to enemy)
-        # DF - defended cells factor
-        # MF - movement freedom ratio (free to total)
-        # AM - additional move factor
-        # MB - mobility factor
-        EM = 1
-        if (ag_em + en_em != 0):
-            EM = 1 - ag_em / (ag_em + en_em)
-        
-        DF = 1
-        if (ag_def + en_def != 0):
-            DF = ag_def / (ag_def + en_def)
-        
-        MF = len(self.moves) / ag_pws
-        AM = int(self.additional_move)
-        MB = (0,1,0.5)[self.mobility] #check coef for -1 
+                e_tem += m
 
-        S = (EM, DF, MF, AM, MB)
-        C = (10,5,3,3,1)
-        RES = sum([S[i] * C[i] for i in range(5)]) / (sum(C) * 5)
+        res = 1
+        if (a_tem + e_tem != 0):
+            res = 1 - ag_em / (ag_em + en_em)
         
-        return (RES, EM, DF, MF, AM, MB)
+        return res
 
     @staticmethod
     def get_bench(board):
