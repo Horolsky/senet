@@ -3,9 +3,10 @@ from os.path import isfile#, isdir
 #from os import mkdir
 from json import load, dumps
 from shutil import copyfile 
+
 class settings(metaclass=singleton):
     """
-    settings singletone manager
+    singletone settings manager
     operates on ./senet_settings.json
     if file not exict, creates default
     """
@@ -29,16 +30,15 @@ class settings(metaclass=singleton):
         pass a setting path in form "group/setting"
         or "all" to get all settings as 2d dict
         """
+        settings = self.__getall()
         if path == "all":
-            return self.__getall()
+            return settings
         if type(path) is not str or "/" not in path:
             return None
-        f = open(self._fpath, "r") 
-        settings = load(f) 
-        f.close()
         group, st = path.split("/")
         try:
-            return settings[group][st]["value"]
+            value = settings[group][st]["value"] 
+            return value
         except:
             return None
     def set(self, path, value):
@@ -64,10 +64,14 @@ class settings(metaclass=singleton):
                 if len(set(value) - set(options)) != 0:
                     return False
             else:
-                value = type(oldval)(value)
+                if str(value).lower() == "true":
+                    value = True
+                elif str(value).lower() == "false":
+                    value = False
+                else:
+                    value = type(oldval)(value)
                 if value not in settings[group][st]["options"]:
                     return False
-
             
             settings[group][st]["value"] = value
             settings = dumps(settings)
@@ -77,5 +81,8 @@ class settings(metaclass=singleton):
             return True
         except:
             return False
-        
-        
+
+SETTINGS = settings()
+"""
+instance of a settings managment singleton class
+"""

@@ -1,8 +1,8 @@
 {
     "dev": {
         "gamelogs": {
-            "value": "True",
-            "options": [ "True", "False" ]
+            "value": true,
+            "options": [ true, false ]
         }
     }, 
     "rules": {
