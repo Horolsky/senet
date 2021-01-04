@@ -16,9 +16,12 @@ messages = {
       h - show help info
       r - show rules
       i - detailed info about the game
-      o - show options info
-      o list - show options state
-      o <name> <value> - set option
+      o - show options state
+      o <key> <value> - set option
+
+    NB! <value> token in option command must not contain a whitespace.
+    if option require an array input (see the option description),
+    values in second token must be separated with comma.
     All commands are case insensitive
 
     How to play:
@@ -31,7 +34,7 @@ messages = {
       if omitted, first player will start with Y by default
       
     To make a turn enter a coordinates of choosen pawn to move, 
-    in form <row> <cell> for tabular mode, 
+    in form <row> <column> for tabular mode, 
     or <index> for linear mode.
     In both modes indexation starts from 1.
 
@@ -49,26 +52,7 @@ messages = {
 
   "confirm_s" : "The game is running. To confirm restart enter Y, to continue press any key",
 
-  "warn": "invalid input, try again or press h for help",
-
-  "options" : """
-
-    List of avaliable options:
-
-      COORDINATES MODE. There are two options:
-      - linear: to make move enter a number of cell with controlled pawn (1-30)
-      - tabular: to make move enter a row and column of cell with controlled pawn. This is default option.
-      Note that the movement direction in the second row does not affect the column numbering, which tarts from left. 
-      Commands:
-        o crd tbl - toggle tabular mode (t <row> <column>)
-        o crd lin - toggle linear mode (t <cellnum>)
-
-      BOARD MODE. Same as above, the game board can be rendered as single line or as table (default)
-      this does not affect the coordinates mode
-      Commands:
-        o brd tbl - toggle tabular mode 
-        o brd lin - toggle linear mode
-    """  
+  "warn": "invalid input, try again or press h for help"
 }
 
 def msgout(msg):
