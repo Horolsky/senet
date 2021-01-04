@@ -11,12 +11,12 @@ class AIplayer():
         if number not in [1, 2]:
             raise ValueError("invalid agent number value")
         self._number = number
+        self._name = "AI"
         self._tree = []
         self._dec = 0
         self._turn = 0
         self.stopFlag = False
         self._timer = SETTINGS.get("ai/timer")
-
         
     def choose_movement(self, state):
         #TODO: check state

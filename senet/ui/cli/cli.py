@@ -32,9 +32,9 @@ class cli(metaclass=singleton):
             return
         #agents
         agents = {
-            "human": lambda an: agent(num=an, dfunc=self.ask_human, name="human"),
-            "ai": lambda an: AIplayer(an),#agent(num=an), #TODO
-            "dummy": lambda an: agent(num=an) 
+            "human": lambda an: agent(number=an, dfunc=self.ask_human, name="human"),
+            "ai": lambda an: AIplayer(number=an),#agent(num=an), #TODO
+            "dummy": lambda an: agent(number=an) 
             }
         agent1 = agents.get(tokens[1])(1)
         agent2 = agents.get(tokens[2])(2)
