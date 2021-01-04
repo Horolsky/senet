@@ -49,6 +49,14 @@
             "descr": [
                 "level of ai efficiency"
             ]
+        },
+        "timer": {
+            "value": 2,
+            "options": [1,2,3,4,5,6],
+            "descr": [
+                "working timer for ai"
+            ]
         }
+
     }
 }

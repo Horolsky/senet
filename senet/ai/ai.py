@@ -2,9 +2,10 @@ import threading
 import time
 from senet.core import state, agent
 from senet.utils.report import report
+from senet.settings import SETTINGS
 
 DEPTH = 6 #settings: ai level
-WAIT = 2 #TODO put to settings or derive from level
+WAIT = 6 #TODO put to settings or derive from level
 class AIplayer():
     def __init__(self, number):
         if number not in [1, 2]:
@@ -14,6 +15,7 @@ class AIplayer():
         self._dec = 0
         self._turn = 0
         self.stopFlag = False
+        self._timer = SETTINGS.get("ai/timer")
 
         
     def choose_movement(self, state):
@@ -33,7 +35,7 @@ class AIplayer():
         self.stopFlag = False
         t = AIthread(self)
         t.start()
-        counter = int(WAIT)#check negat
+        counter = int(self._timer)#check negat
         while counter:
             #stop if ready
             if self.stopFlag:
@@ -41,6 +43,7 @@ class AIplayer():
             #wait
             counter -= 1
             time.sleep(1)
+        #self.stopFlag = True #stopping thread 
         return self._dec
 
     def think(self):
