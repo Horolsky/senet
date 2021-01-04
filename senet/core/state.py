@@ -1,6 +1,7 @@
 from json import dumps
+#from senet.settings import SETTINGS
 class state():
-    def __init__(self, board, agent, steps, event = None):
+    def __init__(self, board, agent, steps, rules, event = None):
         """
         immutable game state class
         @param board: list or tuple (pass None for initial state)
@@ -17,6 +18,7 @@ class state():
             raise ValueError("invalid agent number")
         self.__agent = agent
         self.__enemy = agent % 2 + 1
+        self._rules = rules
         
         if event is None:
             event = (agent, 0,0,0,0)
@@ -29,7 +31,7 @@ class state():
         if steps not in [1,2,3,4,5]:
             raise ValueError("invalid steps value")
         self.__steps = steps
-        self.__am = steps in [1,4,5] #additional move
+        self.__am = steps in self._rules.get("addmove")#[1,4,5] #additional move
         self.__bench = state.get_bench(board)
         #cached data
         self.__moves = None
@@ -143,7 +145,7 @@ class state():
         next_player = (self.enemy, self.__agent)[self.__am]
         # skipping move
         if self.__mobility == 0:
-            return state(self.__board, next_player, newsteps, self.__event)
+            return state(self.__board, next_player, newsteps, self._rules, self.__event)
         # incorrect cell index
         if cell not in self.__moves:
             return None
@@ -154,6 +156,7 @@ class state():
         agent = self.__agent
         enemy = self.__enemy
         event = self.__event 
+        rules = self._rules
         #reverse
         if self.__mobility == -1:
             if cell == 27: #reverse to House of Waters
@@ -203,7 +206,7 @@ class state():
             event = (agent, 2, cell, destination, -1)
         else:
             raise ValueError(f"incorrect move logic, start: {cell}")
-        return state(board, next_player, newsteps, event)
+        return state(board, next_player, newsteps, rules, event)
 
     def __set_cached_data(self):
         mobility = 1 # 1 for normal movement, -1 for reverse, 0 for skipping

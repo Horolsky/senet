@@ -34,6 +34,9 @@ class game():
         @param agent2: agent
         """
         self.__log = SETTINGS.get("dev/gamelogs")
+        rules = {
+            "addmove": SETTINGS.get("rules/addmove")#TODO check 
+        } 
         #settings changes not affect the running game
 
         #agents duck typing
@@ -44,7 +47,7 @@ class game():
         self.__running = True
         self.__turn = 0
         self.__sticks = game.throw_sticks()
-        self.__state = state(None, first, self.steps)
+        self.__state = state(None, first, self.steps, rules)
         if self.__log:
             self._report = report(
                 "game", "json", "logs/games", 
