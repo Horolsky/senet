@@ -129,7 +129,6 @@ class state():
             "board": self.board,
             "agent": self.agent,
             "steps": self.steps,
-            "moves": self.moves,
             "event": self.event
         }
         return dumps(data)
