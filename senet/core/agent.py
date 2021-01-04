@@ -1,11 +1,17 @@
 import random
 
 class agent:
-    def __init__(self, dfunc): 
+    """
+    wrapper class for human and dummy agent controls
+    """
+    def __init__(self, num, dfunc=None, name="dummy"): 
         """
         dfunc: decision function
         or dummy code str ("random", "first", "last")
         """
+        if num not in [1,2]:
+            raise ValueError("invalid number arg")
+        self._number = num
         if dfunc in ("random", "first", "last"):
             self._dfunc = {
                 "random": choose_random,
@@ -15,7 +21,11 @@ class agent:
         elif callable(dfunc):
             self._dfunc = dfunc
         else:
-            raise TypeError("invalid decision function")
+            self._dfunc = choose_random
+
+        self._name = name
+        #else:
+        #    raise TypeError("invalid decision function")
     
     def choose_movement(self, state):
         """

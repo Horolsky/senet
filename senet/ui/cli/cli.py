@@ -4,11 +4,6 @@ from senet.ui.rules import rules
 from senet.utils import singleton
 from senet.settings import SETTINGS
 
-dummy_player_f = agent("first")
-dummy_player_l = agent("last")
-dummy_player_r = agent("random")
-
-
 class cli(metaclass=singleton):
     def __init__(self):
         self.__game = game(self._on_move, self._on_victory)
@@ -36,17 +31,14 @@ class cli(metaclass=singleton):
             return
         #agents
         agents = {
-            "human": agent(self.ask_human),
-            "ai": dummy_player_r, #TODO
-            "dummy": dummy_player_r 
+            "human": lambda an: agent(num=an, dfunc=self.ask_human, name="human"),
+            "ai": lambda an: agent(num=an), #TODO
+            "dummy": lambda an: agent(num=an) 
             }
-        agent1, agent2 = tokens[1:3]
-        if type(agent1) is str:
-            agent1 = agents.get(agent1)
-        if type(agent2) is str:
-            agent2 = agents.get(agent2)
-        if not (type(agent1) is type(agent2) is agent):
-            return
+        agent1 = agents.get(tokens[1])(1)
+        agent2 = agents.get(tokens[2])(2)
+        if agent1 is None or agent2 is None:
+            return None
         #default first player pawns
         first = 1
         if len(tokens) == 4:
