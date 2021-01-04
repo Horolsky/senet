@@ -13,7 +13,7 @@ class AIplayer():
         self._tree = []
         self._dec = 0
         self._turn = 0
-    
+        self.stopFlag = False
 
         
     def choose_movement(self, state):
@@ -30,19 +30,19 @@ class AIplayer():
         #TODO do work in other thread
 
         #test thread
+        self.stopFlag = False
         t = AIthread(self)
         t.start()
         counter = int(WAIT)#check negat
         while counter:
-
             #stop if ready
-            if ai.stopFlag:
+            if self.stopFlag:
                 break
             #wait
             counter -= 1
             time.sleep(1)
-
         return self._dec
+
     def think(self):
         """
         recursive tree traversing
@@ -64,15 +64,3 @@ class AIthread (threading.Thread):
         self.ai.think()
         self.ai.stopFlag = True
         #do work
-        
-        
-
-#agents
-        agents = {
-            "human": lambda an: agent(number=an, dfunc=self.ask_human, name="human"),
-            #"ai": lambda an: AIplayer(an),#dummy_player_r, #TODO
-            "dummy": lambda an: agent(number=an)
-            }
-        
-        agent1 = agents.get(tokens[1])(1)
-        agent2 = agents.get(tokens[2])(2)

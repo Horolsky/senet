@@ -1,4 +1,5 @@
 from senet.core import game, state, agent
+from senet.ai import AIplayer
 from .msg_cli import msgout#messages as msg
 from senet.ui.rules import rules
 from senet.utils import singleton
@@ -32,7 +33,7 @@ class cli(metaclass=singleton):
         #agents
         agents = {
             "human": lambda an: agent(num=an, dfunc=self.ask_human, name="human"),
-            "ai": lambda an: agent(num=an), #TODO
+            "ai": lambda an: AIplayer(an),#agent(num=an), #TODO
             "dummy": lambda an: agent(num=an) 
             }
         agent1 = agents.get(tokens[1])(1)
