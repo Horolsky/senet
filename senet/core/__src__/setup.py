@@ -3,8 +3,8 @@ from distutils.core import Extension
 from Cython.Build import cythonize
 
 setup(
-    name="xtc",
-    ext_modules=cythonize(Extension("xtc", ["state/*.pyx"])),
-    package_data={"xtc":['state/*.pxd']},
+    name="plyx",
+    ext_modules=cythonize(Extension("plyx", ["*.pyx"])),
+    package_data={"plyx":['*.pxd']},
     zip_safe=False,
 )
