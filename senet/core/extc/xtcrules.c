@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "senetrules.h"
+#include "xtcrules.h"
 
 sRules* _RULES;
 

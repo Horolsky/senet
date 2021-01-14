@@ -1,5 +1,5 @@
-#ifndef SENET_RULES_H
-#define SENET_RULES_H
+#ifndef SENETXTC_RULES_H
+#define SENETXTC_RULES_H
 
 typedef struct _SenetRules {
     char addmoves[5];//1-5, for empty positions use 0

@@ -1,5 +1,5 @@
-#include "senetstate.h"
-#include "senetrules.h"
+#include "xtcstate.h"
+//#include "xtcrules.h"
 
 char sState_agent(sState s){
     return (char) s._agent;
@@ -112,17 +112,18 @@ sState _set_board(sState s){
 }
 
 sState sState_iterate(sState s, char m){
-    const sRules* RULES = sRules_get();
+    //const sRules* RULES = sRules_get();
     const sMoves moves = sState_getMoves(s);
     sState next = s;
     next._steps = 0;
     next._agent = s._agent % 2 + 1;
-    for (int i = 0; i < 5; i++){
+    if (s._steps == 1 || s._steps == 4 || s._steps == 5) next._agent = s._agent;
+    /*for (int i = 0; i < 5; i++){
         if (RULES->addmoves[i] == s._steps){
             next._agent = s._agent;
             break;
         }
-    }
+    }*/
     
     if (moves._len == 0) return next;
     if (_check_move(moves, m) == 0) return (sState){0};//invalid arg

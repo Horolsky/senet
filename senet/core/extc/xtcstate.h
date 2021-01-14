@@ -1,5 +1,5 @@
-#ifndef SENET_STATE_H
-#define SENET_STATE_H
+#ifndef SENETXTC_STATE_H
+#define SENETXTC_STATE_H
 
 typedef unsigned long long int statedata;
 /*
