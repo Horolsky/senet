@@ -1,6 +1,7 @@
 from libc.stdlib cimport malloc, free
 cimport xply
 from xply cimport ui8, ui32, ui64, xState, xMoves
+from json import dumps
 
 cdef ui8* get_board(xState s, ui8 * board):
     if board is NULL:
@@ -43,7 +44,7 @@ cdef xMoves get_moves(xState s):
     cdef ui8 prev = 0
     cdef ui8 nxt = 0
 
-    moves._dir = 1
+    moves._dir = 1                                      # direct move
     for i from 0 <= i < 30 by 1:
         if board[i] != agent:
             continue
@@ -65,6 +66,13 @@ cdef xMoves get_moves(xState s):
                 nxt = board[dest+1]
             if prev != enemy and nxt != enemy:
                 moves = add_move(moves, i)
+    if moves._len == 0:
+        moves._dir = 2                                  # reverse move
+        for i from 1 <= i < 30 by 1:
+            if board[i] == agent and board[i-1] == 0:
+                moves = add_move(moves, i)
+    if moves._len == 0:
+        moves._dir = 0                                  # skip move
     free(board)
     return moves
 
@@ -85,7 +93,7 @@ cdef ui8 is_in(xMoves moves, ui8 m):
     return isin
 
 
-cdef xState iterate(xState s, ui8 m): #static rules
+cdef xState increment(xState s, ui8 m): #static rules
     cdef xMoves moves = get_moves(s)
     cdef xState nxt = s
 
@@ -179,8 +187,8 @@ cdef class xPly():
     cdef void upd_xmoves(self):
         self._xmoves = get_moves(self._xstate)
 
-    cdef ui64 iterate(self, ui8 move):
-        return iterate(self._xstate, move)._bitvalue
+    cdef ui64 increment(self, ui8 move):
+        return increment(self._xstate, move)._bitvalue
 
     cdef double get_utility(self):
         return utility(self._xstate)
@@ -189,43 +197,51 @@ cdef class Ply(xPly):
     """
     xPly Python wrapper 
     """
-    cdef dict _cache
+    cdef dict __cache
+    cdef tuple __event
+    cdef tuple __bench
 
-    def __init__(self, bitval=10066320):
+    def __init__(self, ui64 bitval=10066320):
         """
         @param bitval: 64-bit integer xstate bitvalue
+        @param event: tuple 
         """
-        self._cache = {
+        xPly.__init__(self, bitval)
+        self.__cache = {
             "moves": None,
             "board": None,
-            "utility": None
+            "utility": None,
         }
-        xPly.__init__(self, bitval)
+        self.__event = (bitval, 0,0,0,0) #this updates on iteration after init
+        self.__bench = Ply.get_bench(self._xstate)
     @property
     def agent(self):
         return self._xstate._agent + 1
     @agent.setter
-    def agent(self, ui8 agent):
+    def agent(self, ui8 agent): #unsafe
         self.set_agent(agent - 1)
-        self._cache["moves"] = None
-
+        self.__cache["moves"] = None
+    @property
+    def enemy(self):
+        return self.enemy % 2 + 1
+    
     @property
     def steps(self):
         return self._xstate._steps
     @steps.setter
-    def steps(self, ui8 val):
+    def steps(self, ui8 val): #unsafe
         self.set_steps(val)
-        self._cache["moves"] = None
+        self.__cache["moves"] = None
     @property
     def board(self):
-        if self._cache["board"] is None:
+        if self.__cache["board"] is None:
             _board = []
             for i from 0 <= i < 30 by 1:
                 _board.append((self._xstate._board >> i * 2) % 4)
-            self._cache["board"] = tuple(_board)
-        return self._cache["board"]
+            self.__cache["board"] = tuple(_board)
+        return self.__cache["board"]
     @board.setter
-    def board(self, board):
+    def board(self, board): #unsafe
         if type(board) not in (list, tuple):
             return
         if len(board) != 30:
@@ -233,9 +249,9 @@ cdef class Ply(xPly):
         for i from 0 <= i < 30 by 1:
             self._xstate._board += ( <ui64> board[i] << i * 2)
         self.upd_xmoves()
-        self._cache["moves"] = None
-        self._cache["board"] = None
-        self._cache["utility"] = None
+        self.__cache["moves"] = None
+        self.__cache["board"] = None
+        self.__cache["utility"] = None
 
     def __upd_moves(self):
         moves = []
@@ -249,24 +265,87 @@ cdef class Ply(xPly):
             moves.append(self._xmoves._mv3)
         if (self._xmoves._len == 5):
             moves.append(self._xmoves._mv4)
-        self._cache["moves"] = tuple(moves)
+        self.__cache["moves"] = tuple(moves)
 
     @property
     def moves(self):
-        if self._cache["moves"] is None:
+        if self.__cache["moves"] is None:
             self.__upd_moves()
-        return self._cache["moves"]
+        return self.__cache["moves"]
 
-    def iterate(self, move):
+    @property
+    def event(self):
         """
-        call xply.iterate for movement handling
-        return new xstate bitvalue
-        0 if given move is impossible
+        last turn info
+        (<agent>, <eventcode>, <start>, <destination>)
+        codes:
+        0 - drow
+        1 - reverse
+        2 - skip
+        3 - move
+        4 - attack
+        5 - escape 
         """
-        return xPly.iterate(self, move)
+        return self.__event     
+
+    @property
+    def bench(self):
+        return self.__bench
+
+    @property
+    def mobility(self):
+        return (0,1,-1)[self._xmoves._dir]
+    
+    def increment(self, start):
+        """
+        event handling wrapper
+        calling xply.increment for movement handling
+        return new Ply instance
+        None if given movement is impossible
+        """
+
+        if self._xmoves._dir != 0 and start not in self.moves:
+            return None
+        
+        dest = 0                            # skip default
+        code = 2    
+        if self._xmoves._dir == 2:          # reverse
+            dest = start - 1                    
+            code = 1    
+            if dest == 25:                  # drow
+                code = 0    
+        elif self._xmoves._dir == 1:        # forvard
+            dest = start + self.steps       
+            code = 3    
+            if dest == 25:                  # drow
+                code = 0
+            elif dest > 29:                 # escape
+                code = 5
+            elif self.board[dest] != 0:     # attack
+                code = 4
+
+        event = (self._xstate._bitvalue, self.agent, code, start, dest)
+        
+        iteration = Ply(xPly.increment(self, start))
+        iteration.__event = event
+        return iteration
 
     @property
     def utility(self):
-        if self._cache["utility"] is None:
-            self._cache["utility"] = self.get_utility() 
-        return self._cache["utility"]
+        if self.__cache["utility"] is None:
+            self.__cache["utility"] = self.get_utility() 
+        return self.__cache["utility"]
+    
+    def to_json(self):
+        return dumps(self.event)
+
+    @staticmethod
+    def get_bench(xState state):
+        a1, a2 = 5, 5
+        for i from 0 <= i < 30 by 1:
+            cell = (state._board >> i * 2) % 4
+            if cell == 1:
+                a1 -= 1
+            elif cell == 2:
+                a2 -= 1
+        return (a1, a2)

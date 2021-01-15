@@ -60,5 +60,5 @@ cdef extern from *:
 cdef ui8* get_board(xState s, ui8 * board)
 cdef xState set_board(xState s, ui8 * board)
 cdef xMoves get_moves(xState s)
-cdef xState iterate(xState s, ui8 m)
+cdef xState increment(xState s, ui8 m)
 cdef double utility(xState s)
