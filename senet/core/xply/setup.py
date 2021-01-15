@@ -3,12 +3,11 @@ from distutils.core import Extension
 from Cython.Build import cythonize
 
 ext_modules=[
-    Extension("xstate", ["xstate.pyx"]),
     Extension("xply", ["xply.pyx"])
 ]
 
 ext_data = {
-    "xstate":['xstate.pxd']
+    "xply":['xply.pxd']
 }
 
 setup(
