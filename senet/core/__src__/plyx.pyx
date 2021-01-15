@@ -1,19 +1,18 @@
 from libc.stdlib cimport malloc, free
 cimport plyx
-from plyx cimport ui8, ui32, ui64, xState, xMoves, _start, _stop, _step
+from plyx cimport ui8, ui32, ui64, xState, xMoves
 
 cdef ui8* get_board(xState s, ui8 * board):
     if board is NULL:
         board = <ui8 *> malloc(sizeof(ui8) * 30)
-    #for i in range(_start, _stop, _step):
-    for i from _start <= i < _stop by _step:
+    for i from 0 <= i < 30 by 1:
         board[i] = (s._board >> i * 2) % 4
     return board
 
 cdef xState set_board(xState s, ui8 * board):
     if board is NULL:
         s._bitvalue = 0
-    for i from _start <= i < _stop by _step:
+    for i from 0 <= i < 30 by 1:
         s._board += (<ui8> board[i] << i * 2)
     return s
 cdef xMoves add_move(xMoves moves, ui8 m):
@@ -44,7 +43,7 @@ cdef xMoves get_moves(xState s):
     cdef ui8 nxt = 0
 
     moves._dir = 1
-    for i from _start <= i < _stop by _step:
+    for i from 0 <= i < 30 by 1:
         if board[i] != s._agent:
             continue
         dest = i + s._steps
@@ -104,7 +103,7 @@ cdef xState iterate(xState s, ui8 m): #static rules
         dest = m + s._steps
 
     cdef ui8 board[30]
-    for i from _start <= i < _stop by _step:
+    for i from 0 <= i < 30 by 1:
         board[i] = (s._board >> i * 2) % 4
 
     #drowing in House of Water
@@ -138,13 +137,19 @@ cdef xState iterate(xState s, ui8 m): #static rules
         return nxt
 
     nxt._board = 0
-    for i from _start <= i < _stop by _step:
+    for i from 0 <= i < 30 by 1:
         nxt._board += ( <ui64> board[i] << i * 2)
 
     return nxt
 
-def test():
-    cdef xState s
-    s._bitvalue = 0
-    s._board = 1
-    return s._bitvalue
+cdef double utility(xState s):
+    cdef int maxSum = 0
+    cdef int minSum = 0
+    cdef int cell
+    for i from 0 <= i < 30 by 1:
+        cell = (s._board >> i * 2) % 4
+        if cell == 1:
+            maxSum += (30 - i)
+        elif cell == 2:
+            minSum += (30 - i)
+    return <double> (30 - maxSum + minSum) / 60  # ut2: diff ratio to start

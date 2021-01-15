@@ -1,7 +1,3 @@
-cdef int _start = 0
-cdef int _stop = 30
-cdef int _step = 1
-
 cdef extern from *: 
     """
     typedef unsigned char ui8;
