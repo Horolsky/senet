@@ -9,17 +9,6 @@
             ]
         }
     }, 
-    "rules": {
-        "addmove": {
-            "value": [1, 4, 5],
-            "options": [1,2,3,4,5],
-            "descr": [
-                "number of steps that gives additional move",
-                "original: 1, 4, 5",
-                "array input"
-            ]
-        }
-    }, 
     "cli": {
         "crd": {
             "value": "tbl",

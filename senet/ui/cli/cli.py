@@ -212,17 +212,16 @@ class cli(metaclass=singleton):
         if self.game.turn == 0:
             event_msg = "game starts"
         else:
-            code = self.game.state.event[1]
-            previous = ('V', 'X')[self.game.state.event[0]-1]
-            start, destination, victim_destination = map(self.get_pos, self.game.state.event[2:])
+            code = self.game.state.event[2]
+            previous = ('V', 'X')[self.game.state.event[1]-1]
+            start, destination = map(self.get_pos, self.game.state.event[3:])
             event_msg = {
-                0: f"{previous} skipped the turn",
-                1: f"{previous} reversed from {start} to {destination}",
-                2: f"{previous} moved from {start} to {destination}",
-                3: f"{previous} from {start} attacked enemy on {destination}",
-                4: f"{previous} drawed in House of Waters and reborned on {destination}",
-                5: f"{previous} from {start} attacked enemy on {destination}. His victim rebourned on {victim_destination}",
-                6: f"{previous} from {start} has successfully escaped the board",
+                0: f"{previous} drawed in House of Waters",
+                1: f"{previous} reversed from {start}",
+                2: f"{previous} skipped the turn",
+                3: f"{previous} moved from {start} to {destination}",
+                4: f"{previous} from {start} attacked enemy on {destination}",
+                5: f"{previous} from {start} has successfully escaped the board",
             }.get(code)
         #STATS MSG
         stats = f"\tplayer {agent} is moving for {self.game.state.steps} steps\n"
