@@ -1,4 +1,4 @@
-from senet.core import game, state, agent
+from senet.core import game, agent
 from senet.ai import AIplayer
 from .msg_cli import msgout#messages as msg
 from senet.ui.rules import rules

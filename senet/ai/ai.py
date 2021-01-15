@@ -1,6 +1,6 @@
 import threading
 import time
-from senet.core import state, agent
+from senet.core import agent
 from senet.utils.report import report
 from senet.settings import SETTINGS
 
