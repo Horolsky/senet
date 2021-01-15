@@ -25,7 +25,7 @@ class AIplayer():
         self._currentstate = state
 
         #some correct value is guaranteed
-        self._dec = None
+        self._dec = 0
         if len(state.moves) > 0:
             self._dec = state.moves[0] 
 

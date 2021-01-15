@@ -39,16 +39,16 @@ def choose_first(state):
     if len(state.moves) > 0:
         return state.moves[0]
     else:
-        return None
+        return 0
 
 def choose_random(state):
     if len(state.moves) > 0:
         return random.choice(state.moves)
     else:
-        return None
+        return 0
 
 def choose_last(state):
     if len(state.moves) > 0:
         return state.moves[-1]
     else:
-        return None
+        return 0
