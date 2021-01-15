@@ -1,3 +1,7 @@
+cdef int _start = 0
+cdef int _stop = 30
+cdef int _step = 1
+
 cdef extern from *: 
     """
     typedef unsigned char ui8;
@@ -60,3 +64,4 @@ cdef extern from *:
 cdef ui8* get_board(xState s, ui8 * board)
 cdef xState set_board(xState s, ui8 * board)
 cdef xMoves get_moves(xState s)
+cdef xState iterate(xState s, ui8 m)

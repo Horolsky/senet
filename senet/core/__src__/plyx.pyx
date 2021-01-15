@@ -1,10 +1,6 @@
 from libc.stdlib cimport malloc, free
-cimport xstate
-from xstate cimport ui8, ui32, ui64, xState, xMoves
-
-cdef int _start = 0
-cdef int _stop = 30
-cdef int _step = 1
+cimport plyx
+from plyx cimport ui8, ui32, ui64, xState, xMoves, _start, _stop, _step
 
 cdef ui8* get_board(xState s, ui8 * board):
     if board is NULL:
@@ -71,3 +67,84 @@ cdef xMoves get_moves(xState s):
                 moves = add_move(moves, i)
     free(board)
     return moves
+
+cdef ui8 is_in(xMoves moves, ui8 m):
+    cdef ui8 isin = 0
+    if (moves._mv0 == m):
+        isin = 1
+    elif (moves._mv1 == m):
+        isin = 2
+    elif (moves._mv2 == m):
+        isin = 3
+    elif (moves._mv3 == m):
+        isin = 4
+    elif (moves._mv4 == m):
+        isin = 5
+    if isin > moves._len:
+        isin = 0
+    return isin
+
+
+cdef xState iterate(xState s, ui8 m): #static rules
+    cdef xMoves moves = get_moves(s)
+    cdef xState nxt = s
+
+    nxt._agent = s._agent % 2 + 1
+    if (s._steps == 1 or s._steps == 4 or s._steps == 5): #TODO: SETTINGS dependency
+        nxt._agent = s._agent
+    if (moves._len == 0):
+        return nxt
+    if (is_in(moves, m) == 0):
+        nxt._bitvalue = 0
+        return nxt
+    
+    cdef ui8 enemy = s._agent % 2 + 1
+    cdef ui8 dest = m - 1
+    if moves._dir  == 1:
+        dest = m + s._steps
+
+    cdef ui8 board[30]
+    for i from _start <= i < _stop by _step:
+        board[i] = (s._board >> i * 2) % 4
+
+    #drowing in House of Water
+    if dest == 26:
+        for i from 14 > i >= 0 by -1:
+            if board[i] == 0:
+                dest = <ui8>i
+                break
+        board[m] = 0
+        board[dest] = s._agent
+    #escaping
+    elif (m == 29 or dest == 30):
+        board[m] = 0
+    #attacking
+    elif (board[dest] == enemy):
+        board[dest] = s._agent
+        if dest > 26: #attacking Houses rule
+            for i from 14 > i >= 0 by -1:
+                if (board[i] == 0):
+                    board[i] = enemy
+                    break
+        else: 
+            board[m] = enemy
+    #moving to empty target
+    elif board[dest] == 0:
+        board[dest] = s._agent
+        board[m] = 0
+    #corrupted logic
+    else: 
+        nxt._bitvalue = 0 
+        return nxt
+
+    nxt._board = 0
+    for i from _start <= i < _stop by _step:
+        nxt._board += ( <ui64> board[i] << i * 2)
+
+    return nxt
+
+def test():
+    cdef xState s
+    s._bitvalue = 0
+    s._board = 1
+    return s._bitvalue
