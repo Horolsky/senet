@@ -1,6 +1,6 @@
 from libc.stdlib cimport malloc, free
-cimport plyx
-from plyx cimport ui8, ui32, ui64, xState, xMoves
+cimport xstate
+from xstate cimport ui8, ui32, ui64, xState, xMoves
 
 cdef ui8* get_board(xState s, ui8 * board):
     if board is NULL:
@@ -37,14 +37,15 @@ cdef xMoves get_moves(xState s):
     cdef ui8* board = get_board(s, NULL)
     cdef xMoves moves
     moves._bitvalue = 0
-    cdef ui8 enemy = s._agent % 2 + 1
+    cdef ui8 agent = s._agent + 1
+    cdef ui8 enemy = agent % 2 + 1
     cdef ui8 dest
     cdef ui8 prev = 0
     cdef ui8 nxt = 0
 
     moves._dir = 1
     for i from 0 <= i < 30 by 1:
-        if board[i] != s._agent:
+        if board[i] != agent:
             continue
         dest = i + s._steps
         if i == 29:                                     # always escaping
@@ -88,16 +89,18 @@ cdef xState iterate(xState s, ui8 m): #static rules
     cdef xMoves moves = get_moves(s)
     cdef xState nxt = s
 
-    nxt._agent = s._agent % 2 + 1
+    cdef ui8 agent = s._agent + 1
+    cdef ui8 enemy = agent % 2 + 1
+
+    nxt._agent = enemy - 1
     if (s._steps == 1 or s._steps == 4 or s._steps == 5): #TODO: SETTINGS dependency
-        nxt._agent = s._agent
+        nxt._agent = agent - 1
     if (moves._len == 0):
         return nxt
     if (is_in(moves, m) == 0):
         nxt._bitvalue = 0
         return nxt
     
-    cdef ui8 enemy = s._agent % 2 + 1
     cdef ui8 dest = m - 1
     if moves._dir  == 1:
         dest = m + s._steps
@@ -113,13 +116,13 @@ cdef xState iterate(xState s, ui8 m): #static rules
                 dest = <ui8>i
                 break
         board[m] = 0
-        board[dest] = s._agent
+        board[dest] = agent
     #escaping
     elif (m == 29 or dest == 30):
         board[m] = 0
     #attacking
     elif (board[dest] == enemy):
-        board[dest] = s._agent
+        board[dest] = agent
         if dest > 26: #attacking Houses rule
             for i from 14 > i >= 0 by -1:
                 if (board[i] == 0):
@@ -129,7 +132,7 @@ cdef xState iterate(xState s, ui8 m): #static rules
             board[m] = enemy
     #moving to empty target
     elif board[dest] == 0:
-        board[dest] = s._agent
+        board[dest] = agent
         board[m] = 0
     #corrupted logic
     else: 
@@ -153,3 +156,17 @@ cdef double utility(xState s):
         elif cell == 2:
             minSum += (30 - i)
     return <double> (30 - maxSum + minSum) / 60  # ut2: diff ratio to start
+
+def test():
+    print("test start")
+    cdef xState s
+    s._bitvalue = 0
+    cdef ui8 board[30]
+    for i from 0 <= i < 30 by 1:
+        board[i] = 0
+    board[25] = 1 #30
+    board[1] = 2 #25
+    for i from 0 <= i < 30 by 1:
+        s._board += (board[i] << i * 2)
+    print("test end")
+    return (s._bitvalue, s._board, utility(s))
