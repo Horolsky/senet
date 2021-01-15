@@ -1,8 +1,16 @@
 import random as r
-from .state import state
+from .xply import Ply
 from .agent import agent
 from senet.utils import report
 from senet.settings import SETTINGS
+from json import dumps
+
+def is_agent(agent):
+    for attr in ("choose_movement", "_number", "_name"):
+        if not hasattr(agent, attr):
+            return False  
+    return True
+
 
 class game():
     def __init__(self, onmove, onvictory):
@@ -27,38 +35,43 @@ class game():
         @param agent2: agent
         """
         self.__log = SETTINGS.get("dev/gamelogs")
-        #settings changes not affect the running game
+
 
         #agents duck typing
-        if not hasattr(agent1, "choose_movement") or not hasattr(agent2, "choose_movement"):
+        if not is_agent(agent1) or not is_agent(agent2):
             raise TypeError("invalid agent objects") 
         self.__agent1 = agent1
         self.__agent2 = agent2
         self.__running = True
         self.__turn = 0
         self.__sticks = game.throw_sticks()
-        self.__state = state(None, first, self.steps)
+        self.__state = Ply()
+        self.__state.steps = self.steps
         if self.__log:
-            self._report = report("game", "json", "logs/games", "{")
+            self._report = report(
+                "game", "json", "logs/games", 
+                f'{{\n"players": "1 - {agent1._name}, 2 - {agent2._name}",\n"game": [\n'
+                )
         self.__onmove()
         self.__run()
     
     def __run(self):
         if self.__log:
-            self._report.write(f'\n"{self.__turn}":' + self.state.to_json())
+            self._report.write(self.state.to_json())
             
         while self.__running:
-            if self.__log:
-                self._report.write(f',\n"{self.__turn}":' + self.state.to_json())
             self.__running = self.__move()
             self.__onmove()
+            if self.__log:
+                self._report.write(',\n' + self.state.to_json())
             #END GAME CONDITION
             if 5 in self.state.bench:
-                self.__onvictory(self.state.event[0]) #sending agent n to callback
+                self.__onvictory(self.state.event[1]) #sending agent n to callback
                 self.stop()
                 if self.__log:
-                    self._report.write("\n}")
+                    self._report.write("\n]\n}")
                     self._report.close()
+
 
     def __move(self):  #manage_movement
         """
@@ -69,7 +82,8 @@ class game():
         """ 
         cell = self.agent.choose_movement(self.state)
         newsticks = game.throw_sticks()
-        newstate = self.state.increment(cell, game.get_steps(newsticks)) 
+        newstate = self.state.increment(cell)
+        newstate.steps = game.get_steps(newsticks) 
         if newstate is None:
             return False  
         else:

@@ -1,6 +1,6 @@
 """
 senet game core classes
 """
-from .state import state
+from .xply import Ply
 from .agent import agent
 from .game import game

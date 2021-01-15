@@ -4,14 +4,14 @@ class agent:
     """
     wrapper class for human and dummy agent controls
     """
-    def __init__(self, num, dfunc=None, name="dummy"): 
+    def __init__(self, number, dfunc=None, name="dummy"): 
         """
         dfunc: decision function
         or dummy code str ("random", "first", "last")
         """
-        if num not in [1,2]:
+        if number not in [1,2]:
             raise ValueError("invalid number arg")
-        self._number = num
+        self._number = number
         if dfunc in ("random", "first", "last"):
             self._dfunc = {
                 "random": choose_random,
@@ -39,16 +39,16 @@ def choose_first(state):
     if len(state.moves) > 0:
         return state.moves[0]
     else:
-        return None
+        return 0
 
 def choose_random(state):
     if len(state.moves) > 0:
         return random.choice(state.moves)
     else:
-        return None
+        return 0
 
 def choose_last(state):
     if len(state.moves) > 0:
         return state.moves[-1]
     else:
-        return None
+        return 0
