@@ -313,12 +313,12 @@ cdef class Ply(xPly):
         if self._xmoves._dir == 2:          # reverse
             dest = start - 1                    
             code = 1    
-            if dest == 25:                  # drow
+            if dest == 26:                  # drow
                 code = 0    
         elif self._xmoves._dir == 1:        # forvard
             dest = start + self.steps       
             code = 3    
-            if dest == 25:                  # drow
+            if dest == 26:                  # drow
                 code = 0
             elif dest > 29:                 # escape
                 code = 5
