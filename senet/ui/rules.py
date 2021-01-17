@@ -1,6 +1,6 @@
 rules = """
 
-ABOUT GAME:
+ABOUT THE GAME:
 
 Goal
   Win by moving all of your Pawns off the board and into the afterlife.
@@ -17,13 +17,13 @@ Rules
       If player cannot do either, his turn is forfeited.
 
 Special Cells
-  (15)  House of Rebirth The square where pawns go from the House of Waters.
-  (*a)  House of Beauty A mandatory square every pawn must land directly on.
-  (*b)  House of Waters Any pawn landing on this square is moved to the House of Rebirth, or behind it if the square is occupied. 
-        Any pawn which is attacked on one of the squares after this gets taken to the House of Waters instead of switching places.
+  (15)  House of Rebirth      The square where pawns go from the House of Waters.
+  (*a)  House of Beauty       A mandatory square every pawn must land directly on.
+  (*b)  House of Waters       Any pawn landing on this square is moved to the House of Rebirth, or behind it if the square is occupied. 
+                              Any pawn which is attacked on one of the squares after this gets taken to the House of Waters instead of switching places.
   (*c)  House of Three Truths A pawn may only advance on a roll of 3.
-  (*d)  House of Re-Atoum A pawn may only advance on a roll of 2.
-  (*e)  House of the Scarab A pawn may advance on any roll.
+  (*d)  House of Re-Atoum     A pawn may only advance on a roll of 2.
+  (*e)  House of the Scarab   A pawn may advance on any roll.
 
 Throwing Sticks 
   The ancient game of Senet was played with four split sticks, each with a mark on one side. 
