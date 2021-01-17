@@ -48,28 +48,26 @@ class game():
         self.__state = Ply()
         self.__state.steps = self.steps
         if self.__log:
-            self._report = report(
-                "game", "json", "logs/games", 
-                f'{{\n"players": "1 - {agent1._name}, 2 - {agent2._name}",\n"game": [\n'
-                )
+            headers = f"N;{agent1._name} vs {agent2._name};agent;steps;utility;bitval\n"
+            self._report = report("game", "csv", "logs/games", headers)
         self.__onmove()
         self.__run()
     
     def __run(self):
         if self.__log:
-            self._report.write(self.state.to_json())
+            self._report.write(f"{self.__turn};{self.state.to_csv()}")
             
         while self.__running:
             self.__running = self.__move()
             self.__onmove()
             if self.__log:
-                self._report.write(',\n' + self.state.to_json())
+                self._report.write(f"\n{self.__turn};{self.state.to_csv()}")
             #END GAME CONDITION
             if 5 in self.state.bench:
                 self.__onvictory(self.state.event[1]) #sending agent n to callback
                 self.stop()
                 if self.__log:
-                    self._report.write("\n]\n}")
+                    self._report.write("\ngame over")
                     self._report.close()
 
 
