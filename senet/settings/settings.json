@@ -32,11 +32,11 @@
         } 
     }, 
     "ai": {
-        "level": {
-            "value": "dummy",
-            "options": ["dummy", "june", "middle", "senior"],
+        "depth": {
+            "value": 1,
+            "options": [1,2,3,4],
             "descr": [
-                "level of ai efficiency"
+                "depth of tree search"
             ]
         },
         "timer": {
