@@ -6,7 +6,7 @@ from senet.settings import SETTINGS
 from json import dumps
 
 def is_agent(agent):
-    for attr in ("choose_movement", "_number", "_name"):
+    for attr in ("choose_movement", "_agent", "_name"):
         if not hasattr(agent, attr):
             return False  
     return True

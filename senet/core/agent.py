@@ -11,7 +11,7 @@ class agent:
         """
         if number not in [1,2]:
             raise ValueError("invalid number arg")
-        self._number = number
+        self._agent = number
         if dfunc in ("random", "first", "last"):
             self._dfunc = {
                 "random": choose_random,
