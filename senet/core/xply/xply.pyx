@@ -1,6 +1,6 @@
 from libc.stdlib cimport malloc, free
 cimport xply
-from xply cimport ui8, ui32, ui64, xState, xMoves
+from xply cimport ui8, ui32, ui64, xState, xMoves, xPly
 from json import dumps
 
 cdef ui8* get_board(xState s, ui8 * board):
@@ -153,7 +153,7 @@ cdef xState increment(xState s, ui8 m): #static rules
 
     return nxt
 
-cdef double utility(xState s):
+cdef float utility(xState s):
     cdef int maxSum = 0
     cdef int minSum = 0
     cdef int cell
@@ -163,14 +163,14 @@ cdef double utility(xState s):
             maxSum += (30 - i)
         elif cell == 2:
             minSum += (30 - i)
-    return <double> (30 - maxSum + minSum) / 60  # ut2: diff ratio to start
+    return <float> (30 - maxSum + minSum) / 60  # ut2: diff ratio to start
 
 cdef class xPly():
-    """
-    class for low-level game-state managment
-    """
-    cdef readonly xState _xstate
-    cdef readonly xMoves _xmoves
+    #"""
+    #class for low-level game-state managment
+    #"""
+    #cdef readonly xState _xstate
+    #cdef readonly xMoves _xmoves
 
     def __init__(self, ui64 bitval):
         self._xstate._bitvalue = bitval
@@ -190,7 +190,7 @@ cdef class xPly():
     cdef ui64 increment(self, ui8 move):
         return increment(self._xstate, move)._bitvalue
 
-    cdef double get_utility(self):
+    cdef float get_utility(self):
         return utility(self._xstate)
     
 cdef class Ply(xPly):

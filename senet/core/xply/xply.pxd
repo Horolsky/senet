@@ -61,4 +61,13 @@ cdef ui8* get_board(xState s, ui8 * board)
 cdef xState set_board(xState s, ui8 * board)
 cdef xMoves get_moves(xState s)
 cdef xState increment(xState s, ui8 m)
-cdef double utility(xState s)
+cdef float utility(xState s)
+cdef class xPly:
+    cdef readonly xState _xstate
+    cdef readonly xMoves _xmoves
+    #def __init__(self, ui64 bitval)
+    cdef void set_steps(self, ui8 steps)
+    cdef void set_agent(self, ui8 agent)
+    cdef void upd_xmoves(self)
+    cdef ui64 increment(self, ui8 move)
+    cdef float get_utility(self)
