@@ -136,6 +136,7 @@ cdef xState increment(xState s, ui8 m): #static rules
                 if (board[i] == 0):
                     board[i] = enemy
                     break
+            board[m] = 0
         else: 
             board[m] = enemy
     #moving to empty target
