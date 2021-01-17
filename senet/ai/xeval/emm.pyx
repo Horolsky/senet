@@ -8,6 +8,7 @@ cdef float xemm(ui64 bitval, ui8 depth):
     cdef xPly ply = xPly(bitval)
     cdef float util = ply.get_utility()
     if util  == 1 or util == 0 or depth == 0:
+        counter += 1
         return util
     
     cdef xMoves cm
@@ -36,7 +37,6 @@ cdef float xemm(ui64 bitval, ui8 depth):
         result += cutil * P[steps-1]
         if cm._len != 0:
             result /= cm._len
-        counter += cm._len
     return result
 
 def emm(ui64 state, ui8 depth):
