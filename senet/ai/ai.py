@@ -28,7 +28,7 @@ class AIplayer():
         self._dec = 0
         self._util = (-inf, inf)[self._agent - 1]
         if len(state.moves) > 0:
-            self._dec = state.moves[-1:] 
+            self._dec = state.moves[-1:][0]
 
         
         self.stopFlag = False
