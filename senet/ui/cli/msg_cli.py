@@ -9,7 +9,7 @@ messages = {
 
     Basic controls:
       q - quit game
-      s - start new game or stop the running one
+      s - start a new game or stop the running one
       a - start autoplay
       b - render the game board
       u - show current state utility
@@ -18,11 +18,6 @@ messages = {
       i - detailed info about the game
       o - show options state
       o <key> <value> - set option
-
-    NB! <value> token in option command must not contain a whitespace.
-    if option require an array input (see the option description),
-    values in second token must be separated with comma.
-    All commands are case insensitive
 
     How to play:
     Pawns of two players are represented on the board as V and X
