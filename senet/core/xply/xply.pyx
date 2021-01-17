@@ -164,7 +164,16 @@ cdef float utility(xState s):
             maxSum += (30 - i)
         elif cell == 2:
             minSum += (30 - i)
-    return <float> (30 - maxSum + minSum) / 60  # ut2: diff ratio to start
+    cdef float ut
+    if minSum == 0:
+        ut = 0
+    elif maxSum == 0:
+        ut = 0
+    else:
+        ut = <float> (minSum) / (maxSum + minSum)#<float> (minSum - maxSum + 130) / 260
+    return ut
+    #(30 - maxSum + minSum) / 60
+    #(130 - max + min) / 260
 
 cdef class xPly():
     #"""
@@ -339,6 +348,10 @@ cdef class Ply(xPly):
     
     def to_json(self):
         return dumps(self.event)
+    
+    
+    def to_csv(self):
+        return " ".join([('_','V','X')[c] for c in self.board]) + f" ;{self.agent};{self.steps};{self.utility};{self._xstate._bitvalue}" 
 
     @staticmethod
     def get_bench(xState state):
