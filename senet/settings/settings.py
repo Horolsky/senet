@@ -41,7 +41,7 @@ class settings(metaclass=singleton):
             return value
         except:
             return None
-    def set(self, path, value):
+    def set(self, path, token):
         """
         pass a setting path in form "group/setting"
         and a new value
@@ -57,14 +57,15 @@ class settings(metaclass=singleton):
         try:
             oldval = settings[group][st]["value"] 
         
-            if type(oldval) is list and type(value) is list:
-                value = [int(c) for c in value]
+            if type(oldval) is list:
+                value = [int(c) for c in token]
                 options = settings[group][st]["options"]
                 if len(set(value) - set(options)) != 0:
                     return False
                 if len(value) not in settings[group][st]["lrange"]:
                     return False
-            else:
+            elif len(token) == 1:
+                value = token[0]
                 if str(value).lower() == "true":
                     value = True
                 elif str(value).lower() == "false":
