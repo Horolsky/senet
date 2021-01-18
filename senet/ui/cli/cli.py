@@ -30,9 +30,10 @@ class cli(metaclass=singleton):
         if len(tokens) > 1:
             try:
                 newseed = int(tokens[1])
-                seed = newseed #TODO seed check
+                if game.check_seed(newseed):
+                    seed = newseed 
             except:
-                seed = 10066320
+                return False
         autodepth = SETTINGS.get("ai/autodepth")
         autofirst = SETTINGS.get("ai/autofirst")
         agent1 = AIplayer(number=1, depth=autodepth[0])
@@ -40,6 +41,7 @@ class cli(metaclass=singleton):
         
         self.msgout("\tGAME STARTED")
         self.game.start(agent1, agent2, autofirst, seed)
+        return True
 
     def start(self, tokens):
         """
@@ -50,7 +52,7 @@ class cli(metaclass=singleton):
         3: <option>      starting player (1, 2) or game seed
         """
         if type(tokens) is not list or len(tokens) < 3:
-            return
+            return False
         #agents
         agents = {
             "human": lambda an: agent(number=an, dfunc=self.ask_human, name="human"),
@@ -60,19 +62,22 @@ class cli(metaclass=singleton):
         agent1 = agents.get(tokens[1])(1)
         agent2 = agents.get(tokens[2])(2)
         if agent1 is None or agent2 is None:
-            return None
+            return False
         #default first player pawns
         first, seed = 1, 10066320 #def seed for game start
         if len(tokens) == 4:
             option = int(tokens[3])
             if option in [1,2]:
                 first = 1
+            elif game.check_seed(option):
+                seed = option 
             else:
-                seed = option #TODO check seed validity
+                return False
         
         self.msgout("\tGAME STARTED")
         #self.msgout(self.stringify_board())
         self.game.start(agent1, agent2, first, seed)
+        return True
     
     def ask_human(self, state=0):
         """
@@ -117,7 +122,9 @@ class cli(metaclass=singleton):
                 if self.game.running:
                     self.msgout("to start autoplay break the current game")
                 else:
-                    self.autoplay(tks)
+                    success = self.autoplay(tks)
+                    if not success:
+                        self.msgout("warn")
                     #break
                 continue
             # actions
@@ -129,7 +136,9 @@ class cli(metaclass=singleton):
                         seed = self.game.stop()
                         self.msgout(f"game stopped, seed: {seed}")
                 else:
-                    self.start(tks)
+                    success = self.start(tks)
+                    if not success:
+                        self.msgout("warn")
                 #break
             if cmd[0] in "0123456789" and self.game.running:
                 m = self.get_index(tks)
