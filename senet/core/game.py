@@ -5,14 +5,28 @@ from senet.utils import report
 from senet.settings import SETTINGS
 from json import dumps
 
-def is_agent(agent):
-    for attr in ("choose_movement", "_agent", "_name"):
-        if not hasattr(agent, attr):
-            return False  
-    return True
-
 
 class game():
+    @staticmethod
+    def check_agent(agent):
+        for attr in ("choose_movement", "_agent", "_name"):
+            if not hasattr(agent, attr):
+                return False  
+        return True
+    @staticmethod
+    def check_seed(seed):
+        if type(seed) is not int:
+            return False
+        test = Ply(seed)
+        res = True
+        if test.agent not in (1,2):
+            res = False
+        if test.steps not in [1,2,3,4,5]:
+            res = False
+        if test.utility in (0, 1):
+            res = False
+        return res
+        
     def __init__(self, onmove, onvictory):
         """
         game logic manager
@@ -45,7 +59,7 @@ class game():
 
 
         #agents duck typing
-        if not is_agent(agent1) or not is_agent(agent2):
+        if not game.check_agent(agent1) or not game.check_agent(agent2):
             raise TypeError("invalid agent objects") 
         self.__agent1 = agent1
         self.__agent2 = agent2
