@@ -57,11 +57,12 @@ class settings(metaclass=singleton):
         try:
             oldval = settings[group][st]["value"] 
         
-            if type(oldval) is list and type(value) is not list:
-                value = value.replace(" ", "").replace(",", "")
+            if type(oldval) is list and type(value) is list:
                 value = [int(c) for c in value]
                 options = settings[group][st]["options"]
                 if len(set(value) - set(options)) != 0:
+                    return False
+                if len(value) not in settings[group][st]["lrange"]:
                     return False
             else:
                 if str(value).lower() == "true":

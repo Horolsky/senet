@@ -45,7 +45,14 @@
             "descr": [
                 "working timer for ai"
             ]
+        },
+        "auto": {
+            "value": [1, 1],
+            "options": [1,2,3,4],
+            "descr": [
+                "depth of two ai agents for autoplay"
+            ],
+            "lrange": [2]
         }
-
     }
 }
