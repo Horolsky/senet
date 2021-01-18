@@ -46,13 +46,20 @@
                 "working timer for ai"
             ]
         },
-        "auto": {
+        "autodepth": {
             "value": [1, 1],
             "options": [1,2,3,4],
             "descr": [
-                "depth of two ai agents for autoplay"
+                "search depth of ai agents in autoplay"
             ],
             "lrange": [2]
+        },
+        "autofirst": {
+            "value": 1,
+            "options": [1,2],
+            "descr": [
+                "first moving player in autoplay"
+            ]
         }
     }
 }
