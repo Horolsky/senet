@@ -42,6 +42,8 @@ class Game():
         self.__running = False
         if self.__log:
             self._report.close("\ngame over")
+        self.__agent1 = None
+        self.__agent2 = None
         
     def stop(self): #in loop game stop
         self.__running = False
