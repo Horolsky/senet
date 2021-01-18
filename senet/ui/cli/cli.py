@@ -20,6 +20,26 @@ class cli(metaclass=singleton):
     def init(self):
         self.msgout('h')
         self.ask_human()
+        
+    def autoplay(self, tokens):
+        """
+        ai vs ai autoplayed game
+        ai depth are taken from the settings 
+        """
+        seed=10066320
+        if len(tokens) > 1:
+            try:
+                newseed = int(tokens[1])
+                seed = newseed #TODO seed check
+            except:
+                seed = 10066320
+        autodepth = SETTINGS.get("ai/autodepth")
+        autofirst = SETTINGS.get("ai/autofirst")
+        agent1 = AIplayer(number=1, depth=autodepth[0])
+        agent2 = AIplayer(number=2, depth=autodepth[1])
+        
+        self.msgout("\tGAME STARTED")
+        self.game.start(agent1, agent2, autofirst, seed)
 
     def start(self, tokens):
         """
@@ -97,7 +117,7 @@ class cli(metaclass=singleton):
                 if self.game.running:
                     self.msgout("to start autoplay break the current game")
                 else:
-                    self.start(["s", "dummy", "dummy", 1])
+                    self.autoplay(tks)
                     #break
                 continue
             # actions
