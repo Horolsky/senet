@@ -1,6 +1,6 @@
 import random as r
 from .xply import Ply
-from .agent import agent
+from .agent import Agent
 from senet.utils import report
 from senet.settings import SETTINGS
 from json import dumps
@@ -52,8 +52,8 @@ class Game():
         """
         start new or restart current game
         @param first: int
-        @param agent1: agent
-        @param agent2: agent
+        @param agent1: Agent
+        @param agent2: Agent
         """
         self.__log = SETTINGS.get("dev/gamelogs")
 

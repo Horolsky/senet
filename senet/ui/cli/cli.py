@@ -1,4 +1,4 @@
-from senet.core import Game, agent
+from senet.core import Game, Agent
 from senet.ai import AIplayer
 from .msg_cli import msgout#messages as msg
 from senet.ui.rules import rules
@@ -55,9 +55,9 @@ class cli(metaclass=singleton):
             return False
         #agents
         agents = {
-            "human": lambda an: agent(number=an, dfunc=self.ask_human, name="human"),
+            "human": lambda an: Agent(number=an, dfunc=self.ask_human, name="human"),
             "ai": lambda an: AIplayer(number=an, depth=SETTINGS.get("ai/depth")),
-            "dummy": lambda an: agent(number=an) 
+            "dummy": lambda an: Agent(number=an) 
             }
         agent1 = agents.get(tokens[1])(1)
         agent2 = agents.get(tokens[2])(2)

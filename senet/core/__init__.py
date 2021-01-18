@@ -2,5 +2,5 @@
 senet game core classes
 """
 from .xply import Ply
-from .agent import agent
+from .agent import Agent
 from .game import Game

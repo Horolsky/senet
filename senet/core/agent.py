@@ -1,6 +1,6 @@
 import random
 
-class agent:
+class Agent:
     """
     wrapper class for human and dummy agent controls
     """

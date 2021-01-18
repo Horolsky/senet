@@ -1,7 +1,7 @@
 import threading
 import time
 from math import inf
-from senet.core import agent, Ply
+from senet.core import Ply
 from senet.utils.report import report
 from senet.settings import SETTINGS
 from senet.ai.xeval import emm
