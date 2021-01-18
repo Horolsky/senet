@@ -4,32 +4,18 @@
             "value": true,
             "options": [ true, false ],
             "descr": [
-                "saving game log to json file",
+                "saving game log to csv file",
                 "files are stored in logs/games"
             ]
+        },
+        "ailogs": {
+            "value": true,
+            "options": [ true, false ],
+            "descr": [
+                "saving ai working log to csv file",
+                "files are stored in logs/ai"
+            ]
         }
-    }, 
-    "cli": {
-        "crd": {
-            "value": "tbl",
-            "options": [ "tbl", "lin" ],
-            "descr": [
-                "cell coordinates mode",
-                "- lin (linear):   stepwise index coordinate (1-30)",
-                "- tbl (tabular):  row-column cell coordinate",
-                "2nd row keeps LtR direction in tbl mode"
-            ]
-        }, 
-        "brd": {
-            "value": "tbl",
-            "options": [ "tbl", "lin" ],
-            "descr": [
-                "board cli rendering mode",
-                "- lin (linear):   single line array",
-                "- tbl (tabular):  3x10 table (original)",
-                "this option does not affect the crd mode"
-            ]
-        } 
     }, 
     "ai": {
         "depth": {
@@ -61,5 +47,27 @@
                 "first moving player in autoplay"
             ]
         }
-    }
+    },
+    "cli": {
+        "crd": {
+            "value": "tbl",
+            "options": [ "tbl", "lin" ],
+            "descr": [
+                "cell coordinates mode",
+                "- lin (linear):   stepwise index coordinate (1-30)",
+                "- tbl (tabular):  row-column cell coordinate",
+                "2nd row keeps LtR direction in tbl mode"
+            ]
+        }, 
+        "brd": {
+            "value": "tbl",
+            "options": [ "tbl", "lin" ],
+            "descr": [
+                "board cli rendering mode",
+                "- lin (linear):   single line array",
+                "- tbl (tabular):  3x10 table (original)",
+                "this option does not affect the crd mode"
+            ]
+        } 
+    } 
 }
