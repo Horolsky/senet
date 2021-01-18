@@ -6,7 +6,7 @@ from senet.settings import SETTINGS
 from json import dumps
 
 
-class game():
+class Game():
     @staticmethod
     def check_agent(agent):
         for attr in ("choose_movement", "_agent", "_name"):
@@ -59,7 +59,7 @@ class game():
 
 
         #agents duck typing
-        if not game.check_agent(agent1) or not game.check_agent(agent2):
+        if not Game.check_agent(agent1) or not Game.check_agent(agent2):
             raise TypeError("invalid agent objects") 
         self.__agent1 = agent1
         self.__agent2 = agent2
@@ -68,8 +68,8 @@ class game():
         
         self.__state = Ply(seed)
         if seed == 10066320:
-            self.__sticks = game.throw_sticks()
-            self.__state.steps = game.get_steps(self.__sticks)
+            self.__sticks = Game.throw_sticks()
+            self.__state.steps = Game.get_steps(self.__sticks)
             self.__state.agent = first
         
         if self.__log:
@@ -107,9 +107,9 @@ class game():
         cell = self.agent.choose_movement(self.state)
         if self.__running == False:
             return False
-        newsticks = game.throw_sticks()
+        newsticks = Game.throw_sticks()
         newstate = self.state.increment(cell)
-        newstate.steps = game.get_steps(newsticks) 
+        newstate.steps = Game.get_steps(newsticks) 
         if newstate is None:
             return False  
         else:

@@ -1,4 +1,4 @@
-from senet.core import game, agent
+from senet.core import Game, agent
 from senet.ai import AIplayer
 from .msg_cli import msgout#messages as msg
 from senet.ui.rules import rules
@@ -7,7 +7,7 @@ from senet.settings import SETTINGS
 
 class cli(metaclass=singleton):
     def __init__(self):
-        self.__game = game(self._on_move, self._on_victory)
+        self.__game = Game(self._on_move, self._on_victory)
         self.__running = True
 
     @property
@@ -30,7 +30,7 @@ class cli(metaclass=singleton):
         if len(tokens) > 1:
             try:
                 newseed = int(tokens[1])
-                if game.check_seed(newseed):
+                if Game.check_seed(newseed):
                     seed = newseed 
             except:
                 return False
@@ -69,7 +69,7 @@ class cli(metaclass=singleton):
             option = int(tokens[3])
             if option in [1,2]:
                 first = 1
-            elif game.check_seed(option):
+            elif Game.check_seed(option):
                 seed = option 
             else:
                 return False
