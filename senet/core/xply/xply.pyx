@@ -12,7 +12,7 @@ cdef ui8* get_board(xState s, ui8 * board):
 
 cdef xState set_board(xState s, ui8 * board):
     if board is NULL:
-        s._bitvalue = 0
+        s._seed = 0
     for i from 0 <= i < 30 by 1:
         s._board += (<ui8> board[i] << i * 2)
     return s
@@ -37,7 +37,7 @@ cdef xMoves add_move(xMoves moves, ui8 m):
 cdef xMoves get_moves(xState s):
     cdef ui8* board = get_board(s, NULL)
     cdef xMoves moves
-    moves._bitvalue = 0
+    moves._seed = 0
     cdef ui8 agent = s._agent + 1
     cdef ui8 enemy = agent % 2 + 1
     cdef ui8 dest
@@ -106,7 +106,7 @@ cdef xState increment(xState s, ui8 m): #static rules
     if (moves._len == 0):
         return nxt
     if (is_in(moves, m) == 0):
-        nxt._bitvalue = 0
+        nxt._seed = 0
         return nxt
     
     cdef ui8 dest = m - 1
@@ -145,7 +145,7 @@ cdef xState increment(xState s, ui8 m): #static rules
         board[m] = 0
     #corrupted logic
     else: 
-        nxt._bitvalue = 0 
+        nxt._seed = 0 
         return nxt
 
     nxt._board = 0
@@ -170,20 +170,13 @@ cdef float utility(xState s):
     elif maxSum == 0:
         ut = 0
     else:
-        ut = <float> (minSum) / (maxSum + minSum)#<float> (minSum - maxSum + 130) / 260
+        ut = <float> (minSum) / (maxSum + minSum)
     return ut
-    #(30 - maxSum + minSum) / 60
-    #(130 - max + min) / 260
-
+    
 cdef class xPly():
-    #"""
-    #class for low-level game-state managment
-    #"""
-    #cdef readonly xState _xstate
-    #cdef readonly xMoves _xmoves
 
-    def __init__(self, ui64 bitval):
-        self._xstate._bitvalue = bitval
+    def __init__(self, ui64 seed):
+        self._xstate._seed = seed
         self.upd_xmoves()
 
     cdef void set_steps(self, ui8 steps):
@@ -198,7 +191,7 @@ cdef class xPly():
         self._xmoves = get_moves(self._xstate)
 
     cdef ui64 increment(self, ui8 move):
-        return increment(self._xstate, move)._bitvalue
+        return increment(self._xstate, move)._seed
 
     cdef float get_utility(self):
         return utility(self._xstate)
@@ -211,18 +204,18 @@ cdef class Ply(xPly):
     cdef tuple __event
     cdef tuple __bench
 
-    def __init__(self, ui64 bitval=10066320):
+    def __init__(self, ui64 seed=10066320):
         """
-        @param bitval: 64-bit integer xstate bitvalue
+        @param seed: 64-bit integer xstate seed
         @param event: tuple 
         """
-        xPly.__init__(self, bitval)
+        xPly.__init__(self, seed)
         self.__cache = {
             "moves": None,
             "board": None,
             "utility": None,
         }
-        self.__event = (bitval, 0,0,0,0) #this updates on iteration after init
+        self.__event = (seed, 0,0,0,0) #this updates on iteration after init
         self.__bench = Ply.get_bench(self._xstate)
     @property
     def agent(self):
@@ -334,11 +327,14 @@ cdef class Ply(xPly):
             elif self.board[dest] != 0:     # attack
                 code = 4
 
-        event = (self._xstate._bitvalue, self.agent, code, start, dest)
+        event = (self._xstate._seed, self.agent, code, start, dest)
         
         iteration = Ply(xPly.increment(self, start))
         iteration.__event = event
         return iteration
+    @property
+    def seed(self):
+        return self._xstate._seed
 
     @property
     def utility(self):
@@ -351,7 +347,7 @@ cdef class Ply(xPly):
     
     
     def to_csv(self):
-        return " ".join([('_','V','X')[c] for c in self.board]) + f" ;{self.agent};{self.steps};{self.utility};{self._xstate._bitvalue}" 
+        return " ".join([('_','V','X')[c] for c in self.board]) + f" ;{self.agent};{self.steps};{self.utility};{self._xstate._seed}" 
 
     @staticmethod
     def get_bench(xState state):

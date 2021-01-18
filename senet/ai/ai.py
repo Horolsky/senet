@@ -54,12 +54,12 @@ class AIplayer():
         if len(self._state.moves) < 2:
             return
         #get util for guaranteed move first    
-        res = emm.emm(self._state.increment(self._dec)._xstate["_bitvalue"], self._depth)
+        res = emm.emm(self._state.increment(self._dec).seed, self._depth)
         self._util = res[0]
         print(f"leaves: {res[1]}")
 
         for move in self._state.moves[:-1]:
-            res = emm.emm(self._state.increment(move)._xstate["_bitvalue"], self._depth)
+            res = emm.emm(self._state.increment(move).seed, self._depth)
             print(f"leaves: {res[1]}")
             if (self._agent == 1 and res[0] > self._util) or (self._agent == 2 and res[0] < self._util):
                 self._util = res[0]

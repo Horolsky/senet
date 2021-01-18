@@ -3,9 +3,9 @@ from senet.core.xply cimport ui8, ui64, xState, xMoves, xPly# get_utility, get_m
 #    cdef xPly x = xPly(1)
 #    return x
 cdef ui64 counter = 0
-cdef float xemm(ui64 bitval, ui8 depth):
+cdef float xemm(ui64 seed, ui8 depth):
     global counter
-    cdef xPly ply = xPly(bitval)
+    cdef xPly ply = xPly(seed)
     cdef float util = ply.get_utility()
     if util  == 1 or util == 0 or depth == 0:
         counter += 1
