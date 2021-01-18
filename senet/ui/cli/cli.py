@@ -34,7 +34,7 @@ class cli(metaclass=singleton):
         #agents
         agents = {
             "human": lambda an: agent(number=an, dfunc=self.ask_human, name="human"),
-            "ai": lambda an: AIplayer(number=an),#agent(num=an), #TODO
+            "ai": lambda an: AIplayer(number=an, depth=SETTINGS.get("ai/depth")),
             "dummy": lambda an: agent(number=an) 
             }
         agent1 = agents.get(tokens[1])(1)
@@ -95,7 +95,7 @@ class cli(metaclass=singleton):
             
             if cmd == 'a':
                 if self.game.running:
-                    self.msgout("to start autoplay terminate current game")
+                    self.msgout("to start autoplay break the current game")
                 else:
                     self.start(["s", "dummy", "dummy", 1])
                     #break
@@ -154,7 +154,8 @@ class cli(metaclass=singleton):
             msgout(msg)
     
     def toggle_option(self, tokens):
-        option, value = tokens
+        option = tokens[0]
+        value = tokens[1:]
         settings = SETTINGS.get("all")
         success = False
         for group in settings:
