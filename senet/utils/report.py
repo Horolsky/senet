@@ -34,4 +34,6 @@ class report:
         return False
         
     def close(self, msg=0):
+        if type(msg) is str:
+            self._file.write(msg)
         self._file.close()

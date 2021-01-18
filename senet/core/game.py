@@ -41,8 +41,7 @@ class Game():
     def __stop(self): #after loop game closing
         self.__running = False
         if self.__log:
-            self._report.write("\ngame over")
-            self._report.close()
+            self._report.close("\ngame over")
         
     def stop(self): #in loop game stop
         self.__running = False
