@@ -8,6 +8,7 @@ from senet.settings import SETTINGS
 class cli(metaclass=singleton):
     def __init__(self):
         self.__game = game(self._on_move, self._on_victory)
+        self.__running = True
 
     @property
     def game(self):
@@ -26,7 +27,7 @@ class cli(metaclass=singleton):
         0: <cmd>        "s"
         1: <player 1>   "human", "ai", "dummy"
         2: <player 2>   "human", "ai", "dummy"
-        3: <first>      1, 2
+        3: <option>      starting player (1, 2) or game seed
         """
         if type(tokens) is not list or len(tokens) < 3:
             return
@@ -41,14 +42,17 @@ class cli(metaclass=singleton):
         if agent1 is None or agent2 is None:
             return None
         #default first player pawns
-        first = 1
+        first, seed = 1, 10066320 #def seed for game start
         if len(tokens) == 4:
-            first = int(tokens[3])
-            if first not in [1,2]:
+            option = int(tokens[3])
+            if option in [1,2]:
                 first = 1
+            else:
+                seed = option #TODO check seed validity
+        
         self.msgout("\tGAME STARTED")
         #self.msgout(self.stringify_board())
-        self.game.start(agent1, agent2, first)
+        self.game.start(agent1, agent2, first, seed)
     
     def ask_human(self, state=0):
         """
@@ -58,8 +62,9 @@ class cli(metaclass=singleton):
         return integer cell number
         """
         movement = -1 #default invalid move
-        while True:
-            tks = input("human: ").lower().split(None, 2)
+
+        while self.__running:
+            tks = input("human: ").lower().split()
             if len(tks) < 1:
                 continue
             cmd = tks[0]
@@ -70,8 +75,10 @@ class cli(metaclass=singleton):
                     conf = input("human: ")
                     if conf != "Y" and conf != "y":
                         continue
-                self.msgout("cli is terminated")
-                break
+                seed = self.game.stop()
+                self.msgout(f"game stopped, seed: {seed}")
+                self.msgout("shut down")
+                self.__running = False
             # msg request
             if cmd in ['h', 'r', 'i']:
                 self.msgout(cmd)
@@ -97,9 +104,10 @@ class cli(metaclass=singleton):
             if cmd == 's':
                 if self.game.running:
                     self.msgout("confirm_s")
-                    conf = input("human: ").lower()
+                    conf = input("\nhuman: ").lower()
                     if conf == "y": 
-                        self.game.stop()
+                        seed = self.game.stop()
+                        self.msgout(f"game stopped, seed: {seed}")
                 else:
                     self.start(tks)
                 #break
@@ -107,7 +115,7 @@ class cli(metaclass=singleton):
                 m = self.get_index(tks)
                 if m in self.game.state.moves:
                     movement = m
-                    break
+                    break # return movement for in-game loop
                 else:
                     self.msgout("choosen movement is impossible")
                     continue

@@ -24,10 +24,17 @@ class game():
         self.__onmove = onmove
         self.__onvictory = onvictory
     
-    def stop(self): #stop_game
+    def __stop(self): #after loop game closing
         self.__running = False
+        if self.__log:
+            self._report.write("\ngame over")
+            self._report.close()
+        
+    def stop(self): #in loop game stop
+        self.__running = False
+        return self.__state.seed
     
-    def start(self, agent1, agent2,  first=1): #start_game
+    def start(self, agent1, agent2,  first=1, seed=10066320): #start_game
         """
         start new or restart current game
         @param first: int
@@ -44,14 +51,19 @@ class game():
         self.__agent2 = agent2
         self.__running = True
         self.__turn = 0
-        self.__sticks = game.throw_sticks()
-        self.__state = Ply()
-        self.__state.steps = self.steps
+        
+        self.__state = Ply(seed)
+        if seed == 10066320:
+            self.__sticks = game.throw_sticks()
+            self.__state.steps = game.get_steps(self.__sticks)
+            self.__state.agent = first
+        
         if self.__log:
-            headers = f"N;{agent1._name} vs {agent2._name};agent;steps;utility;bitval\n"
+            headers = f"N;{agent1._name} vs {agent2._name};agent;steps;utility;seed\n"
             self._report = report("game", "csv", "logs/games", headers)
         self.__onmove()
         self.__run()
+        self.__stop()
     
     def __run(self):
         if self.__log:
@@ -59,16 +71,16 @@ class game():
             
         while self.__running:
             self.__running = self.__move()
+            if not self.__running:
+                break
             self.__onmove()
             if self.__log:
                 self._report.write(f"\n{self.__turn};{self.state.to_csv()}")
             #END GAME CONDITION
             if 5 in self.state.bench:
                 self.__onvictory(self.state.event[1]) #sending agent n to callback
-                self.stop()
-                if self.__log:
-                    self._report.write("\ngame over")
-                    self._report.close()
+                break
+                
 
 
     def __move(self):  #manage_movement
@@ -79,6 +91,8 @@ class game():
         False on failure
         """ 
         cell = self.agent.choose_movement(self.state)
+        if self.__running == False:
+            return False
         newsticks = game.throw_sticks()
         newstate = self.state.increment(cell)
         newstate.steps = game.get_steps(newsticks) 
@@ -127,10 +141,6 @@ class game():
     @property
     def sticks(self):
         return self.__sticks
-
-    @property
-    def steps(self):        
-        return game.get_steps(self.sticks)
 
     @staticmethod
     def throw_sticks():
