@@ -7,7 +7,7 @@ from senet.settings import SETTINGS
 from senet.ai.xeval import emm
 
 class AIplayer():
-    def __init__(self, number):
+    def __init__(self, number, depth):
         if number not in [1, 2]:
             raise ValueError("invalid agent number value")
         self._agent = number
@@ -17,7 +17,7 @@ class AIplayer():
         self._turn = 0
         self.stopFlag = False
         self._timer = SETTINGS.get("ai/timer")
-        self._depth = SETTINGS.get("ai/depth")
+        self._depth = depth#SETTINGS.get("ai/depth")
         
     def choose_movement(self, state):
         #TODO: check state
