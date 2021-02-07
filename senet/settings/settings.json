@@ -2,6 +2,7 @@
     "dev": {
         "gamelogs": {
             "value": false,
+            "type": "flag",
             "options": [ true, false ],
             "descr": [
                 "saving game log to csv file",
@@ -10,6 +11,7 @@
         },
         "ailogs": {
             "value": false,
+            "type": "flag",
             "options": [ true, false ],
             "descr": [
                 "saving ai working log to csv file",
@@ -20,28 +22,32 @@
     "ai": {
         "depth": {
             "value": 1,
-            "options": [1,2,3,4],
+            "type": "number",
+            "options": [1,4],
             "descr": [
                 "depth of tree search"
             ]
         },
         "timer": {
             "value": 2,
-            "options": [1,2,3,4,5,6,10,15,30],
+            "type": "number",
+            "options": [1,60],
             "descr": [
                 "working timer for ai"
             ]
         },
         "autodepth": {
             "value": [1, 1],
-            "options": [1,2,3,4],
+            "type": "list",
+            "options": [1,4],
             "descr": [
                 "search depth of ai agents in autoplay"
             ],
-            "lrange": [2]
+            "lrange": [2,2]
         },
         "autofirst": {
             "value": 1,
+            "type": "flag",
             "options": [1,2],
             "descr": [
                 "first moving player in autoplay"
@@ -51,6 +57,7 @@
     "cli": {
         "crd": {
             "value": "tbl",
+            "type": "flag",
             "options": [ "tbl", "lin" ],
             "descr": [
                 "cell coordinates mode",
@@ -61,6 +68,7 @@
         }, 
         "brd": {
             "value": "tbl",
+            "type": "flag",
             "options": [ "tbl", "lin" ],
             "descr": [
                 "board cli rendering mode",

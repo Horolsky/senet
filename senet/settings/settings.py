@@ -53,18 +53,27 @@ class settings(metaclass=singleton):
         settings = load(f) 
         f.close()
         group, st = path.split("/")
-        oldval = None
+        value = None
         try:
-            oldval = settings[group][st]["value"] 
-        
-            if type(oldval) is list:
+            oldval = settings[group][st]["value"]
+            stype = settings[group][st]["type"]
+
+            if stype == "list":
                 value = [int(c) for c in token]
-                options = settings[group][st]["options"]
-                if len(set(value) - set(options)) != 0:
+                l = len(value)
+                lrange = settings[group][st]["lrange"]
+                if l < lrange[0] or l > lrange[1]:
                     return False
-                if len(value) not in settings[group][st]["lrange"]:
+                vrange = settings[group][st]["options"]
+                for k in value:
+                    if k < vrange[0] or k > vrange[1]:
+                        return False
+            elif stype == "number":
+                value = int(token[0])
+                vrange = settings[group][st]["options"]
+                if value < vrange[0] or value > vrange[1]:
                     return False
-            elif len(token) == 1:
+            elif stype == "flag":
                 value = token[0]
                 if str(value).lower() == "true":
                     value = True
@@ -72,6 +81,7 @@ class settings(metaclass=singleton):
                     value = False
                 else:
                     value = type(oldval)(value)
+                options = settings[group][st]["options"]
                 if value not in settings[group][st]["options"]:
                     return False
             
