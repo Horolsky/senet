@@ -205,8 +205,15 @@ class cli(metaclass=singleton):
             msg += f"  {group.upper()}:\n  {'`'*120}\n" #group separator
 
             for option in settings[group]:
+                stype = settings[group][option]['type']
                 value = settings[group][option]['value']
+                if stype == "list":
+                    value = ", ".join([str(k) for k in value])
                 options = settings[group][option]['options']
+                if stype == "flag":
+                    options = ", ".join([str(o) for o in options])
+                else:
+                    options = " - ".join([str(o) for o in options])
                 descr = settings[group][option]['descr']
                 dlines = descr[0] + "\n"
                 for line in descr[1:]:
