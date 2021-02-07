@@ -28,14 +28,6 @@
                 "depth of tree search"
             ]
         },
-        "timer": {
-            "value": 2,
-            "type": "number",
-            "options": [1,60],
-            "descr": [
-                "working timer for ai"
-            ]
-        },
         "autodepth": {
             "value": [1, 1],
             "type": "list",
@@ -44,6 +36,14 @@
                 "search depth of ai agents in autoplay"
             ],
             "lrange": [2,2]
+        },
+        "timer": {
+            "value": 2,
+            "type": "number",
+            "options": [1,60],
+            "descr": [
+                "working timer for ai"
+            ]
         },
         "autofirst": {
             "value": 1,
