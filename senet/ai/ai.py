@@ -29,7 +29,8 @@ class AIplayer():
 
     def __del__(self):
         print("ai instance disposed")
-        self._report.close('ai instance disposed')
+        if self.__log:
+            self._report.close('ai instance disposed')
         
     def choose_movement(self, state):
         #TODO: check state
