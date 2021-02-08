@@ -77,7 +77,8 @@ ui8 move_is_in(xMoves moves, ui8 m){
     return mn > moves._len ? 0 : 1;
 }
 
-xMoves _get_moves(xState s){
+ui32 get_moves(ui64 seed){
+    xState s = {._seed=seed};
     xMoves moves;
     moves._seed = 0;
     ui8 agent = s._agent + 1;
@@ -111,21 +112,19 @@ xMoves _get_moves(xState s){
         }
     }
     if (moves._len == 0) moves._dir = 0;                                              // skip move
-    return moves;
+    return moves._seed;
 }
 
-xState increment_1(xState s, ui8 m){
-    xMoves moves = _get_moves(s);
+ui64 increment_1(ui64 seed, ui8 m){
+    xState s = {._seed=seed};
+    xMoves moves = {._seed=get_moves(seed)};
     ui8 agent = s._agent + 1;
     ui8 enemy = agent % 2 + 1;
     s._agent = enemy - 1;
 
     if (s._steps == 1 || s._steps == 4 || s._steps == 5) s._agent = agent - 1;
-    if (moves._len == 0) return s;
-    if (move_is_in(moves, m) == 0){
-        s._seed = 0;
-        return s;
-    }
+    if (moves._len == 0) return s._seed;
+    if (move_is_in(moves, m) == 0) return 0;
     ui8 dest = m - 1;
     if (moves._dir  == 1) dest = m + s._steps;
     //drowing in House of Water
@@ -161,9 +160,10 @@ xState increment_1(xState s, ui8 m){
     }
     //corrupted logic
     else s._seed = 0; 
-    return s;
+    return s._seed;
 }
-float eval_basic(xState s){
+float eval_basic(ui64 seed){
+    xState s = {._seed=seed};
     int maxSum = 0;
     int minSum = 0;
     int cell;
