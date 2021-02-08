@@ -1,8 +1,43 @@
-#include "extern-src-xply.h"
-#define BOARD_GET(state, cell) ((state._board >> (cell << 2)) % 4)
+typedef unsigned char ui8;
+typedef unsigned int ui16;
+typedef unsigned long int ui32; 
+typedef unsigned long long int ui64;
+typedef struct _xState {
+    union {
+        /*
+         * 1st bit for agent, 2d-4d for steps, other for board
+         * right to left indexation
+         */
+        ui64 _seed; 
+        struct {
+            ui64 _agent:1; // current ply active agent 
+            ui64 _steps:3; // 1-5, 0 for unset
+            ui64 _board:60;// 30x array, 
+        };
+    };
+} xState; 
+typedef struct _xMoves{
+    union {
+        /*
+         * 1st bit for direction, 2d for length, other for 5 movement indices 
+         * right to left indexation
+         */
+        ui32 _seed; 
+        struct {
+            ui32 _dir:2; // 0: no movement, 1: normal, 2: backward
+            ui32 _len:3; // length of avaliable movements
+            ui32 _mv0:5;
+            ui32 _mv1:5;
+            ui32 _mv2:5;
+            ui32 _mv3:5;
+            ui32 _mv4:5;
+        };
+    };
+} xMoves;
+#define BOARD_GET(state, cell) ((state._board >> (cell * 2)) % 4)
 #define BOARD_SET(state, cell, val) \
-state._board &= ~(3<<(cell<<2));    \
-state._board ^= (val<<(cell<<2));   \
+state._board &= ~(3 << (cell * 2));    \
+state._board ^= (val << (cell * 2));   \
 
 xMoves _add_move(xMoves moves, ui8 m){
     switch (moves._len){
@@ -42,7 +77,7 @@ ui8 move_is_in(xMoves moves, ui8 m){
     return mn > moves._len ? 0 : 1;
 }
 
-xMoves get_moves(xState s){
+xMoves _get_moves(xState s){
     xMoves moves;
     moves._seed = 0;
     ui8 agent = s._agent + 1;
@@ -51,17 +86,18 @@ xMoves get_moves(xState s){
     
     moves._dir = 1;                                                                 // direct move
     for (ui8 i =0; i < 30; i++){
-        if (BOARD_GET(s, i) != agent) continue;
+        ui8 cell = BOARD_GET(s, i);
+        if (cell != agent) continue;
         dest = i + s._steps;
         trgt = BOARD_GET(s, dest);
         if (i == 29) moves = _add_move(moves, i);                                   // always escaping
-        else if ((i == 28 || i == 29) && dest == 30) moves = _add_move(moves, i);   // correct escaping
+        else if ((i == 27 || i == 28) && dest == 30) moves = _add_move(moves, i);   // correct escaping
         else if (i != 25 && dest > 25) continue;                                    // forbidden house arriving
         else if (dest > 29) continue;                                               // forbidden escaping
         else if (trgt == 0) moves = _add_move(moves, i);                            // normal movement
         else if (trgt == enemy) {                                                   // attack
-            ui8 prev = dest > 0 ? BOARD_GET(s, dest-1) : 0;
-            ui8 nxt = dest < 29 ? BOARD_GET(s, dest+1) : 0;
+            ui8 prev = dest > 0 ? BOARD_GET(s, (dest-1)) : 0;
+            ui8 nxt = dest < 29 ? BOARD_GET(s, (dest+1)) : 0;
             if (prev != enemy && nxt != enemy) moves = _add_move(moves, i);
         }
     }
@@ -79,7 +115,7 @@ xMoves get_moves(xState s){
 }
 
 xState increment_1(xState s, ui8 m){
-    xMoves moves = get_moves(s);
+    xMoves moves = _get_moves(s);
     ui8 agent = s._agent + 1;
     ui8 enemy = agent % 2 + 1;
     s._agent = enemy - 1;
@@ -119,7 +155,7 @@ xState increment_1(xState s, ui8 m){
         } else { BOARD_SET(s, dest, enemy) }
     }
     //moving to empty target
-    else if (BOARD_GET(s, dest)){
+    else if (BOARD_GET(s, dest) == 0){
         BOARD_SET(s,dest,agent)
         BOARD_SET(s,m,0)
     }
@@ -142,3 +178,4 @@ float eval_basic(xState s){
     else ut = (float) (minSum) / (maxSum + minSum);
     return ut;
 }
+//from senet.core.xply import Ply, incr, get_state, get_moves

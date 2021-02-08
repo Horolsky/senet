@@ -1,1 +1,1 @@
-from .xply import Ply
+from .xply import Ply, incr, get_state, get_moves

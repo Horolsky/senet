@@ -1,6 +1,6 @@
 from libc.stdlib cimport malloc, free
 cimport xply
-from xply cimport ui8, ui32, ui64, xState, xMoves, xPly
+from xply cimport ui8, ui32, ui64, xState, xMoves, xPly, increment_1
 from json import dumps
 
 cdef ui8* get_board(xState s, ui8 * board):
@@ -298,7 +298,7 @@ cdef class Ply(xPly):
     @property
     def mobility(self):
         return (0,1,-1)[self._xmoves._dir]
-    
+
     def increment(self, start):
         """
         event handling wrapper
@@ -359,3 +359,16 @@ cdef class Ply(xPly):
             elif cell == 2:
                 a2 -= 1
         return (a1, a2)
+
+def incr(ui64 state, ui8 m):
+    cdef xState s
+    s._seed = state
+    return increment_1(s, m)
+def get_state(ui64 state):
+    cdef xState s
+    s._seed = state
+    return s
+def get_moves(ui64 state):
+    cdef xState s
+    s._seed = state
+    return _get_moves(s)
