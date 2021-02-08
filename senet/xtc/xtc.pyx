@@ -167,7 +167,7 @@ cdef class Ply():
     
     
     def to_csv(self):
-        return " ".join([('_','V','X')[c] for c in self.board]) + f" ;{self.agent};{self.steps};{self.utility};{self._xstate._seed}" 
+        return " ".join([('_','V','X')[c] for c in self.board]) + f" ;{self.agent};{self.steps};{self.utility};{self.__xstate._seed}" 
 
     @staticmethod
     def get_bench(ui64 seed):
