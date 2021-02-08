@@ -23,7 +23,7 @@
         "depth": {
             "value": 1,
             "type": "number",
-            "options": [1,4],
+            "options": [1,8],
             "descr": [
                 "depth of tree search"
             ]
@@ -31,7 +31,7 @@
         "autodepth": {
             "value": [1, 1],
             "type": "list",
-            "options": [1,4],
+            "options": [1,8],
             "descr": [
                 "search depth of ai agents in autoplay"
             ],
