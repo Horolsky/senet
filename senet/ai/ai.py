@@ -2,11 +2,10 @@ import threading
 import time
 import ctypes
 from math import inf
-from senet.core import Ply
 from senet.utils.report import report
 from time import perf_counter_ns
 from senet.settings import SETTINGS
-from senet.ai.xeval import emm
+from senet.xtc import emax_brute
 
 class AIplayer():
     def __init__(self, number, depth):
@@ -23,7 +22,7 @@ class AIplayer():
         self._timer = SETTINGS.get("ai/timer")
         self._depth = depth#SETTINGS.get("ai/depth")
         if self.__log:
-            header = f"seed;t, ns;t, ~sec;leaves searched;agent: {self._agent}, timer: {self._timer}, depth: {self._depth}\n;"
+            header = f"seed;t, ns;t, ~sec;leaves searched;agent: {self._agent}, timer: {self._timer}, depth: {self._depth}\n"
             self._report = report(f"ai-{number}", "csv", "logs/ai", header)
         self._leaves = 0
 
@@ -87,12 +86,14 @@ class AIthread (threading.Thread):
             return
         #get util for guaranteed move first    
         
-        res = emm.emm(self.ai._state.increment(self.ai._dec).seed, self.ai._depth)
+        res = emax_brute(self.ai._state.increment(self.ai._dec).seed, self.ai._depth)
+        
         self.ai._util = res[0]
         self.ai._leaves += res[1]
 
         for move in self.ai._state.moves[:-1]:
-            res = emm.emm(self.ai._state.increment(move).seed, self.ai._depth)
+            res = emax_brute(self.ai._state.increment(move).seed, self.ai._depth)
+            
             self.ai._leaves += res[1]
             if (self.ai._agent == 1 and res[0] > self.ai._util) or (self.ai._agent == 2 and res[0] < self.ai._util):
                 self.ai._util = res[0]

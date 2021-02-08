@@ -1,5 +1,5 @@
 import random as r
-from .xply import Ply
+from senet.xtc import Ply
 from .agent import Agent
 from senet.utils import report
 from senet.settings import SETTINGS
@@ -110,6 +110,8 @@ class Game():
             return False
         newsticks = Game.throw_sticks()
         newstate = self.state.increment(cell)
+        if 3 in newstate.board:
+            print("erreo: " + str(newstate.seed))
         newstate.steps = Game.get_steps(newsticks) 
         if newstate is None:
             return False  
