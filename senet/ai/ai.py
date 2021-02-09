@@ -62,13 +62,13 @@ class AIplayer():
         if time == 0:
             time == 1
         #get util for guaranteed move first  
-        res = emax_timedbrute(self._state.increment(self._decision).seed, self._depth, time)
+        res = emax_timedbrute(self._state.increment(self._decision).seed, self._depth-1, time)
         
         self._util = res[0]
         self._leaves += res[1]
 
         for move in self._state.moves[:-1]:
-            res = emax_timedbrute(self._state.increment(move).seed, self._depth, time)
+            res = emax_timedbrute(self._state.increment(move).seed, self._depth-1, time)
             
             self._leaves += res[1]
             if (self._agent == 1 and res[0] > self._util) or (self._agent == 2 and res[0] < self._util):
