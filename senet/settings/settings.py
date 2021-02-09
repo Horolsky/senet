@@ -55,11 +55,13 @@ class settings(metaclass=singleton):
         group, st = path.split("/")
         value = None
         try:
+            options = settings[group][st]["options"]
             oldval = settings[group][st]["value"]
             stype = settings[group][st]["type"]
-
+            vtype = type(options[0])
+            
             if stype == "list":
-                value = [int(c) for c in token]
+                value = [vtype(c) for c in token]
                 l = len(value)
                 lrange = settings[group][st]["lrange"]
                 if l < lrange[0] or l > lrange[1]:
@@ -69,8 +71,8 @@ class settings(metaclass=singleton):
                     if k < vrange[0] or k > vrange[1]:
                         return False
             elif stype == "number":
-                value = int(token[0])
-                vrange = settings[group][st]["options"]
+                value = vtype(token[0])
+                vrange = options
                 if value < vrange[0] or value > vrange[1]:
                     return False
             elif stype == "flag":
@@ -80,9 +82,8 @@ class settings(metaclass=singleton):
                 elif str(value).lower() == "false":
                     value = False
                 else:
-                    value = type(oldval)(value)
-                options = settings[group][st]["options"]
-                if value not in settings[group][st]["options"]:
+                    value = vtype(value)
+                if value not in options:
                     return False
             
             settings[group][st]["value"] = value

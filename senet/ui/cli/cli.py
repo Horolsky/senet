@@ -37,10 +37,19 @@ class cli(metaclass=singleton):
                     repeats = int(tokens[2])
             except:
                 return False
+        autoplayers = SETTINGS.get("ai/autoplayers")
         autodepth = SETTINGS.get("ai/autodepth")
         autofirst = SETTINGS.get("ai/autofirst")
-        agent1 = AIplayer(number=1, depth=autodepth[0])
-        agent2 = AIplayer(number=2, depth=autodepth[1])
+        agent1, agent2 = None, None
+        if autoplayers[0] == "ai":
+            agent1 = AIplayer(number=1, depth=autodepth[0])
+        else:
+            agent1 = Agent(1)
+        if autoplayers[1] == "ai":
+            agent2 = AIplayer(number=2, depth=autodepth[1])
+        else:
+            agent2 = Agent(2)
+        
         for _ in range(repeats):    
             self.msgout("\tGAME STARTED")
             self.game.start(agent1, agent2, autofirst, seed)
@@ -212,10 +221,7 @@ class cli(metaclass=singleton):
                 if stype == "list":
                     value = ", ".join([str(k) for k in value])
                 options = settings[group][option]['options']
-                if stype == "flag":
-                    options = ", ".join([str(o) for o in options])
-                else:
-                    options = " - ".join([str(o) for o in options])
+                options = ", ".join([str(o) for o in options])
                 descr = settings[group][option]['descr']
                 dlines = descr[0] + "\n"
                 for line in descr[1:]:

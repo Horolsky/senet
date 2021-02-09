@@ -37,6 +37,15 @@
                 "depth of tree search"
             ]
         },
+        "autoplayers": {
+            "value": ["ai", "dummy"],
+            "type": "list",
+            "options": ["ai", "dummy"],
+            "descr": [
+                "agent types for autoplay"
+            ],
+            "lrange": [2,2]
+        },
         "autodepth": {
             "value": [1, 1],
             "type": "list",
