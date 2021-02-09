@@ -4,7 +4,7 @@ from .agent import Agent
 from senet.utils import report
 from senet.settings import SETTINGS
 from json import dumps
-
+from datetime import datetime
 
 class Game():
     @staticmethod
@@ -37,11 +37,16 @@ class Game():
         self.__turn = None
         self.__onmove = onmove
         self.__onvictory = onvictory
+        self.__logging_brief = SETTINGS.get("dev/brieflog")
+        if self.__logging_brief:
+            headers = f"end time;agent 1;agent 2;winner;\n"
+            self._brieflog = report("senet_log", "csv", "logs/brief", headers, False)
+
     
     def __stop(self): #after loop game closing
         self.__running = False
-        if self.__log:
-            self._report.close("\ngame over")
+        if self.__logging_game:
+            self._gamelog.close("\ngame over")
         self.__agent1 = None
         self.__agent2 = None
         
@@ -56,7 +61,8 @@ class Game():
         @param agent1: Agent
         @param agent2: Agent
         """
-        self.__log = SETTINGS.get("dev/gamelogs")
+        self.__logging_game = SETTINGS.get("dev/gamelogs")
+        self.__logging_brief = SETTINGS.get("dev/brieflog")
 
 
         #agents duck typing
@@ -73,27 +79,39 @@ class Game():
             self.__state.steps = Game.get_steps(self.__sticks)
             self.__state.agent = first
         
-        if self.__log:
+        if self.__logging_game:
             headers = f"N;{agent1._name} vs {agent2._name};agent;steps;utility;seed\n"
-            self._report = report("game", "csv", "logs/games", headers)
+            self._gamelog = report("game", "csv", "logs/games", headers)
         self.__onmove()
         self.__run()
         self.__stop()
     
     def __run(self):
-        if self.__log:
-            self._report.write(f"{self.__turn};{self.state.to_csv()}")
+        if self.__logging_game:
+            self._gamelog.write(f"{self.__turn};{self.state.to_csv()}")
             
         while self.__running:
             self.__running = self.__move()
             if not self.__running:
                 break
             self.__onmove()
-            if self.__log:
-                self._report.write(f"\n{self.__turn};{self.state.to_csv()}")
+            if self.__logging_game:
+                self._gamelog.write(f"\n{self.__turn};{self.state.to_csv()}")
             #END GAME CONDITION
             if 5 in self.state.bench:
                 self.__onvictory(self.state.event[1]) #sending agent n to callback
+                if self.__logging_brief:
+                    agents = [self.__agent1._name, self.__agent2._name]
+                    depth = depth = SETTINGS.get("ai/depth")
+                    if agents[0].lower() == agents[1].lower() == 'ai':
+                        depth = SETTINGS.get("ai/autodepth")
+                        agents[0] += f"-{str(depth[0])}"
+                        agents[1] += f"-{str(depth[1])}"
+                    elif agents[0].lower() == "ai":
+                        agents[0] += f"-{str(depth)}"
+                    elif agents[1].lower() == "ai":
+                        agents[1] += f"-{str(depth)}"
+                    self._brieflog.write(f"{str(datetime.now())};{agents[0]};{agents[1]};{self.state.event[1]};\n")
                 break
                 
 

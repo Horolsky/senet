@@ -53,16 +53,15 @@ class cli(metaclass=singleton):
         """
         if type(tokens) is not list or len(tokens) < 3:
             return False
-        #agents
         agents = {
             "human": lambda an: Agent(number=an, dfunc=self.ask_human, name="human"),
             "ai": lambda an: AIplayer(number=an, depth=SETTINGS.get("ai/depth")),
             "dummy": lambda an: Agent(number=an) 
             }
+        if tokens[1] not in agents or tokens[2] not in agents:
+            return False
         agent1 = agents.get(tokens[1])(1)
         agent2 = agents.get(tokens[2])(2)
-        if agent1 is None or agent2 is None:
-            return False
         #default first player pawns
         first, seed = 1, 10066320 #def seed for game start
         if len(tokens) == 4:

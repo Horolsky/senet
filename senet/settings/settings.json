@@ -1,5 +1,14 @@
 {
     "dev": {
+        "brieflog":{
+            "value": false,
+            "type": "flag",
+            "options": [ true, false ],
+            "descr": [
+                "maintaining brief session log",
+                "file are stored in logs/brief"
+            ]
+        },
         "gamelogs": {
             "value": false,
             "type": "flag",
