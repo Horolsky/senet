@@ -150,11 +150,10 @@ float expectimax_brute(ui64 seed, ui8 depth){
         return util;
     }
 
-    xState state;
+    xState state = {._seed=seed};
     xMoves cm;//chance moves
-    float result = 0;
-    float cutil;//chance util
-    
+    float cutil = 0;//chance util
+    util = 0;
     for (ui8 steps = 1; steps < 6; steps++){
         cutil = 0;
         state._steps = steps;
@@ -166,10 +165,9 @@ float expectimax_brute(ui64 seed, ui8 depth){
         if (cm._len >= 4) cutil += expectimax_brute(increment_1(state._seed,cm._mv3), depth-1);
         if (cm._len == 5) cutil += expectimax_brute(increment_1(state._seed,cm._mv4), depth-1);
         
-        result += cutil * P[steps-1];
-        if (cm._len != 0) result /= cm._len;
+        util += cm._len != 0 ? cutil * P[steps-1] / cm._len : cutil * P[steps-1];
     }
-    return result;
+    return util;
 }
 
 
@@ -188,25 +186,24 @@ float expectimax_timedbrute(ui64 seed, ui8 depth){
         counter += 1;
         return util;
     }
-    xState state;
+    xState state = {._seed=seed};
     xMoves cm;//chance moves
-    float result = 0;
-    
+    float cutil = 0;//chance util
+    util = 0;
     for (ui8 steps = 1; steps < 6; steps++){
-        util = 0;
+        cutil = 0;
         state._steps = steps;
         cm._seed = get_moves(state._seed);
-        if (cm._len == 0) util += expectimax_timedbrute(0, depth-1);
-        if (cm._len >= 1) util += expectimax_timedbrute(increment_1(state._seed, cm._mv0), depth-1);
-        if (cm._len >= 2) util += expectimax_timedbrute(increment_1(state._seed,cm._mv1), depth-1);
-        if (cm._len >= 3) util += expectimax_timedbrute(increment_1(state._seed,cm._mv2), depth-1);
-        if (cm._len >= 4) util += expectimax_timedbrute(increment_1(state._seed,cm._mv3), depth-1);
-        if (cm._len == 5) util += expectimax_timedbrute(increment_1(state._seed,cm._mv4), depth-1);
+        if (cm._len == 0) cutil += expectimax_timedbrute(0, depth-1);
+        if (cm._len >= 1) cutil += expectimax_timedbrute(increment_1(state._seed, cm._mv0), depth-1);
+        if (cm._len >= 2) cutil += expectimax_timedbrute(increment_1(state._seed,cm._mv1), depth-1);
+        if (cm._len >= 3) cutil += expectimax_timedbrute(increment_1(state._seed,cm._mv2), depth-1);
+        if (cm._len >= 4) cutil += expectimax_timedbrute(increment_1(state._seed,cm._mv3), depth-1);
+        if (cm._len == 5) cutil += expectimax_timedbrute(increment_1(state._seed,cm._mv4), depth-1);
         
-        result += util * P[steps-1];
-        if (cm._len != 0) result /= cm._len;
+        util += cm._len != 0 ? cutil * P[steps-1] / cm._len : cutil * P[steps-1];
     }
-    return result;
+    return util;
 }
 
 emax_test expectimax_timecount(ui64 seed, ui8 depth, ui8 sec){
