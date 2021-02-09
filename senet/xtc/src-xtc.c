@@ -114,7 +114,7 @@ ui64 increment_1(ui64 seed, ui8 m){
                 }
             }
             BOARD_SET(s,m,0)
-        } else { BOARD_SET(s, dest, enemy) }
+        } else { BOARD_SET(s, m, enemy) }
     }
     //moving to empty target
     else if (BOARD_GET(s, dest) == 0){
