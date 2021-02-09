@@ -26,4 +26,4 @@ cdef extern from "src-xtc.h":
         ui32 count
     ctypedef _emax_test emax_test
     cdef emax_test expectimax_count(ui64 seed, ui8 depth)
-    cdef float expectimax_brute(ui64 seed, ui8 depth)
+    cdef emax_test expectimax_timecount(ui64 seed, ui8 depth, ui8 sec)

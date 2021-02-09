@@ -41,16 +41,17 @@ typedef struct _xMoves{
 state._board &= ~((ui64) 3 << (cell * 2));    \
 state._board ^= ((ui64) val << (cell * 2));   \
 
+static const float P[5] = {.25, .375, .25, .0625, .0625};//chance probabilities
+
 ui32 get_moves(ui64 seed);
 
 ui64 increment_1(ui64 seed, ui8 m);
 float eval_basic(ui64 seed);
 
-static ui64 counter;
 typedef struct _emax_test {
     float res;
     ui32 count;
 } emax_test;
 emax_test expectimax_count(ui64 seed, ui8 depth);
-float expectimax_brute(ui64 seed, ui8 depth);
+emax_test expectimax_timecount(ui64 seed, ui8 depth, ui8 sec);
 #endif

@@ -3,7 +3,7 @@
 
 from libc.stdlib cimport malloc, free
 cimport xtc
-from xtc cimport ui8, ui32, ui64, xState, xMoves, increment_1, get_moves, eval_basic, emax_test, expectimax_count, expectimax_brute
+from xtc cimport ui8, ui32, ui64, xState, xMoves, increment_1, get_moves, eval_basic, emax_test, expectimax_count, expectimax_timecount
 from json import dumps
 
 cdef class Ply():
@@ -185,4 +185,9 @@ cdef class Ply():
 def emax_brute(ui64 state, ui8 depth):
     cdef emax_test result
     result = expectimax_count(state, depth)
+    return (result.res, result.count)
+
+def emax_timedbrute(ui64 state, ui8 depth, ui8 sec):
+    cdef emax_test result
+    result = expectimax_timecount(state, depth, sec)
     return (result.res, result.count)
