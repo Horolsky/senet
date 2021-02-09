@@ -39,7 +39,7 @@ class Game():
         self.__onvictory = onvictory
         self.__logging_brief = SETTINGS.get("dev/brieflog")
         if self.__logging_brief:
-            headers = f"end time;agent 1;agent 2;winner;score;\n"
+            headers = f"end time;timer;agent 1;agent 2;winner;score;\n"
             self._brieflog = report("senet_log", "csv", "logs/brief", headers, False)
         else:
             self._brieflog = None
@@ -114,12 +114,13 @@ class Game():
         looser = winner % 2 + 1
         score = sum(self.state.board) / looser
         agents = [self.__agent1._name, self.__agent2._name]
+        timer = SETTINGS.get("ai/timer")
 
         if agents[0].lower() == "ai":
             agents[0] += f"-{str(self.__agent1._depth)}"
         elif agents[1].lower() == "ai":
             agents[1] += f"-{str(self.__agent2._depth)}"
-        self._brieflog.write(f"{str(datetime.now())};{agents[0]};{agents[1]};{winner};{score}\n")
+        self._brieflog.write(f"{str(datetime.now())};{timer};{agents[0]};{agents[1]};{winner};{score}\n")
 
     def __move(self):  #manage_movement
         """
