@@ -53,7 +53,8 @@ class Game():
         
     def stop(self): #in loop game stop
         self.__running = False
-        return self.__state.seed
+        if self.__state:
+            return self.__state.seed
     
     def start(self, agent1, agent2,  first=1, seed=10066320): #start_game
         """
