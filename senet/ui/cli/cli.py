@@ -27,20 +27,23 @@ class cli(metaclass=singleton):
         ai depth are taken from the settings 
         """
         seed=10066320
+        repeats = 1
         if len(tokens) > 1:
             try:
                 newseed = int(tokens[1])
                 if Game.check_seed(newseed):
                     seed = newseed 
+                if len(tokens) == 3:
+                    repeats = int(tokens[2])
             except:
                 return False
         autodepth = SETTINGS.get("ai/autodepth")
         autofirst = SETTINGS.get("ai/autofirst")
         agent1 = AIplayer(number=1, depth=autodepth[0])
         agent2 = AIplayer(number=2, depth=autodepth[1])
-        
-        self.msgout("\tGAME STARTED")
-        self.game.start(agent1, agent2, autofirst, seed)
+        for _ in range(repeats):    
+            self.msgout("\tGAME STARTED")
+            self.game.start(agent1, agent2, autofirst, seed)
         return True
 
     def start(self, tokens):
