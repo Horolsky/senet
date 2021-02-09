@@ -9,6 +9,7 @@ class cli(metaclass=singleton):
     def __init__(self):
         self.__game = Game(self._on_move, self._on_victory)
         self.__running = True
+        print(self)
 
     @property
     def game(self):
@@ -19,6 +20,7 @@ class cli(metaclass=singleton):
     
     def init(self):
         self.msgout('h')
+        self.__running = True
         self.ask_human()
         
     def autoplay(self, tokens):
