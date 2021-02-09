@@ -39,7 +39,7 @@ class Game():
         self.__onvictory = onvictory
         self.__logging_brief = SETTINGS.get("dev/brieflog")
         if self.__logging_brief:
-            headers = f"end time;agent 1;agent 2;winner;\n"
+            headers = f"end time;agent 1;agent 2;winner;score;\n"
             self._brieflog = report("senet_log", "csv", "logs/brief", headers, False)
 
     
@@ -101,20 +101,24 @@ class Game():
             if 5 in self.state.bench:
                 self.__onvictory(self.state.event[1]) #sending agent n to callback
                 if self.__logging_brief:
-                    agents = [self.__agent1._name, self.__agent2._name]
-                    depth = depth = SETTINGS.get("ai/depth")
-                    if agents[0].lower() == agents[1].lower() == 'ai':
-                        depth = SETTINGS.get("ai/autodepth")
-                        agents[0] += f"-{str(depth[0])}"
-                        agents[1] += f"-{str(depth[1])}"
-                    elif agents[0].lower() == "ai":
-                        agents[0] += f"-{str(depth)}"
-                    elif agents[1].lower() == "ai":
-                        agents[1] += f"-{str(depth)}"
-                    self._brieflog.write(f"{str(datetime.now())};{agents[0]};{agents[1]};{self.state.event[1]};\n")
+                    self.__brieflog()
                 break
                 
-
+    def __brieflog(self):
+        winner = self.state.event[1]
+        looser = winner % 2 + 1
+        score = sum(self.state.board) / looser
+        agents = [self.__agent1._name, self.__agent2._name]
+        depth = depth = SETTINGS.get("ai/depth")
+        if agents[0].lower() == agents[1].lower() == 'ai':
+            depth = SETTINGS.get("ai/autodepth")
+            agents[0] += f"-{str(depth[0])}"
+            agents[1] += f"-{str(depth[1])}"
+        elif agents[0].lower() == "ai":
+            agents[0] += f"-{str(depth)}"
+        elif agents[1].lower() == "ai":
+            agents[1] += f"-{str(depth)}"
+        self._brieflog.write(f"{str(datetime.now())};{agents[0]};{agents[1]};{winner};{score}\n")
 
     def __move(self):  #manage_movement
         """
