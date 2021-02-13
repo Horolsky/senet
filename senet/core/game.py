@@ -135,6 +135,8 @@ class Game():
             return False
         newsticks = Game.throw_sticks()
         newstate = self.state.increment(cell)
+        if newstate is None:
+            exit("fuck")
         if 3 in newstate.board:
             print("erreo: " + str(newstate.seed))
         newstate.steps = Game.get_steps(newsticks) 
