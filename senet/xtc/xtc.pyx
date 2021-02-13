@@ -3,7 +3,7 @@
 
 from libc.stdlib cimport malloc, free
 cimport xtc
-from xtc cimport ui8, ui32, ui64, xState, xMoves, increment_1, get_moves, eval_basic, emax_test, expectimax_count, expectimax_timecount
+from xtc cimport ui8, ui32, ui64, xState, xMoves, increment_1, get_moves, eval_basic, emax_test, emax_res, expectimax_count, expectimax_timecount, expectimax_multithread
 from json import dumps
 
 cdef class Ply():
@@ -74,16 +74,9 @@ cdef class Ply():
         moves = []
         cdef xMoves xmoves
         xmoves._seed = get_moves(self.__xstate._seed)
-        if (xmoves._len >= 1):
-            moves.append(xmoves._mv0)
-        if (xmoves._len >= 2):
-            moves.append(xmoves._mv1)
-        if (xmoves._len >= 3):
-            moves.append(xmoves._mv2)
-        if (xmoves._len >= 4):
-            moves.append(xmoves._mv3)
-        if (xmoves._len == 5):
-            moves.append(xmoves._mv4)
+        for i in range(xmoves._len):
+            moves.append((xmoves._mvs >> (i * 5)) % 32)
+
         self.__cache["moves"] = tuple(moves)
         self.__xmoves = xmoves
 
@@ -190,4 +183,9 @@ def emax_brute(ui64 state, ui8 depth):
 def emax_timedbrute(ui64 state, ui8 depth, ui8 sec):
     cdef emax_test result
     result = expectimax_timecount(state, depth, sec)
+    return (result.res, result.count)
+
+def emax(ui64 state, ui8 depth, ui8 sec):
+    cdef emax_res result
+    result = expectimax_multithread(state, depth, sec)
     return (result.res, result.count)

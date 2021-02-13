@@ -28,20 +28,24 @@ typedef struct _xMoves{
         struct {
             ui32 _dir:2; // 0: no movement, 1: normal, 2: backward
             ui32 _len:3; // length of avaliable movements
-            ui32 _mv0:5;
-            ui32 _mv1:5;
-            ui32 _mv2:5;
-            ui32 _mv3:5;
-            ui32 _mv4:5;
+            ui32 _mvs:27;
         };
     };
 } xMoves;
-#define BOARD_GET(state, cell) ((state._board >> (cell * 2)) % 4)
+#define BOARD_GET(state, cell) ((state._board >> (cell << 1)) % 4)
 #define BOARD_SET(state, cell, val) \
-state._board &= ~((ui64) 3 << (cell * 2));    \
-state._board ^= ((ui64) val << (cell * 2));   \
+state._board &= ~((ui64) 3 << (cell << 1));    \
+state._board ^= ((ui64) val << (cell << 1));   \
+
+#define MOVES_GET(moves, index) ((moves._mvs >> (index * 5)) % 32)
+#define MOVES_SET(moves, index, val) \
+    moves._mvs &= ~((ui32) 31 << (index * 5));    \
+    moves._mvs ^= ((ui32) val << (index * 5));   \
+
 
 static const float P[5] = {.25, .375, .25, .0625, .0625};//chance probabilities
+
+xMoves add_move(xMoves moves, ui8 m);
 
 ui32 get_moves(ui64 seed);
 
@@ -52,6 +56,15 @@ typedef struct _emax_test {
     float res;
     ui32 count;
 } emax_test;
+
 emax_test expectimax_count(ui64 seed, ui8 depth);
 emax_test expectimax_timecount(ui64 seed, ui8 depth, ui8 sec);
+
+typedef struct _emax_res {
+    ui8 res;
+    ui32 count;
+} emax_res;
+emax_res expectimax_multithread(ui64 seed, ui8 depth, ui8 sec);
+float emax_brute_t_mt(ui64 seed, ui8 depth);
+
 #endif

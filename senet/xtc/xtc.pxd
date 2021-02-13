@@ -12,11 +12,7 @@ cdef extern from "src-xtc.h":
         ui32 _seed 
         ui32 _dir
         ui32 _len
-        ui32 _mv0
-        ui32 _mv1
-        ui32 _mv2
-        ui32 _mv3
-        ui32 _mv4
+        ui32 _mvs
     ctypedef _xMoves xMoves
     cdef ui32 get_moves(ui64 seed)
     cdef ui64 increment_1(ui64 seed, ui8 m)
@@ -27,3 +23,10 @@ cdef extern from "src-xtc.h":
     ctypedef _emax_test emax_test
     cdef emax_test expectimax_count(ui64 seed, ui8 depth)
     cdef emax_test expectimax_timecount(ui64 seed, ui8 depth, ui8 sec)
+
+    cdef struct _emax_res:
+        ui8 res
+        ui32 count
+    ctypedef _emax_res emax_res
+    cdef emax_res expectimax_multithread(ui64 seed, ui8 depth, ui8 sec)
+    
