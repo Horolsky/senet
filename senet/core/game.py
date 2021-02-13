@@ -119,7 +119,7 @@ class Game():
 
         if agents[0].lower() == "ai":
             agents[0] += f"-{str(self.__agent1._depth)}"
-        elif agents[1].lower() == "ai":
+        if agents[1].lower() == "ai":
             agents[1] += f"-{str(self.__agent2._depth)}"
         self._brieflog.write(f"{str(datetime.now())};{timer};{agents[0]};{agents[1]};{winner};{score}\n")
 
