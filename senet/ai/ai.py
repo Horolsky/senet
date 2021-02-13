@@ -29,6 +29,10 @@ class AIplayer():
         #TODO: check state
         if state.agent != self._agent:
             raise ReferenceError("wrong agent call")
+        if len(state.moves) == 0:
+            return 0
+        elif len(state.moves) == 1:
+            return state.moves[0]
 
         timeA = perf_counter_ns()
         res = emax(state.seed, self._depth, self._timer)
@@ -39,11 +43,5 @@ class AIplayer():
         if self.__log:
             nano = timeB - timeA
             self._report.write(f"{state.seed};{nano};{nano / 10**9};{leaves};\n")
-
-        if len(state.moves) == 0:
-            return 0
-        else:
-            return state.moves[decision]    
-        #NB: ai works also on x0 and x1 strategies just for lulz
-        #it could be useful for memo optimisation, if such would be imlemented
-
+            
+        return state.moves[decision]
