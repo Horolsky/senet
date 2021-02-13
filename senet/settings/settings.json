@@ -49,7 +49,7 @@
         "autodepth": {
             "value": [1, 1],
             "type": "list",
-            "options": [1,8],
+            "options": [1,12],
             "descr": [
                 "search depth of ai agents in autoplay"
             ],
@@ -58,7 +58,7 @@
         "timer": {
             "value": 2,
             "type": "number",
-            "options": [1,60],
+            "options": [1,255],
             "descr": [
                 "working timer for ai"
             ]
