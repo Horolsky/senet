@@ -30,9 +30,9 @@ cdef extern from "src-xtc.h":
         id_incr_1
     ctypedef _state_increment_id incr_id_e
 
-    cdef state_increment_func get_increment_func(incr_id_e id)
-    cdef state_legal_moves_func get_legal_moves_func(incr_id_e id)
-    cdef state_evaluation_func get_evaluation_func(eval_id_e id)
+    cdef state_increment_func get_increment_func(incr_id_e _id)
+    cdef state_legal_moves_func get_legal_moves_func(incr_id_e _id)
+    cdef state_evaluation_func get_evaluation_func(eval_id_e _id)
 
     cdef struct _emax_res:
         ui8 strategy
