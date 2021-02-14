@@ -3,7 +3,7 @@
 
 from libc.stdlib cimport malloc, free
 cimport xtc
-from xtc cimport ui8, ui32, ui64, xState, xMoves, increment_1, get_moves, eval_basic, emax_test, emax_res, expectimax_count, expectimax_timecount, expectimax_multithread
+from xtc cimport ui8, ui32, ui64, eval_id_e, incr_id_e # xtc.xState, xtc.xMoves, increment_1, get_moves_1, eval_basic, emax_res, get_strategy_emax_mt
 from json import dumps
 
 cdef class Ply():
@@ -13,8 +13,8 @@ cdef class Ply():
     cdef dict __cache
     cdef tuple __event
     cdef tuple __bench
-    cdef xState __xstate
-    cdef xMoves __xmoves
+    cdef xtc.xState __xstate
+    cdef xtc.xMoves __xmoves
 
     def __init__(self, ui64 seed=10066320):
         """
@@ -72,8 +72,8 @@ cdef class Ply():
 
     def __upd_moves(self):
         moves = []
-        cdef xMoves xmoves
-        xmoves._seed = get_moves(self.__xstate._seed)
+        cdef xtc.xMoves xmoves
+        xmoves._seed = xtc.get_moves_1(self.__xstate._seed)
         for i in range(xmoves._len):
             moves.append((xmoves._mvs >> (i * 5)) % 32)
 
@@ -142,7 +142,7 @@ cdef class Ply():
 
         event = (self.__xstate._seed, self.agent, code, start, dest)
         
-        iteration = Ply(increment_1(self.__xstate._seed, start))
+        iteration = Ply(xtc.increment_1(self.__xstate._seed, start))
         iteration.__event = event
         return iteration
     @property
@@ -152,7 +152,7 @@ cdef class Ply():
     @property
     def utility(self):
         if self.__cache["utility"] is None:
-            self.__cache["utility"] = eval_basic(self.__xstate._seed)
+            self.__cache["utility"] = xtc.eval_basic(self.__xstate._seed)
         return self.__cache["utility"]
     
     def to_json(self):
@@ -164,7 +164,7 @@ cdef class Ply():
 
     @staticmethod
     def get_bench(ui64 seed):
-        cdef xState state
+        cdef xtc.xState state
         state._seed = seed
         a1, a2 = 5, 5
         for i from 0 <= i < 30 by 1:
@@ -175,17 +175,18 @@ cdef class Ply():
                 a2 -= 1
         return (a1, a2)
 
-def emax_brute(ui64 state, ui8 depth):
-    cdef emax_test result
-    result = expectimax_count(state, depth)
-    return (result.res, result.count)
 
-def emax_timedbrute(ui64 state, ui8 depth, ui8 sec):
-    cdef emax_test result
-    result = expectimax_timecount(state, depth, sec)
-    return (result.res, result.count)
+def emax(ui64 state, ui8 depth, ui8 sec, eval_id_e id_eval=id_eval_basic, incr_id_e id_incr=id_incr_1):
+    """
+    choose strategy on expectiminimax value
+    """
+    cdef xtc.emax_res result
+    result = xtc.get_strategy_emax_mt(state, depth, sec, id_eval, id_incr)
+    return (result.strategy, result.searched_nodes)
 
-def emax(ui64 state, ui8 depth, ui8 sec):
-    cdef emax_res result
-    result = expectimax_multithread(state, depth, sec)
-    return (result.res, result.count)
+#def increment_func(incr_id_e id):
+#    return get_increment_func(id)
+#def legal_moves_func(incr_id_e id):
+#    return get_legal_moves_func(id)
+#def eval_func(eval_id_e id):
+#    return get_evaluation_func(id)

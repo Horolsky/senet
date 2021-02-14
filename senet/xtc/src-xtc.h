@@ -45,26 +45,33 @@ state._board ^= ((ui64) val << (cell << 1));   \
 
 static const float P[5] = {.25, .375, .25, .0625, .0625};//chance probabilities
 
-xMoves add_move(xMoves moves, ui8 m);
+typedef ui64 (*state_increment_func)(ui64 seed, ui8 move);
+typedef ui32 (*state_legal_moves_func)(ui64 seed);
+typedef float (*state_evaluation_func)(ui64 seed);
 
-ui32 get_moves(ui64 seed);
+typedef enum _evaluation_function_id {
+    id_eval_basic,
+    id_eval_basic_zero
+} eval_id_e;
+typedef enum _state_increment_id {
+    id_incr_1
+} incr_id_e;
 
+state_increment_func get_increment_func(incr_id_e id);
+state_legal_moves_func get_legal_moves_func(incr_id_e id);
+state_evaluation_func get_evaluation_func(eval_id_e id);
+
+ui32 get_moves_1(ui64 seed);
 ui64 increment_1(ui64 seed, ui8 m);
+
 float eval_basic(ui64 seed);
+float eval_basic_zero(ui64 seed);
 
-typedef struct _emax_test {
-    float res;
-    ui32 count;
-} emax_test;
-
-emax_test expectimax_count(ui64 seed, ui8 depth);
-emax_test expectimax_timecount(ui64 seed, ui8 depth, ui8 sec);
 
 typedef struct _emax_res {
-    ui8 res;
-    ui32 count;
+    ui8 strategy;
+    ui32 searched_nodes;
 } emax_res;
-emax_res expectimax_multithread(ui64 seed, ui8 depth, ui8 sec);
-float emax_brute_t_mt(ui64 seed, ui8 depth);
 
+emax_res get_strategy_emax_mt(ui64 seed, ui8 depth, ui8 sec, eval_id_e id_eval, incr_id_e id_incr);
 #endif
