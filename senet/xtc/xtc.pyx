@@ -6,7 +6,10 @@ cimport xtc
 from xtc cimport ui8, ui32, ui64, eval_id_e, incr_id_e 
 from json import dumps
 
-def emax(ui64 state, ui8 depth, ui8 sec, eval_id_e id_eval=id_eval_basic, incr_id_e id_incr=id_incr_1):
+INCREMENT_RULES = ("Meub", "Kendal")
+EVALUATION_FUNCS = ("basic",)
+
+def emax(ui64 state, ui8 depth, ui8 sec, eval_id_e id_eval=id_eval_basic, incr_id_e id_incr=id_incr_meub):
     """
     best strategy expectiminimax multithread search
     @param state: 64-bit uint state seed
@@ -33,16 +36,12 @@ cdef class Ply():
     cdef incr_id_e _incr_id
     cdef eval_id_e _eval_id
 
-    def __init__(self, ui64 seed=10066320, incr_id_e incr_id=id_incr_1, eval_id_e eval_id=id_eval_basic):
+    def __init__(self, ui64 seed=10066320, incr_id="Meub", eval_id="basic"):
         """
         @param seed: 64-bit integer xstate seed
         @param incr_id: increment func id
         @param eval_id: eval func id
         """
-        self.incr_func = incr_id
-        self.eval_func = eval_id
-        
-        self._eval = xtc.get_evaluation_func(eval_id)
 
         self.__xstate._seed = seed
         self.__cache = {
@@ -50,6 +49,9 @@ cdef class Ply():
             "board": None,
             "utility": None,
         }
+        self.incr_func = incr_id
+        self.eval_func = eval_id
+
         self.__event = (seed, 0,0,0,0) #this updates on iteration after init
         self.__bench = Ply.get_bench(seed)
 
@@ -59,27 +61,30 @@ cdef class Ply():
         id of increment function
         0 - default
         """
-        return self._incr_id
+        return INCREMENT_RULES[self._incr_id]
 
     @incr_func.setter
-    def incr_func(self, incr_id_e func):
-        self._incr_id = func
-        self._increment = xtc.get_increment_func(func)
-        self._get_moves = xtc.get_legal_moves_func(func)
+    def incr_func(self, func):
+        if func in INCREMENT_RULES:
+            self._incr_id = INCREMENT_RULES.index(func)
+            self._increment = xtc.get_increment_func(self._incr_id)
+            self._get_moves = xtc.get_legal_moves_func(self._incr_id)
+            self.__cache["moves"] = None
     
     @property
     def eval_func(self):
         """
         id of evaluation function
         0 - basic, range  0, 1
-        1 - basic, range -1, 1
         """
-        return self._eval_id
+        return EVALUATION_FUNCS[self._eval_id]
         
     @eval_func.setter
-    def eval_func(self, eval_id_e func):
-        self._eval_id = func
-        self._eval = xtc.get_evaluation_func(func)
+    def eval_func(self, func):
+        if func in EVALUATION_FUNCS:
+            self._eval_id = EVALUATION_FUNCS.index(func)
+            self._eval = xtc.get_evaluation_func(self._eval_id)
+            self.__cache["utility"] = None
 
     @property
     def agent(self):
@@ -126,7 +131,6 @@ cdef class Ply():
         moves = []
         cdef xtc.xMoves xmoves
         xmoves._seed = self._get_moves(self.__xstate._seed)
-        #xmoves._seed = xtc.get_moves_1(self.__xstate._seed)
         for i in range(xmoves._len):
             moves.append((xmoves._mvs >> (i * 5)) % 32)
 

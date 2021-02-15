@@ -54,15 +54,16 @@ typedef enum _evaluation_function_id {
     id_eval_basic_zero
 } eval_id_e;
 typedef enum _state_increment_id {
-    id_incr_1
+    id_incr_meub,
+    id_incr_kendal
 } incr_id_e;
 
 state_increment_func get_increment_func(incr_id_e id);
 state_legal_moves_func get_legal_moves_func(incr_id_e id);
 state_evaluation_func get_evaluation_func(eval_id_e id);
 
-ui32 get_moves_1(ui64 seed);
-ui64 increment_1(ui64 seed, ui8 m);
+ui32 get_moves_meub(ui64 seed);
+ui64 increment_meub(ui64 seed, ui8 m);
 
 float eval_basic(ui64 seed);
 float eval_basic_zero(ui64 seed);

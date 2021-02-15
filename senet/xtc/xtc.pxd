@@ -14,9 +14,6 @@ cdef extern from "src-xtc.h":
         ui32 _len
         ui32 _mvs
     ctypedef _xMoves xMoves
-    cdef ui32 get_moves_1(ui64 seed)
-    cdef ui64 increment_1(ui64 seed, ui8 m)
-    cdef float eval_basic(ui64 seed)
 
     ctypedef ui64 (*state_increment_func)(ui64 seed, ui8 move)
     ctypedef ui32 (*state_legal_moves_func)(ui64 seed)
@@ -27,7 +24,8 @@ cdef extern from "src-xtc.h":
         id_eval_basic_zero
     ctypedef _evaluation_function_id eval_id_e
     cdef enum _state_increment_id:
-        id_incr_1
+        id_incr_meub,
+        id_incr_kendal
     ctypedef _state_increment_id incr_id_e
 
     cdef state_increment_func get_increment_func(incr_id_e _id)
