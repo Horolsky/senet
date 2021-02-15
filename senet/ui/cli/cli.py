@@ -205,7 +205,7 @@ class cli(metaclass=singleton):
                 success = SETTINGS.set(f"{group}/{option}", value)
                 break
         if success:
-            self.msgout(f"{option} has been set to {value}")
+            self.msgout(f"{option} has been set to {SETTINGS.get(f'{group}/{option}')}")
         else:
             self.msgout("warn")
         

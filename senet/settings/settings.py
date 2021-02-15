@@ -83,6 +83,13 @@ class settings(metaclass=singleton):
                     value = False
                 else:
                     value = vtype(value)
+                
+                if vtype is str: 
+                    for el in options:
+                        if value.lower() == el.lower():
+                            value = el
+                            break
+                        
                 if value not in options:
                     return False
             

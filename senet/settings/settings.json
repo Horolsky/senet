@@ -1,4 +1,22 @@
 {
+    "game": {
+        "rules": {
+            "value": "Meub",
+            "type": "flag",
+            "options": [ "Meub", "Kendal" ],
+            "descr": [
+                "rules of game"
+            ]
+        },
+        "pawns": {
+            "value": 5,
+            "type": "number",
+            "options": [ 3, 7 ],
+            "descr": [
+                "number of pawns on game start"
+            ]
+        }
+    },
     "dev": {
         "brieflog":{
             "value": false,
