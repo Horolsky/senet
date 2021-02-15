@@ -47,6 +47,14 @@
         }
     }, 
     "ai": {
+        "eval": {
+            "value": "basic",
+            "type": "flag",
+            "options": [ "basic" ],
+            "descr": [
+                "state evaluation function"
+            ]
+        },
         "depth": {
             "value": 1,
             "type": "number",
