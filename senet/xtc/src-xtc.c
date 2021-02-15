@@ -63,13 +63,14 @@ ui64 increment_meub(ui64 seed, ui8 move){
     state._agent = enemy - 1;
     ui8 steps = state._steps;
     state._steps = 0;
-    ui8 dest = move + steps;
+    ui8 dest = move;
 
     if (steps == 1 || steps == 4 || steps == 5) state._agent = agent - 1; //bonus 
     if (moves._len == 0) return state._seed;
     if (_move_is_in(moves, move) == 0) return 0;
     
     if (moves._dir  == 1) dest = move + steps;
+    else if (moves._dir  == 2) dest = move - 1;
     //drowing in House of Water
     if (dest == 26){
         for (ui8 i = 14; i >= 0; i--){
@@ -114,6 +115,21 @@ ui32 get_moves_kendal(ui64 seed){
     ui8 agent = state._agent + 1;
     ui8 enemy = agent % 2 + 1;
     ui8 dest, trgt;
+
+    ui8 penalty = BOARD_GET(state, 26) == agent;                                    //House of Water penalty
+    if (penalty){
+        moves._dir = 0; 
+        if (state._steps == 4){
+            moves = _add_move(moves, 26);                                           //escaping
+            moves._dir = 1; 
+        }
+        else if (BOARD_GET(state, 14) == 0){
+            moves = _add_move(moves, 26);                                           //reborning    
+            moves = _add_move(moves, 30);                                           //skipping
+            moves._dir = 2;                                                         
+        }
+        return moves._seed;
+    }
     
     moves._dir = 1;                                                                 // direct move
     for (ui8 i =0; i < 30; i++){
@@ -122,23 +138,30 @@ ui32 get_moves_kendal(ui64 seed){
         dest = i + state._steps;
         trgt = BOARD_GET(state, dest);
         if (i == 29) moves = _add_move(moves, i);                                   // always escaping
-        else if ((i == 27 || i == 28) && dest == 30) moves = _add_move(moves, i);   // correct escaping
+        else if (i > 24 && dest == 30) moves = _add_move(moves, i);                 // correct escaping
         else if (i != 25 && dest > 25) continue;                                    // forbidden house arriving
-        else if (dest > 29) continue;                                               // forbidden escaping
+        else if (dest > 29) continue;                                               // corrupted logic
         else if (trgt == 0) moves = _add_move(moves, i);                            // normal movement
         else if (trgt == enemy) {                                                   // attack
             ui8 prev = dest > 0 ? BOARD_GET(state, (dest-1)) : 0;
             ui8 nxt = dest < 29 ? BOARD_GET(state, (dest+1)) : 0;
-            if (prev != enemy && nxt != enemy) moves = _add_move(moves, i);
+            if (prev != enemy && nxt != enemy) moves = _add_move(moves, i);         //defended trgt
+            else if (dest == 26) moves = _add_move(moves, i);                       //drowed trgt
         }
     }
     if (moves._len == 0){   // reverse move
         moves._dir = 2;                      
-        ui8 cell, prev = BOARD_GET(state, 0);// state._board % 4;                                       
+        ui8 cell;
+        trgt = BOARD_GET(state, 0);// state._board % 4;                                       
         for (ui8 i = 1; i < 30; i++) {
             cell = BOARD_GET(state, i);
-            if (cell == agent && prev == 0) moves = _add_move(moves, i);
-            prev = cell;
+            if (cell == agent && trgt == 0) moves = _add_move(moves, i);
+            else if (cell == agent && trgt == enemy) {                                                   // attack backward
+                ui8 prev = i > 1 ? BOARD_GET(state, (i-2)) : 0;
+                if (prev != enemy) moves = _add_move(moves, i);
+                else if (i == 27) moves = _add_move(moves, i);                          //drowed trgt
+            }
+            trgt = cell;
         }
     }
     if (moves._len == 0) moves._dir = 0;                                              // skip move
@@ -147,44 +170,35 @@ ui32 get_moves_kendal(ui64 seed){
 
 ui64 increment_kendal(ui64 seed, ui8 move){
     xState state = {._seed=seed};
-    xMoves moves = {._seed=get_moves_meub(seed)};
+    xMoves moves = {._seed=get_moves_kendal(seed)};
     ui8 agent = state._agent + 1;
-    if (BOARD_GET(state, move) != agent) return 0;
-
     ui8 enemy = agent % 2 + 1;
-    state._agent = enemy - 1;
     ui8 steps = state._steps;
-    state._steps = 0;
-    ui8 dest = move + steps;
+    ui8 dest = move; 
 
-    if (steps == 1 || steps == 4 || steps == 5) state._agent = agent - 1; //bonus 
-    if (moves._len == 0) return state._seed;
-    if (_move_is_in(moves, move) == 0) return 0;
+    //next step preparation
+    state._agent = enemy - 1;
+    state._steps = 0;
+    
+    if (steps == 1 || steps == 4 || steps == 5) state._agent = agent - 1; //bonus move
+    if (move == 30 && _move_is_in(moves, 30)) return state._seed;         //penalty skipping
+    if (moves._len == 0) return state._seed;                              //normal skipping
+    if (_move_is_in(moves, move) == 0) return 0;                          //illegal move
     
     if (moves._dir  == 1) dest = move + steps;
-    //drowing in House of Water
-    if (dest == 26){
-        for (ui8 i = 14; i >= 0; i--){
-            if (BOARD_GET(state, i) == 0) {
-                dest = i;
-                break;
-            }
-        }
-        BOARD_SET(state,move,0)
-        BOARD_SET(state,dest,agent)
-    }
+    else if (moves._dir  == 2) dest = move - 1;
     //escaping
-    else if (move == 29 || dest == 30) {BOARD_SET(state,move,0)}
+    if (dest == 30 || move == 29) {BOARD_SET(state,move,0)}
+    //reborning from House of Water
+    else if (move == 26 && BOARD_GET(state, 14) == 0){
+        BOARD_SET(state,move,0)
+        BOARD_SET(state,14,agent)
+    }
     //attacking
     else if (BOARD_GET(state, dest) == enemy){
         BOARD_SET(state, dest, agent)
-        if (dest > 26){ //attacking Houses rule
-            for (ui8 i = 14; i >= 0; i--){
-                if (BOARD_GET(state, i) == 0){
-                    BOARD_SET(state, i, enemy)
-                    break;
-                }
-            }
+        if (dest > 26 && BOARD_GET(state, 26) == 0){ //attacking Houses rule    
+            BOARD_SET(state, 26, enemy)
             BOARD_SET(state,move,0)
         } else { BOARD_SET(state, move, enemy) }
     }

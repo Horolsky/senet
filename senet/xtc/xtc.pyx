@@ -199,7 +199,7 @@ cdef class Ply():
 
         event = (self.__xstate._seed, self.agent, code, start, dest)
         
-        iteration = Ply(self._increment(self.__xstate._seed, start))
+        iteration = Ply(self._increment(self.__xstate._seed, start), self.incr_func, self.eval_func)
         iteration.__event = event
         return iteration
     @property
