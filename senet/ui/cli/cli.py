@@ -42,19 +42,22 @@ class cli(metaclass=singleton):
         autoplayers = SETTINGS.get("ai/autoplayers")
         autodepth = SETTINGS.get("ai/autodepth")
         autofirst = SETTINGS.get("ai/autofirst")
+        eval_func = SETTINGS.get("ai/eval")
+        rules = SETTINGS.get("game/rules")
+
         agent1, agent2 = None, None
         if autoplayers[0] == "ai":
-            agent1 = AIplayer(number=1, depth=autodepth[0])
+            agent1 = AIplayer(number=1, depth=autodepth[0], rules=rules, eval_func=eval_func)
         else:
             agent1 = Agent(1)
         if autoplayers[1] == "ai":
-            agent2 = AIplayer(number=2, depth=autodepth[1])
+            agent2 = AIplayer(number=2, depth=autodepth[1], rules=rules, eval_func=eval_func)
         else:
             agent2 = Agent(2)
         
         for _ in range(repeats):    
             self.msgout("\tGAME STARTED")
-            self.game.start(agent1, agent2, autofirst, seed)
+            self.game.start(agent1, agent2, rules, autofirst, seed)
         return True
 
     def start(self, tokens):
@@ -67,9 +70,11 @@ class cli(metaclass=singleton):
         """
         if type(tokens) is not list or len(tokens) < 3:
             return False
+        eval_func = SETTINGS.get("ai/eval")
+        rules = SETTINGS.get("game/rules")
         agents = {
             "human": lambda an: Agent(number=an, dfunc=self.ask_human, name="human"),
-            "ai": lambda an: AIplayer(number=an, depth=SETTINGS.get("ai/depth")),
+            "ai": lambda an: AIplayer(number=an, depth=SETTINGS.get("ai/depth"), rules=rules, eval_func=eval_func),
             "dummy": lambda an: Agent(number=an) 
             }
         if tokens[1] not in agents or tokens[2] not in agents:
@@ -89,7 +94,7 @@ class cli(metaclass=singleton):
         
         self.msgout("\tGAME STARTED")
         #self.msgout(self.stringify_board())
-        self.game.start(agent1, agent2, first, seed)
+        self.game.start(agent1, agent2, rules, first, seed)
         return True
     
     def ask_human(self, state=0):

@@ -56,7 +56,7 @@ class Game():
         if self.__state:
             return self.__state.seed
     
-    def start(self, agent1, agent2,  first=1, seed=10066320): #start_game
+    def start(self, agent1, agent2, rules, first=1, seed=10066320): #start_game
         """
         start new or restart current game
         @param first: int
@@ -75,7 +75,7 @@ class Game():
         self.__running = True
         self.__turn = 0
         
-        self.__state = Ply(seed, SETTINGS.get("game/rules"), SETTINGS.get("ai/eval"))
+        self.__state = Ply(seed, rules, SETTINGS.get("ai/eval"))
         if seed == 10066320:
             self.__sticks = Game.throw_sticks()
             self.__state.steps = Game.get_steps(self.__sticks)
@@ -133,16 +133,14 @@ class Game():
         cell = self.agent.choose_movement(self.state)
         if self.__running == False:
             return False
-        newsticks = Game.throw_sticks()
         newstate = self.state.increment(cell)
         if newstate is None:
-            exit("fuck")
-        if 3 in newstate.board:
-            print("erreo: " + str(newstate.seed))
-        newstate.steps = Game.get_steps(newsticks) 
-        if newstate is None:
-            return False  
+            return False
+        elif 3 in newstate.board:
+            return False
         else:
+            newsticks = Game.throw_sticks()
+            newstate.steps = Game.get_steps(newsticks) 
             self.__sticks = newsticks
             self.__state = newstate
             self.__turn += 1
