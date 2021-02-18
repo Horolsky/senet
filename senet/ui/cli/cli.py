@@ -297,14 +297,20 @@ class cli(metaclass=singleton):
         depending on coordinate options
         """
         mode = SETTINGS.get("cli/crd")
+        result = ""
         if mode == "lin":
-            return str(index + 1)
+            result = str(index + 1)
+            if index == 0:
+                result = "0"
         elif mode == "tbl":
             r = index // 10 + 1
             c = index % 10 + 1
             if r == 2:
                 c = 11 - c
-            return f"({r}, {c})"
+            result = f"({r}, {c})"
+            if index == 0:
+                result = "(0)"
+        return result
         
     def get_index(self, tokens):
         """
@@ -313,9 +319,11 @@ class cli(metaclass=singleton):
         """
         cell, steps, r, c = [None for _ in range(4)]
         mode = SETTINGS.get("cli/crd")
-        if mode == "lin" and len(tokens) == 1:
+        if tokens[0] == "0":
+            cell = 30
+        elif mode == "lin" and len(tokens) == 1:
             cell = int(tokens[0]) - 1
-        if mode == "tbl" and len(tokens) == 2:
+        elif mode == "tbl" and len(tokens) == 2:
             r, c = int(tokens[0])-1, int(tokens[1])-1
             cell = r * 10 + c
             if r == 1:
