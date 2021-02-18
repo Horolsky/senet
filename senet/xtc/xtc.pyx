@@ -3,19 +3,23 @@
 
 from libc.stdlib cimport malloc, free
 cimport xtc
-from xtc cimport ui8, ui32, ui64, eval_id_e, incr_id_e 
+from xtc cimport ui8, ui32, ui64, eval_e, rules_e 
 from json import dumps
 
 INCREMENT_RULES = ("Meub", "Kendal")
 EVALUATION_FUNCS = ("basic",)
 
-def emax(ui64 state, ui8 depth, ui8 sec, eval_id_e id_eval=id_eval_basic, incr_id_e id_incr=id_incr_meub):
+def emax(ui64 state, ui8 depth, ui8 sec, incr_func="Kendal", eval_func="basic"):
     """
     best strategy expectiminimax multithread search
     @param state: 64-bit uint state seed
     @param depth: 8-bit uint depth of search 
     @param sec: 8-bit uint stoptimer
+    @param incr_func: game rules descriptor
+    @param eval_func: state evaluation descriptor
     """
+    cdef eval_e id_eval = EVALUATION_FUNCS.index(eval_func)
+    cdef rules_e id_incr = INCREMENT_RULES.index(incr_func)
     cdef xtc.emax_res result
     result = xtc.get_strategy_emax_mt(state, depth, sec, id_eval, id_incr)
     return (result.strategy, result.searched_nodes)
@@ -33,13 +37,13 @@ cdef class Ply():
     cdef xtc.state_increment_func _increment
     cdef xtc.state_legal_moves_func _get_moves
     cdef xtc.state_evaluation_func _eval
-    cdef incr_id_e _incr_id
-    cdef eval_id_e _eval_id
+    cdef rules_e _rules
+    cdef eval_e _eval_id
 
-    def __init__(self, ui64 seed=10066320, incr_id="Meub", eval_id="basic"):
+    def __init__(self, ui64 seed=10066320, rules="Meub", eval_id="basic"):
         """
         @param seed: 64-bit integer xstate seed
-        @param incr_id: increment func id
+        @param rules: increment func id
         @param eval_id: eval func id
         """
 
@@ -49,7 +53,7 @@ cdef class Ply():
             "board": None,
             "utility": None,
         }
-        self.incr_func = incr_id
+        self.incr_func = rules
         self.eval_func = eval_id
 
         self.__event = (seed, 0,0,0,0) #this updates on iteration after init
@@ -61,14 +65,14 @@ cdef class Ply():
         id of increment function
         0 - default
         """
-        return INCREMENT_RULES[self._incr_id]
+        return INCREMENT_RULES[self._rules]
 
     @incr_func.setter
     def incr_func(self, func):
         if func in INCREMENT_RULES:
-            self._incr_id = INCREMENT_RULES.index(func)
-            self._increment = xtc.get_increment_func(self._incr_id)
-            self._get_moves = xtc.get_legal_moves_func(self._incr_id)
+            self._rules = INCREMENT_RULES.index(func)
+            self._increment = xtc.get_increment_func(self._rules)
+            self._get_moves = xtc.get_legal_moves_func(self._rules)
             self.__cache["moves"] = None
     
     @property

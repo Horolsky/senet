@@ -213,7 +213,7 @@ ui64 increment_kendal(ui64 seed, ui8 move){
     return state._seed;
 }
 
-state_increment_func get_increment_func(incr_id_e id){
+state_increment_func get_increment_func(rules_e id){
     switch (id){
         case id_incr_meub:
             return increment_meub;
@@ -227,7 +227,7 @@ state_increment_func get_increment_func(incr_id_e id){
     }
 }
 
-state_legal_moves_func get_legal_moves_func(incr_id_e id){
+state_legal_moves_func get_legal_moves_func(rules_e id){
     switch (id){
         case id_incr_meub:
             return get_moves_meub;
@@ -258,7 +258,7 @@ float eval_basic(ui64 seed){
     return ut;
 }
 
-state_evaluation_func get_evaluation_func(eval_id_e id){
+state_evaluation_func get_evaluation_func(eval_e id){
     switch (id){
         case id_eval_basic:
             return eval_basic;
@@ -312,7 +312,7 @@ void * _threadwork(void * param){
     return NULL;
 }
 
-emax_res get_strategy_emax_mt(ui64 seed, ui8 depth, ui8 sec, eval_id_e eval_id, incr_id_e incr_id){
+emax_res get_strategy_emax_mt(ui64 seed, ui8 depth, ui8 sec, eval_e eval_id, rules_e incr_id){
     _eval = get_evaluation_func(eval_id);
     _increment = get_increment_func(incr_id);
     _get_moves = get_legal_moves_func(incr_id);

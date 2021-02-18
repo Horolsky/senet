@@ -39,7 +39,7 @@ state._board ^= ((ui64) val << (cell << 1));   \
 
 #define MOVES_GET(moves, index) ((moves._mvs >> (index * 5)) % 32)
 #define MOVES_SET(moves, index, val) \
-    moves._mvs &= ~((ui32) 31 << (index * 5));    \
+    moves._mvs &= ~((ui32) 31 << (index * 5));   \
     moves._mvs ^= ((ui32) val << (index * 5));   \
 
 
@@ -49,18 +49,17 @@ typedef ui64 (*state_increment_func)(ui64 seed, ui8 move);
 typedef ui32 (*state_legal_moves_func)(ui64 seed);
 typedef float (*state_evaluation_func)(ui64 seed);
 
-typedef enum _evaluation_function_id {
-    id_eval_basic,
-    id_eval_basic_zero
-} eval_id_e;
-typedef enum _state_increment_id {
+typedef enum _eval_id {
+    id_eval_basic
+} eval_e;
+typedef enum _rules_id {
     id_incr_meub,
     id_incr_kendal
-} incr_id_e;
+} rules_e;
 
-state_increment_func get_increment_func(incr_id_e id);
-state_legal_moves_func get_legal_moves_func(incr_id_e id);
-state_evaluation_func get_evaluation_func(eval_id_e id);
+state_increment_func get_increment_func(rules_e id);
+state_legal_moves_func get_legal_moves_func(rules_e id);
+state_evaluation_func get_evaluation_func(eval_e id);
 
 ui32 get_moves_meub(ui64 seed);
 ui64 increment_meub(ui64 seed, ui8 m);
@@ -74,5 +73,5 @@ typedef struct _emax_res {
     ui32 searched_nodes;
 } emax_res;
 
-emax_res get_strategy_emax_mt(ui64 seed, ui8 depth, ui8 sec, eval_id_e id_eval, incr_id_e id_incr);
+emax_res get_strategy_emax_mt(ui64 seed, ui8 depth, ui8 sec, eval_e id_eval, rules_e id_incr);
 #endif
