@@ -300,7 +300,7 @@ class cli(metaclass=singleton):
         result = ""
         if mode == "lin":
             result = str(index + 1)
-            if index == 0:
+            if index == 30:
                 result = "0"
         elif mode == "tbl":
             r = index // 10 + 1
@@ -308,7 +308,7 @@ class cli(metaclass=singleton):
             if r == 2:
                 c = 11 - c
             result = f"({r}, {c})"
-            if index == 0:
+            if index == 30:
                 result = "(0)"
         return result
         
