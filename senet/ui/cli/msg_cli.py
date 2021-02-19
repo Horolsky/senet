@@ -16,16 +16,17 @@ messages = {
       h - show help info
       r - show rules
       i - detailed info about the game
-      o - show options state
+      o - show settings
       o <key> <value> - set option
 
     How to play:
     Pawns of two players are represented on the board as V and X
     To start new game enter next command with desired options:
-      s <player 1> <player 2> <first> 
+      s <player 1> <player 2> <seed/first> 
     options for this command:
       <player #> - choose "human", "ai" or "dummy"
-      <first> - choose pawns troupe (1 or 2) for the first player
+      <seed/first> - choose pawns troupe (1 or 2) for the first player
+      or set a game seed for replay
       if omitted, first player will start with Y by default
       
     To make a turn enter a coordinates of choosen pawn to move, 
@@ -35,12 +36,16 @@ messages = {
 
     Note that on the second row pawns are moving from right to left,
     but that does not affect the cell coordinates in tabular mode. 
+
+    To run autoplays enter next command with desired options:
+      a <seed> <num of plays>
+    autoplay options are dfined in settings.
     """,
 
   "info" : """
 
-    designed by A. Horolsky as a CS study project
-    development in progress
+    developed by A. Horolsky as a CS study project
+
     """,
 
   "confirm_q" : "The game is running. Ton confirm quit enter Y, to continue press any key",
