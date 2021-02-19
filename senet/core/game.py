@@ -6,6 +6,8 @@ from senet.settings import SETTINGS
 from json import dumps
 from datetime import datetime
 
+brieflog_headers = f"end time;rules;timer;agent 1;agent 2;winner;score;\n"
+
 class Game():
     @staticmethod
     def check_agent(agent):
@@ -39,8 +41,7 @@ class Game():
         self.__onvictory = onvictory
         self.__logging_brief = SETTINGS.get("dev/brieflog")
         if self.__logging_brief:
-            headers = f"end time;timer;agent 1;agent 2;winner;score;\n"
-            self._brieflog = report("senet_log", "csv", "logs/brief", headers, False)
+            self._brieflog = report("senet_log", "csv", "logs/brief", brieflog_headers, False)
         else:
             self._brieflog = None
     
@@ -65,7 +66,7 @@ class Game():
         """
         self.__logging_game = SETTINGS.get("dev/gamelogs")
         self.__logging_brief = SETTINGS.get("dev/brieflog")
-
+        self._rules = rules
 
         #agents duck typing
         if not Game.check_agent(agent1) or not Game.check_agent(agent2):
@@ -108,8 +109,7 @@ class Game():
                 
     def __record_to_brieflog(self):
         if self._brieflog == None:
-            headers = f"end time;agent 1;agent 2;winner;score;\n"
-            self._brieflog = report("senet_log", "csv", "logs/brief", headers, False)
+            self._brieflog = report("senet_log", "csv", "logs/brief", brieflog_headers, False)
 
         winner = self.state.event[1]
         looser = winner % 2 + 1
@@ -121,7 +121,7 @@ class Game():
             agents[0] += f"-{str(self.__agent1._depth)}"
         if agents[1].lower() == "ai":
             agents[1] += f"-{str(self.__agent2._depth)}"
-        self._brieflog.write(f"{str(datetime.now())};{timer};{agents[0]};{agents[1]};{winner};{score}\n")
+        self._brieflog.write(f"{str(datetime.now())};{self._rules};{timer};{agents[0]};{agents[1]};{winner};{score}\n")
 
     def __move(self):  #manage_movement
         """
