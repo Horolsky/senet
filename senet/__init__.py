@@ -4,7 +4,7 @@ from senet.settings import SETTINGS
 senet game
 """    
 
-def start(mode="cli"):
+def launch(mode="cli"):
     if mode == "cli":
         print(msg_cli["init"])
         cli().init()
