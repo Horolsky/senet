@@ -22,8 +22,8 @@ ui32 get_moves_meub(ui64 seed){
     ui8 agent = state._agent + 1;
     ui8 enemy = agent % 2 + 1;
     ui8 dest, trgt;
-    
-    moves._dir = 1;                                                                 // direct move
+    /* DIRECT MOVE */
+    moves._dir = 1;
     for (ui8 i =0; i < 30; i++){
         ui8 cell = BOARD_GET(state, i);
         if (cell != agent) continue;
@@ -40,39 +40,45 @@ ui32 get_moves_meub(ui64 seed){
             if (prev != enemy && nxt != enemy) moves = _add_move(moves, i);
         }
     }
-    if (moves._len == 0){   // reverse move
+    /* REVERSE MOVE */
+    if (moves._len == 0){   
         moves._dir = 2;                      
-        ui8 cell, prev = BOARD_GET(state, 0);// state._board % 4;                                       
+        ui8 cell, prev = BOARD_GET(state, 0);
         for (ui8 i = 1; i < 30; i++) {
             cell = BOARD_GET(state, i);
             if (cell == agent && prev == 0) moves = _add_move(moves, i);
             prev = cell;
         }
     }
-    if (moves._len == 0) moves._dir = 0;                                              // skip move
+    /* SKIP MOVE */
+    if (moves._len == 0) moves._dir = 0;
     return moves._seed;
 }
+//internal unsafe function, movement validation must be done before
+ui64 increment_meub_internal(xState state, xMoves moves, ui8 move){
+    if (!_move_is_in(moves, move)) return 0; //illegal move
 
-ui64 increment_meub(ui64 seed, ui8 move){
-    xState state = {._seed=seed};
-    xMoves moves = {._seed=get_moves_meub(seed)};
     ui8 agent = state._agent + 1;
-    if (BOARD_GET(state, move) != agent) return 0;
-
     ui8 enemy = agent % 2 + 1;
-    state._agent = enemy - 1;
     ui8 steps = state._steps;
     state._steps = 0;
-    ui8 dest = move;
 
-    if (steps == 1 || steps == 4 || steps == 5) state._agent = agent - 1; //bonus 
-    if (moves._len == 0) return state._seed;
-    if (_move_is_in(moves, move) == 0) return 0;
+    /* next step preparation */
+    state._agent = enemy - 1;                                               //normal move
+    if (steps == 1 || steps == 4 || steps == 5) state._agent = agent - 1;   //bonus move
+
+    /* skipping moves */
+    if (moves._len == 0) return state._seed;                                //normal skipping
     
-    if (moves._dir  == 1) dest = move + steps;
-    else if (moves._dir  == 2) dest = move - 1;
+    /* movement destination */
+    ui8 dest = moves._dir  == 1 ? dest = move + steps : move - 1; 
+    //skipping case was resolved in prev. step 
+
+    /* STATE UPD */
+    //escaping
+    if (move == 29 || dest == 30) {BOARD_SET(state,move,0)}
     //drowing in House of Water
-    if (dest == 26){
+    else if (dest == 26){
         for (ui8 i = 14; i >= 0; i--){
             if (BOARD_GET(state, i) == 0) {
                 dest = i;
@@ -82,8 +88,6 @@ ui64 increment_meub(ui64 seed, ui8 move){
         BOARD_SET(state,move,0)
         BOARD_SET(state,dest,agent)
     }
-    //escaping
-    else if (move == 29 || dest == 30) {BOARD_SET(state,move,0)}
     //attacking
     else if (BOARD_GET(state, dest) == enemy){
         BOARD_SET(state, dest, agent)
@@ -116,40 +120,40 @@ ui32 get_moves_kendal(ui64 seed){
     ui8 enemy = agent % 2 + 1;
     ui8 dest, trgt;
 
-    ui8 penalty = BOARD_GET(state, 26) == agent;                                    //House of Water penalty
-    if (penalty){
-        moves._dir = 0; 
+    /* HOUSE OF WATER PENALTY */                            
+    if (BOARD_GET(state, 26) == agent){
         if (state._steps == 4){
-            moves = _add_move(moves, 26);                                           //escaping
+            moves = _add_move(moves, 26);                                   //escaping
             moves._dir = 1; 
         }
         else if (BOARD_GET(state, 14) == 0){
-            moves = _add_move(moves, 26);                                           //reborning    
-            moves = _add_move(moves, 30);                                           //skipping
-            moves._dir = 2;                                                         
+            moves = _add_move(moves, 26);                                   //reborning    
+            moves = _add_move(moves, 30);                                   //skipping
+            moves._dir = 2;                                                 //keep this not 0
         }
         return moves._seed;
     }
-    
-    moves._dir = 1;                                                                 // direct move
+    /* DIRECT MOVE */
+    moves._dir = 1;                                                                 
     for (ui8 i =0; i < 30; i++){
         ui8 cell = BOARD_GET(state, i);
         if (cell != agent) continue;
         dest = i + state._steps;
         trgt = BOARD_GET(state, dest);
-        if (i == 29) moves = _add_move(moves, i);                                   // always escaping
-        else if (i > 24 && dest == 30) moves = _add_move(moves, i);                 // correct escaping
-        else if (i != 25 && dest > 25) continue;                                    // forbidden house arriving
-        else if (dest > 29) continue;                                               // corrupted logic
-        else if (trgt == 0) moves = _add_move(moves, i);                            // normal movement
-        else if (trgt == enemy) {                                                   // attack
+        if (i == 29) moves = _add_move(moves, i);                           // always escaping
+        else if (i > 24 && dest == 30) moves = _add_move(moves, i);         // correct escaping
+        else if (i != 25 && dest > 25) continue;                            // forbidden house arriving
+        else if (dest > 29) continue;                                       // corrupted logic
+        else if (trgt == 0) moves = _add_move(moves, i);                    // normal movement
+        else if (trgt == enemy) {                                           // attack
             ui8 prev = dest > 0 ? BOARD_GET(state, (dest-1)) : 0;
             ui8 nxt = dest < 29 ? BOARD_GET(state, (dest+1)) : 0;
-            if (prev != enemy && nxt != enemy) moves = _add_move(moves, i);         //defended trgt
-            else if (dest == 26) moves = _add_move(moves, i);                       //drowed trgt
+            if (prev != enemy && nxt != enemy) moves = _add_move(moves, i); //defended trgt
+            else if (dest == 26) moves = _add_move(moves, i);               //drowed trgt
         }
     }
-    if (moves._len == 0){   // reverse move
+    /* REVERSE MOVE */
+    if (moves._len == 0) {   
         moves._dir = 2;                      
         ui8 cell;
         trgt = BOARD_GET(state, 0);// state._board % 4;                                       
@@ -164,29 +168,34 @@ ui32 get_moves_kendal(ui64 seed){
             trgt = cell;
         }
     }
-    if (moves._len == 0) moves._dir = 0;                                              // skip move
+    /* SKIP MOVE */
+    if (moves._len == 0) moves._dir = 0;                                              
     return moves._seed;
 }
 
-ui64 increment_kendal(ui64 seed, ui8 move){
-    xState state = {._seed=seed};
-    xMoves moves = {._seed=get_moves_kendal(seed)};
+//internal unsafe function, movement validation must be done before
+ui64 increment_kendal_internal(xState state, xMoves moves, ui8 move){
+    if (!_move_is_in(moves, move)) return 0; //illegal move
+
     ui8 agent = state._agent + 1;
     ui8 enemy = agent % 2 + 1;
     ui8 steps = state._steps;
-    ui8 dest = move; 
-
-    //next step preparation
-    state._agent = enemy - 1;
     state._steps = 0;
+
+    /* next step preparation */
+    state._agent = enemy - 1;                                               //normal move
+    if (steps == 1 || steps == 4 || steps == 5) state._agent = agent - 1;   //bonus move
+
+    /* skipping moves */
+    if (move == 30 && _move_is_in(moves, 30)) return state._seed;           //penalty skipping
+    if (moves._len == 0) return state._seed;                                //normal skipping
     
-    if (steps == 1 || steps == 4 || steps == 5) state._agent = agent - 1; //bonus move
-    if (move == 30 && _move_is_in(moves, 30)) return state._seed;         //penalty skipping
-    if (moves._len == 0) return state._seed;                              //normal skipping
-    if (_move_is_in(moves, move) == 0) return 0;                          //illegal move
+    /* movement destination */
+    ui8 dest = moves._dir  == 1 ? dest = move + steps : move - 1; 
+    //skipping case was resolved in prev. step 
     
-    if (moves._dir  == 1) dest = move + steps;
-    else if (moves._dir  == 2) dest = move - 1;
+    /* STATE UPD */
+    
     //escaping
     if (dest == 30 || move == 29) {BOARD_SET(state,move,0)}
     //reborning from House of Water
@@ -211,6 +220,32 @@ ui64 increment_kendal(ui64 seed, ui8 move){
     else state._seed = 0; 
     
     return state._seed;
+}
+
+state_increment_func get_internal_increment_func(rules_e id){
+    switch (id){
+        case id_incr_meub:
+            return increment_meub_internal;
+            break;
+        case id_incr_kendal:
+            return increment_kendal_internal;
+            break;
+        default:
+            return NULL;
+            break;
+    }
+}
+
+ui64 increment_kendal(ui64 seed, ui8 move){
+    xState state = {._seed=seed};
+    xMoves moves = {._seed=get_moves_kendal(seed)};
+    return increment_kendal_internal(state, moves, move);
+}
+
+ui64 increment_meub(ui64 seed, ui8 move){
+    xState state = {._seed=seed};
+    xMoves moves = {._seed=get_moves_meub(seed)};
+    return increment_meub_internal(state, moves, move);
 }
 
 state_increment_func get_increment_func(rules_e id){
@@ -269,8 +304,8 @@ state_evaluation_func get_evaluation_func(eval_e id){
     }
 }
 
+static ui64 (*_increment)(xState state, xMoves moves, ui8 move);
 static state_evaluation_func _eval;
-static state_increment_func _increment;
 static state_legal_moves_func _get_moves;
 static ui64 _node_counter;
 static time_t _stoptime;
@@ -297,7 +332,7 @@ float _expectimax(ui64 seed, ui8 depth){
         chance_moves._seed=_get_moves(chance_state._seed);
         
         for (ui8 move = 0; move < chance_moves._len; move++){
-            ui64 childstate = _increment(chance_state._seed, MOVES_GET(chance_moves, move));            
+            ui64 childstate = _increment(chance_state, chance_moves, MOVES_GET(chance_moves, move));            
             cutil += _expectimax(childstate, depth);
         }
         util += chance_moves._len != 0 ? cutil * P[chance] / chance_moves._len : cutil * P[chance];
@@ -314,26 +349,27 @@ void * _threadwork(void * param){
 
 emax_res get_strategy_emax_mt(ui64 seed, ui8 depth, ui8 sec, eval_e eval_id, rules_e incr_id){
     _eval = get_evaluation_func(eval_id);
-    _increment = get_increment_func(incr_id);
+    _increment = get_internal_increment_func(incr_id);
     _get_moves = get_legal_moves_func(incr_id);
     _node_counter = 0;
     _stoptime = clock() + sec * CLOCKS_PER_SEC;
     _stopdepth = depth;
-    xMoves smoves = {._seed=_get_moves(seed)};
-    _strat_seeds = malloc (sizeof(ui64) * smoves._len);
-    _strat_utils = malloc (sizeof(float) * smoves._len);
-    pthread_t * threads = malloc (sizeof(pthread_t) * smoves._len);
-    for (ui8 s = 0; s < smoves._len; s++){
-        ui64 substate = _increment(seed, MOVES_GET(smoves, s));
-        _strat_seeds[s] = substate;
+
+    xState state = {._seed=seed};
+    xMoves strat_moves = {._seed=_get_moves(seed)};
+    _strat_seeds = malloc (sizeof(ui64) * strat_moves._len);
+    _strat_utils = malloc (sizeof(float) * strat_moves._len);
+    pthread_t * threads = malloc (sizeof(pthread_t) * strat_moves._len);
+    for (ui8 s = 0; s < strat_moves._len; s++){
+        _strat_seeds[s] = _increment(state, strat_moves, MOVES_GET(strat_moves, s));
         pthread_create(&threads[s], NULL, _threadwork, (void*) s);
         if (!threads[s]) _strat_utils[s] = -1;//TODO handle error
     }   
-    for (ui8 s = 0; s < smoves._len; s++) pthread_join(threads[s], NULL);
+    for (ui8 s = 0; s < strat_moves._len; s++) pthread_join(threads[s], NULL);
     emax_res result;
     result.searched_nodes = _node_counter;
     result.strategy = 0;
-    for (ui8 s = 0; s < smoves._len; s++) {
+    for (ui8 s = 0; s < strat_moves._len; s++) {
         if (_strat_utils[s] > _strat_utils[result.strategy]) result.strategy = s;
     }
     free(_strat_seeds);
