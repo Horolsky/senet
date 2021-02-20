@@ -1,9 +1,15 @@
 from os import mkdir
 from os.path import isdir
 from datetime import datetime
-class report:
-    def __init__(self, prefix, ext="txt", path="logs", msg=0, hold=True):
-        timestamp = str(datetime.now()).replace(":", "").replace("-", "").replace(" ", "-")[:15]
+class Report:
+    def __init__(self, prefix, timestamp=None, ext="txt", path="logs", msg=0, hold=True):
+        """
+        logging game events to file
+        """
+        if str(timestamp) is not str:
+            timestamp = str(datetime.now())
+        timestamp = timestamp.replace(":", "").replace("-", "").replace(" ", "-")[:15]
+        
         if type(prefix) is not str:
             raise TypeError("invalid file prefix arg")
         if type(ext) is not str:

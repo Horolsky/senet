@@ -2,7 +2,7 @@ import threading
 import time
 import ctypes
 from math import inf
-from senet.utils.report import report
+from senet.utils.report import Report
 from time import perf_counter_ns
 from senet.settings import SETTINGS
 from senet.xtc import emax, INCREMENT_RULES, EVALUATION_FUNCS
@@ -29,7 +29,7 @@ class AIplayer():
         self._rules = rules
         if self.__log:
             header = f"seed;t, ns;t, ~sec;leaves searched;agent: {self._agent}, timer: {self._timer}, depth: {self._depth}\n"
-            self._report = report(f"ai-{number}", "csv", "logs/ai", header)
+            self._report = Report(f"ai-{number}", None, "csv", "logs/ai", header)
 
     def __del__(self):
         if self.__log:

@@ -1,2 +1,2 @@
 from .singleton import singleton
-from .report import report
+from .report import Report

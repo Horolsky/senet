@@ -1,7 +1,7 @@
 import random as r
 from senet.xtc import Ply
 from .agent import Agent
-from senet.utils import report
+from senet.utils import Report
 from senet.settings import SETTINGS
 from json import dumps
 from datetime import datetime
@@ -40,8 +40,9 @@ class Game():
         self.__onmove = onmove
         self.__onvictory = onvictory
         self.__logging_brief = SETTINGS.get("dev/brieflog")
+        self.__game_timestamp = None
         if self.__logging_brief:
-            self._brieflog = report("senet_log", "csv", "logs/brief", brieflog_headers, False)
+            self._brieflog = Report("senet_log", None, "csv", "logs/brief", brieflog_headers, False)
         else:
             self._brieflog = None
     
@@ -83,8 +84,9 @@ class Game():
             self.__state.agent = first
         
         if self.__logging_game:
-            headers = f"N;{agent1._name} vs {agent2._name};agent;steps;utility;seed\n"
-            self._gamelog = report("game", "csv", "logs/games", headers)
+            headers = f"N;{agent1._name} vs {agent2._name}: {rules};agent;steps;utility;seed\n"
+            self._gamelog = Report("game", None, "csv", "logs/games", headers)
+        self.__game_timestamp = str(datetime.now())
         self.__onmove()
         self.__run()
         self.__stop()
@@ -109,7 +111,7 @@ class Game():
                 
     def __record_to_brieflog(self):
         if self._brieflog == None:
-            self._brieflog = report("senet_log", "csv", "logs/brief", brieflog_headers, False)
+            self._brieflog = Report("senet_log", None, "csv", "logs/brief", brieflog_headers, False)
 
         winner = self.state.event[1]
         looser = winner % 2 + 1
@@ -121,7 +123,7 @@ class Game():
             agents[0] += f"-{str(self.__agent1._depth)}"
         if agents[1].lower() == "ai":
             agents[1] += f"-{str(self.__agent2._depth)}"
-        self._brieflog.write(f"{str(datetime.now())};{self._rules};{timer};{agents[0]};{agents[1]};{winner};{score}\n")
+        self._brieflog.write(f"{self.__game_timestamp};{self._rules};{timer};{agents[0]};{agents[1]};{winner};{score}\n")
 
     def __move(self):  #manage_movement
         """
