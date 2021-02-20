@@ -1,7 +1,6 @@
 from selenium import webdriver
 from senet.utils import singleton, Report
-from senet.core import Game
-from senet.xtc import emax
+from senet.xtc import emax, Ply
 
 BROWSERS = {
     "Chrome": webdriver.Chrome,
@@ -11,6 +10,17 @@ launch_browser = lambda b: BROWSERS.get(b)()
 MEUB_URL = "http://chrismeub.com/projects/senet.html"
 MEUB_URL_LOCAL = "/home/alexander/projects/chrismeub/senet.html"
 CELL_SELECTOR_T = "body > div > div.content_wrapper > div > div.game_wrapper > div > div.board.unselectable > a:nth-child"
+
+#PROXY_SCRIPT = """
+#const handler = {
+#  get: function(target, prop, receiver) {
+#    if (prop === "proxied") {
+#      return "replaced value";
+#    }
+#    return Reflect.get(...arguments);
+#  }
+#};
+#"""
 
 class MeubPlayer(metaclass=singleton):
     __cells = None
@@ -42,7 +52,6 @@ class MeubPlayer(metaclass=singleton):
         return [cell for row in bb for cell in row]
 
     def __init__(self, report=False):
-        #self._game = Game()
         if report:
             headers = "timestamp;ai;winner;score"
             self._report = Report("webplayer-meub", None, "csv", "logs/meub", headers, False)
@@ -89,5 +98,16 @@ class MeubPlayer(metaclass=singleton):
     def steps(self):
         if self._browser != None:
             return self._browser.execute_script("return game_obj.dice_value;")
+
+    def play_best(self):
+        t = Ply()
+        t.board = self.board
+        t.steps = self.steps
+        t.agent = 1
+        strategy = emax(t.seed, 6, 4, "Meub")[0]
+        move = t.moves[strategy]
+        print(f"ai plays {move}")
+        self.cells[move].click()
+
 
 meubplayer = MeubPlayer() # MeubPlayer singletone
