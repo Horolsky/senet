@@ -10,17 +10,7 @@ launch_browser = lambda b: BROWSERS.get(b)()
 MEUB_URL = "http://chrismeub.com/projects/senet.html"
 MEUB_URL_LOCAL = "/home/alexander/projects/chrismeub/senet.html"
 CELL_SELECTOR_T = "body > div > div.content_wrapper > div > div.game_wrapper > div > div.board.unselectable > a:nth-child"
-
-#PROXY_SCRIPT = """
-#const handler = {
-#  get: function(target, prop, receiver) {
-#    if (prop === "proxied") {
-#      return "replaced value";
-#    }
-#    return Reflect.get(...arguments);
-#  }
-#};
-#"""
+MEUB_SCRIPT_PATH = "senet/webplayer/js/meub_init.js"
 
 class MeubPlayer(metaclass=singleton):
     __cells = None
@@ -66,6 +56,10 @@ class MeubPlayer(metaclass=singleton):
             if local:
                 url = MEUB_URL_LOCAL
             self._browser.get(url)
+            jscript = open(MEUB_SCRIPT_PATH, "r")
+            _s = jscript.read()
+            self._browser.execute_script(_s)
+            jscript.close()
         except:
             print("unable to launch browser")
     def quit(self):
