@@ -98,14 +98,23 @@ class MeubPlayer(metaclass=singleton):
     def steps(self):
         if self._browser != None:
             return self._browser.execute_script("return game_obj.dice_value;")
+    @property
+    def agent(self):
+        if self._browser != None:
+            return (int(self._browser.execute_script("return game_obj.is_player_turn;")) ^ 1) + 1
+
+    @property
+    def state(self):
+        if self._browser != None:
+            state = Ply(0, "Meub")
+            state.board = self.board
+            state.agent = self.agent
+            state.steps = self.steps
+            return state
 
     def play_best(self):
-        t = Ply()
-        t.board = self.board
-        t.steps = self.steps
-        t.agent = 1
-        strategy = emax(t.seed, 6, 4, "Meub")[0]
-        move = t.moves[strategy]
+        strategy = emax(self.state.seed, 6, 4, "Meub")[0]
+        move = self.state.moves[strategy]
         print(f"ai plays {move}")
         self.cells[move].click()
 
