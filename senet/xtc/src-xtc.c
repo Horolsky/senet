@@ -24,17 +24,17 @@ ui32 get_moves_meub(ui64 seed){
     ui8 dest, trgt;
     /* DIRECT MOVE */
     moves._dir = 1;
-    for (ui8 i =0; i < 30; i++){
+    for (ui8 i = 0; i < 30; i++){
         ui8 cell = BOARD_GET(state, i);
         if (cell != agent) continue;
         dest = i + state._steps;
         trgt = BOARD_GET(state, dest);
-        if (i == 29) moves = _add_move(moves, i);                                   // always escaping
-        else if ((i == 27 || i == 28) && dest == 30) moves = _add_move(moves, i);   // correct escaping
-        else if (i != 25 && dest > 25) continue;                                    // forbidden house arriving
-        else if (dest > 29) continue;                                               // forbidden escaping
-        else if (trgt == 0) moves = _add_move(moves, i);                            // normal movement
-        else if (trgt == enemy) {                                                   // attack
+        if (i == 29) moves = _add_move(moves, i);                       // always escaping
+        else if (i > 24 && dest == 30) moves = _add_move(moves, i);     // correct escaping
+        else if (i != 25 && dest > 25) continue;                        // forbidden house arriving
+        else if (dest > 29) continue;                                   // forbidden escaping
+        else if (trgt == 0) moves = _add_move(moves, i);                // normal movement
+        else if (trgt == enemy) {                                       // attack
             ui8 prev = dest > 0 ? BOARD_GET(state, (dest-1)) : 0;
             ui8 nxt = dest < 29 ? BOARD_GET(state, (dest+1)) : 0;
             if (prev != enemy && nxt != enemy) moves = _add_move(moves, i);
@@ -56,7 +56,7 @@ ui32 get_moves_meub(ui64 seed){
 }
 //internal unsafe function, movement validation must be done before
 ui64 increment_meub_internal(xState state, xMoves moves, ui8 move){
-    if (!_move_is_in(moves, move)) return 0; //illegal move
+    if (moves._len > 0 && !_move_is_in(moves, move)) return 0; //illegal move
 
     ui8 agent = state._agent + 1;
     ui8 enemy = agent % 2 + 1;
@@ -175,7 +175,7 @@ ui32 get_moves_kendal(ui64 seed){
 
 //internal unsafe function, movement validation must be done before
 ui64 increment_kendal_internal(xState state, xMoves moves, ui8 move){
-    if (!_move_is_in(moves, move)) return 0; //illegal move
+    if (moves._len > 0 && !_move_is_in(moves, move)) return 0; //illegal move
 
     ui8 agent = state._agent + 1;
     ui8 enemy = agent % 2 + 1;
@@ -370,7 +370,13 @@ emax_res get_strategy_emax_mt(ui64 seed, ui8 depth, ui8 sec, eval_e eval_id, rul
     result.searched_nodes = _node_counter;
     result.strategy = 0;
     for (ui8 s = 0; s < strat_moves._len; s++) {
-        if (_strat_utils[s] > _strat_utils[result.strategy]) result.strategy = s;
+        if (state._agent == 0){
+            if (_strat_utils[s] > _strat_utils[result.strategy]) result.strategy = s;
+        }
+        else {
+            if (_strat_utils[s] < _strat_utils[result.strategy]) result.strategy = s;
+        }
+        
     }
     free(_strat_seeds);
     free(_strat_utils);
