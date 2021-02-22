@@ -5,25 +5,34 @@ _get_index = function(move){
     return _m;
 }
 
-document.addEventListener("generic_move", function(e) { 
-    console.log("move intercept:"); 
-    console.log(e.detail) 
-});
-
-var _gen_mv_event = new CustomEvent("generic_move", {
-    detail: { move: 0, steps: 0, agent: 0, bb: null } 
-});
-
-var orig_move = game_obj.generic_move;
-
-_wrapper = function(move, callback){
-    _gen_mv_event.detail.agent = move[3];
-    _gen_mv_event.detail.move = _get_index(move);
-    _gen_mv_event.detail.steps = game_obj.dice_value;
-    _gen_mv_event.detail.bb = JSON.stringify(game_obj.bb);
-
-    document.dispatchEvent(_gen_mv_event);
-    return orig_move(move, callback);
+_get_state = function() {
+    return { 
+        state_index: game_obj.state_index, 
+        steps: game_obj.dice_value, 
+        agent: game_obj.state_index + 1, 
+        bb: JSON.stringify(game_obj.bb)
+    }
 }
+/* on move */
+_state_before_move = {
+    state_index: game_obj.state_index, 
+    move: 0, 
+    steps: game_obj.dice_value, 
+    agent: game_obj.state_index + 1, 
+    bb: JSON.stringify(game_obj.bb)
+}
+_game_log_buffer = [];
+game_obj._orig_move = game_obj.generic_move;
+game_obj._move_trap = function(move, callback){
+    let record = {
+        state_index: game_obj.state_index,
+        move: _get_index(move),
+        steps: game_obj.dice_value,
+        agent: move[3],
+        bb: JSON.stringify(game_obj.bb),
+    }
+    _game_log_buffer.push(record);
+    return game_obj._orig_move(move, callback);
+}
+game_obj.generic_move = game_obj._move_trap;
 
-game_obj.generic_move = _wrapper;

@@ -1,6 +1,7 @@
 from selenium import webdriver
 from senet.utils import singleton, Report
 from senet.xtc import emax, Ply
+from time import sleep
 
 BROWSERS = {
     "Chrome": webdriver.Chrome,
@@ -10,7 +11,17 @@ launch_browser = lambda b: BROWSERS.get(b)()
 MEUB_URL = "http://chrismeub.com/projects/senet.html"
 MEUB_URL_LOCAL = "/home/alexander/projects/chrismeub/senet.html"
 CELL_SELECTOR_T = "body > div > div.content_wrapper > div > div.game_wrapper > div > div.board.unselectable > a:nth-child"
+RESTART_BTN_SELECTOR = "body > div > div.content_wrapper > div > div.game_wrapper > div > div.controls > a"
 MEUB_SCRIPT_PATH = "senet/webplayer/js/meub_init.js"
+
+SCRIPT_WAIT_FOR_CTRL = """
+  var callback = arguments[arguments.length - 1];
+  (function wait_for_ctrl(){
+    if(!isNaN(game_obj.state_index) && game_obj.state_index != 1) return game_obj.state_index;
+    setTimeout(wait_for_ctrl, 60);
+  })();
+"""
+SCRIPT_GET_MATCHES = " return [game_obj.wins, game_obj.losses]; "
 
 class MeubPlayer(metaclass=singleton):
     __cells = None
@@ -18,6 +29,8 @@ class MeubPlayer(metaclass=singleton):
     _browser = None
     _game = None
     _report = None
+    gamedata = []
+    matches = [0,0] #wins/losses
     @staticmethod
     def get_cell_selector(id_):
         """
@@ -56,19 +69,52 @@ class MeubPlayer(metaclass=singleton):
             if local:
                 url = MEUB_URL_LOCAL
             self._browser.get(url)
+            self._browser.set_script_timeout(30)
+
             jscript = open(MEUB_SCRIPT_PATH, "r")
             _s = jscript.read()
             self._browser.execute_script(_s)
             jscript.close()
+
+            self.matches = self._browser.execute_script(SCRIPT_GET_MATCHES)
         except:
             print("unable to launch browser")
+    
     def quit(self):
         if self._browser != None:
             self._browser.quit()
             self._browser = None
+    
     def __del__(self):
         self.quit()
+
+    def play(self):
+        if self._browser == None:
+            return
+        seed = self.state.seed
+        moves = self.state.moves
+        while self.game_state['state_index'] < 2:
+            strategy = emax(seed, 6, 4, "Meub")[0]
+            if strategy >= len(moves):
+                continue
+            move = moves[strategy]
+            print(f"ai plays {move}")
+            self.cells[move].click()
+            while self.game_state['state_index'] == 1:
+                sleep(0.2)
+            seed = self.state.seed
+            moves = self.state.moves
+            
+        if self.game_state['state_index'] == 2:
+            print("Victory is ours!")
+        elif self.game_state['state_index'] == 3:
+            print("You loose!")
+        
     
+    def restart(self):
+        if self._browser != None:
+            self._browser.find_element_by_css_selector(RESTART_BTN_SELECTOR).click()
+
     @property
     def cells(self):
         """
@@ -105,6 +151,16 @@ class MeubPlayer(metaclass=singleton):
             state.agent = self.agent
             state.steps = self.steps
             return state
+
+    @property
+    def game_state(self):
+        if self._browser != None:
+            return self._browser.execute_script("return _get_state();")
+
+    @property
+    def log_buffer(self):
+        if self._browser != None:
+            return self._browser.execute_script("return _game_log_buffer;")
 
     def play_best(self):
         strategy = emax(self.state.seed, 6, 4, "Meub")[0]
