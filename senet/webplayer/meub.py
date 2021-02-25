@@ -55,9 +55,10 @@ class MeubPlayer(metaclass=singleton):
         return [cell for row in bb for cell in row]
 
     def __init__(self, report=False):
-        if report:
-            headers = "timestamp;ai;winner;score"
-            self._report = Report("webplayer-meub", None, "csv", "logs/meub", headers, False)
+        pass
+        #if report:
+        #    headers = "seed;move"
+        #    self._report = Report("webplayer-meub", None, "csv", "logs/meub", headers, False)
     def launch(self, browser="Chrome", local=False):
         if self._browser != None:
             print("browser is running")
@@ -86,14 +87,17 @@ class MeubPlayer(metaclass=singleton):
             self._browser = None
     
     def __del__(self):
+        #self._report.close()
         self.quit()
 
     def play(self):
         if self._browser == None:
             return
-        seed = self.state.seed
-        moves = self.state.moves
+        
         while self.game_state['state_index'] < 2:
+            #sleep(1)
+            seed = self.state.seed
+            moves = self.state.moves
             strategy = emax(seed, 6, 4, "Meub")[0]
             if strategy >= len(moves):
                 continue
@@ -102,17 +106,17 @@ class MeubPlayer(metaclass=singleton):
             self.cells[move].click()
             while self.game_state['state_index'] == 1:
                 sleep(0.2)
-            seed = self.state.seed
-            moves = self.state.moves
+            
+            
             
         if self.game_state['state_index'] == 2:
             print("Victory is ours!")
         elif self.game_state['state_index'] == 3:
             print("You loose!")
-        
     
     def restart(self):
         if self._browser != None:
+            self.__cells = None
             self._browser.find_element_by_css_selector(RESTART_BTN_SELECTOR).click()
 
     @property
@@ -156,11 +160,6 @@ class MeubPlayer(metaclass=singleton):
     def game_state(self):
         if self._browser != None:
             return self._browser.execute_script("return _get_state();")
-
-    @property
-    def log_buffer(self):
-        if self._browser != None:
-            return self._browser.execute_script("return _game_log_buffer;")
 
     def play_best(self):
         strategy = emax(self.state.seed, 6, 4, "Meub")[0]
