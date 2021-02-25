@@ -43,11 +43,11 @@ ui32 get_moves_meub(ui64 seed){
     /* REVERSE MOVE */
     if (moves._len == 0){   
         moves._dir = 2;                      
-        ui8 cell, prev = BOARD_GET(state, 0);
+        ui8 cell, trgt = BOARD_GET(state, 0);
         for (ui8 i = 1; i < 30; i++) {
             cell = BOARD_GET(state, i);
-            if (cell == agent && prev == 0) moves = _add_move(moves, i);
-            prev = cell;
+            if (cell == agent && trgt == 0) moves = _add_move(moves, i);
+            trgt = cell;
         }
     }
     /* SKIP MOVE */
