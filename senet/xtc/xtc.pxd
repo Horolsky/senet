@@ -21,7 +21,7 @@ cdef extern from "src-xtc.h":
 
     cdef enum _eval_id:
         id_eval_basic,
-        id_eval_basic_zero
+        id_eval_meub
     ctypedef _eval_id eval_e
     cdef enum _rules_id:
         id_incr_meub,

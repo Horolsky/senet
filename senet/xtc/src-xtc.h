@@ -50,7 +50,8 @@ typedef ui32 (*state_legal_moves_func)(ui64 seed);
 typedef float (*state_evaluation_func)(ui64 seed);
 
 typedef enum _eval_id {
-    id_eval_basic
+    id_eval_basic,
+    id_eval_meub
 } eval_e;
 typedef enum _rules_id {
     id_incr_meub,
@@ -65,7 +66,8 @@ ui32 get_moves_meub(ui64 seed);
 ui64 increment_meub(ui64 seed, ui8 m);
 
 float eval_basic(ui64 seed);
-float eval_basic_zero(ui64 seed);
+float eval_meub(ui64 seed);
+
 
 
 typedef struct _emax_res {

@@ -7,7 +7,7 @@ from xtc cimport ui8, ui32, ui64, eval_e, rules_e
 from json import dumps
 
 INCREMENT_RULES = ("Meub", "Kendal")
-EVALUATION_FUNCS = ("basic",)
+EVALUATION_FUNCS = ("basic", "Meub")
 
 def emax(ui64 state, ui8 depth, ui8 sec, incr_func="Kendal", eval_func="basic"):
     """

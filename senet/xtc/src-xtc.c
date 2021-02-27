@@ -293,10 +293,69 @@ float eval_basic(ui64 seed){
     return ut;
 }
 
+float eval_meub(ui64 seed){
+    /*
+    +- 100 pts for each pawn on bench
+    +- sum of steps
+    +- 7 for each guarded pawn (if enemy behind)
+    +- 20 for the foremost blockade
+    -+ 10 pts penalty if cant move 2 steps
+    -+ 10 pts penalty if cant move 3 steps
+    */
+    xState state = {._seed=seed};
+    ui8 prev, cell, next;
+    signed char first[2] = {-1, -1};
+    ui8 defended, foremost;
+    ui8 bench[2] = {5,5};
+    float eval = 0;
+    
+    for (ui8 i =0; i < 30; i++){
+        cell = BOARD_GET(state, i);
+        if (!cell) continue;
+        prev = i > 0 ? BOARD_GET(state, i-1) : 0;
+        next = i < 29 ? BOARD_GET(state, i+1) : 0;
+        if (first[cell-1] < 0) first[cell-1] = i;
+
+        eval += cell == 1 ? i : -i;
+        bench[cell-1]--;
+        defended = (cell == prev) || (cell == next);
+        if (defended && first[cell%2] < i) {
+            eval += cell == 1 ? 7 : -7;
+            foremost = cell; 
+        }
+    }
+    if (bench[0] == 5 || bench[1] == 5) {
+        eval = bench[0] == 5 ? 1 : 0;
+        eval = bench[1] == 5 ? -1 : 0; //corrupted logic or empty board
+    }
+    else {
+        eval += foremost == 1 ? 20 : -20;
+        eval += -100*bench[0] + 100*bench[1];
+
+        ui8 penalty = 0;
+        state._steps = 2;
+        xMoves moves = {._seed=get_moves_meub(state._seed)};
+        penalty += 5 - bench[state._agent] - moves._len;
+        state._steps = 3;
+        moves._seed=get_moves_meub(state._seed);
+        penalty += 5 - bench[state._agent] - moves._len;
+        eval += state._agent == 0 ? -10 * penalty : 10 * penalty;
+        eval = (eval + 500) / 1000;
+    }
+    /*
+    430
+    300 + 14 + 57 + 20
+    */
+    return eval;
+}
+
 state_evaluation_func get_evaluation_func(eval_e id){
     switch (id){
         case id_eval_basic:
             return eval_basic;
+            break;
+        case id_eval_meub:
+            return eval_meub;
             break;
         default:
             return NULL;
