@@ -39,4 +39,11 @@ _get_state = function() {
         bb: JSON.stringify(game_obj.bb)
     }
 }
-
+/*
+_log = [];
+_orig_move = game_obj.generic_move
+game_obj.generic_move = function (move, callback){
+    _log.push(move);
+    return _orig_move(move, callback);
+}
+*/

@@ -9,7 +9,7 @@ BROWSERS = {
 }
 launch_browser = lambda b: BROWSERS.get(b)()
 MEUB_URL = "http://chrismeub.com/projects/senet.html"
-MEUB_URL_LOCAL = "/home/alexander/projects/chrismeub/senet.html"
+MEUB_URL_LOCAL = " file:///home/alexander/projects/chrismeub/senet.html"
 CELL_SELECTOR_T = "body > div > div.content_wrapper > div > div.game_wrapper > div > div.board.unselectable > a:nth-child"
 RESTART_BTN_SELECTOR = "body > div > div.content_wrapper > div > div.game_wrapper > div > div.controls > a"
 MEUB_SCRIPT_PATH = "senet/webplayer/js/meub_init.js"
@@ -59,7 +59,7 @@ class MeubPlayer(metaclass=singleton):
         #if report:
         #    headers = "seed;move"
         #    self._report = Report("webplayer-meub", None, "csv", "logs/meub", headers, False)
-    def launch(self, browser="Chrome", local=False):
+    def launch(self, browser="Chrome", local=True):
         if self._browser != None:
             print("browser is running")
             return
@@ -103,7 +103,12 @@ class MeubPlayer(metaclass=singleton):
                 continue
             move = moves[strategy]
             print(f"ai plays {move}")
-            self.cells[move].click()
+            try:
+                self.cells[move].click()
+            except:
+                print("non clickable move handled")
+                sleep(1)
+                self.cells[move].click()
             while self.game_state['state_index'] == 1:
                 sleep(0.2)
             
@@ -150,7 +155,7 @@ class MeubPlayer(metaclass=singleton):
     @property
     def state(self):
         if self._browser != None:
-            state = Ply(0, "Meub")
+            state = Ply(0, "Meub", "Meub")
             state.board = self.board
             state.agent = self.agent
             state.steps = self.steps
