@@ -8,7 +8,7 @@ from senet.settings import SETTINGS
 from senet.xtc import emax, INCREMENT_RULES, EVALUATION_FUNCS
 
 class AIplayer():
-    def __init__(self, number, depth, rules="Kendal", eval_func="basic"):
+    def __init__(self, number, depth, rules="Kendal", eval_func="basic", coefs=(1,0,0,0)):
         if number not in [1, 2]:
             raise ValueError("invalid agent number value")
         if depth < 0:
@@ -18,7 +18,7 @@ class AIplayer():
         if eval_func not in EVALUATION_FUNCS:
             raise ValueError("inalid eval arg")
             
-
+        
         self.__log = SETTINGS.get("dev/ailogs")
         self._agent = number
         self._name = "AI"
@@ -26,6 +26,7 @@ class AIplayer():
         self._depth = depth
 
         self._eval_func = eval_func
+        self._coefs = coefs
         self._rules = rules
         if self.__log:
             header = f"seed;t, ns;t, ~sec;leaves searched;agent: {self._agent}, timer: {self._timer}, depth: {self._depth}\n"
@@ -45,7 +46,7 @@ class AIplayer():
             return state.moves[0]
 
         timeA = perf_counter_ns()
-        res = emax(state.seed, self._depth, self._timer, self._rules, self._eval_func)
+        res = emax(state=state.seed, depth=self._depth, sec=self._timer, coefs=self._coefs, incr_func=self._rules, eval_func=self._eval_func)
         timeB = perf_counter_ns()
         decision = res[0]
         leaves = res[1]

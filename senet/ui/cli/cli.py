@@ -42,16 +42,19 @@ class cli(metaclass=singleton):
         autoplayers = SETTINGS.get("ai/autoplayers")
         autodepth = SETTINGS.get("ai/autodepth")
         autofirst = SETTINGS.get("ai/autofirst")
-        eval_func = SETTINGS.get("ai/eval")
+        eval_func1 = SETTINGS.get("ai/eval1")
+        eval_func2 = SETTINGS.get("ai/eval2")
+        eval_coefs1 = SETTINGS.get("ai/coefs1")
+        eval_coefs2 = SETTINGS.get("ai/coefs2")
         rules = SETTINGS.get("game/rules")
 
         agent1, agent2 = None, None
         if autoplayers[0] == "ai":
-            agent1 = AIplayer(number=1, depth=autodepth[0], rules=rules, eval_func=eval_func)
+            agent1 = AIplayer(number=1, depth=autodepth[0], rules=rules, eval_func=eval_func1, coefs=eval_coefs1)
         else:
             agent1 = Agent(1)
         if autoplayers[1] == "ai":
-            agent2 = AIplayer(number=2, depth=autodepth[1], rules=rules, eval_func=eval_func)
+            agent2 = AIplayer(number=2, depth=autodepth[1], rules=rules, eval_func=eval_func2, coefs=eval_coefs2)
         else:
             agent2 = Agent(2)
         

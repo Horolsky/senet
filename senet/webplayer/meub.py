@@ -98,7 +98,7 @@ class MeubPlayer(metaclass=singleton):
             #sleep(1)
             seed = self.state.seed
             moves = self.state.moves
-            strategy = emax(seed, 6, 4, "Meub")[0]
+            strategy = emax(state=seed, depth=6, sec=4, incr_func="Meub", eval_func="linear", coefs=(70,15,8,7))[0]
             if strategy >= len(moves):
                 continue
             move = moves[strategy]

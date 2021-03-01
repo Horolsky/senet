@@ -77,7 +77,7 @@ class Game():
         self.__running = True
         self.__turn = 0
         
-        self.__state = Ply(seed, rules, SETTINGS.get("ai/eval"))
+        self.__state = Ply(seed, rules, "basic")
         if seed == 10066320:
             self.__sticks = Game.throw_sticks()
             self.__state.steps = Game.get_steps(self.__sticks)

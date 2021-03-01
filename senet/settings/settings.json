@@ -47,13 +47,39 @@
         }
     }, 
     "ai": {
-        "eval": {
+        "eval1": {
             "value": "basic",
             "type": "flag",
-            "options": [ "basic" ],
+            "options": [ "basic", "linear", "Meub" ],
             "descr": [
-                "state evaluation function"
+                "state evaluation function of 1st ai player"
             ]
+        },
+        "eval2": {
+            "value": "basic",
+            "type": "flag",
+            "options": [ "basic", "linear", "Meub" ],
+            "descr": [
+                "state evaluation function of 2nd ai player"
+            ]
+        },
+        "coefs1": {
+            "value": [1,0,0,0],
+            "type": "list",
+            "options": [0,1000],
+            "descr": [
+                "coefficients for linear evaluation of 1st ai player"
+            ],
+            "lrange": [4,4]
+        },
+        "coefs2": {
+            "value": [1,0,0,0],
+            "type": "list",
+            "options": [0,1000],
+            "descr": [
+                "coefficients for linear evaluation of 2nd ai player"
+            ],
+            "lrange": [4,4]
         },
         "depth": {
             "value": 1,
