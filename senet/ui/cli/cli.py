@@ -39,22 +39,26 @@ class cli(metaclass=singleton):
                     repeats = int(tokens[2])
             except:
                 return False
-        autoplayers = SETTINGS.get("ai/autoplayers")
-        autodepth = SETTINGS.get("ai/autodepth")
-        autofirst = SETTINGS.get("ai/autofirst")
-        eval_func1 = SETTINGS.get("ai/eval1")
-        eval_func2 = SETTINGS.get("ai/eval2")
-        eval_coefs1 = SETTINGS.get("ai/coefs1")
-        eval_coefs2 = SETTINGS.get("ai/coefs2")
+        player1 = SETTINGS.get("agent-V/type")
+        player2 = SETTINGS.get("agent-X/type")
+        depth1 = SETTINGS.get("agent-V/depth")
+        depth2 = SETTINGS.get("agent-X/depth")
+        
+        eval1 = SETTINGS.get("agent-V/eval")
+        eval2 = SETTINGS.get("agent-X/eval")
+        coefs1 = SETTINGS.get("agent-V/coefs")
+        coefs2 = SETTINGS.get("agent-X/coefs")
+
         rules = SETTINGS.get("game/rules")
+        autofirst = SETTINGS.get("game/first")
 
         agent1, agent2 = None, None
-        if autoplayers[0] == "ai":
-            agent1 = AIplayer(number=1, depth=autodepth[0], rules=rules, eval_func=eval_func1, coefs=eval_coefs1)
+        if player1 == "ai":
+            agent1 = AIplayer(number=1, depth=depth1, rules=rules, eval_func=eval1, coefs=coefs1)
         else:
             agent1 = Agent(1)
-        if autoplayers[1] == "ai":
-            agent2 = AIplayer(number=2, depth=autodepth[1], rules=rules, eval_func=eval_func2, coefs=eval_coefs2)
+        if player2 == "ai":
+            agent2 = AIplayer(number=2, depth=depth2, rules=rules, eval_func=eval2, coefs=coefs2)
         else:
             agent2 = Agent(2)
         
@@ -73,17 +77,6 @@ class cli(metaclass=singleton):
         """
         if type(tokens) is not list or len(tokens) < 3:
             return False
-        eval_func = SETTINGS.get("ai/eval")
-        rules = SETTINGS.get("game/rules")
-        agents = {
-            "human": lambda an: Agent(number=an, dfunc=self.ask_human, name="human"),
-            "ai": lambda an: AIplayer(number=an, depth=SETTINGS.get("ai/depth"), rules=rules, eval_func=eval_func),
-            "dummy": lambda an: Agent(number=an) 
-            }
-        if tokens[1] not in agents or tokens[2] not in agents:
-            return False
-        agent1 = agents.get(tokens[1])(1)
-        agent2 = agents.get(tokens[2])(2)
         #default first player pawns
         first, seed = 1, 10066320 #def seed for game start
         if len(tokens) == 4:
@@ -94,9 +87,19 @@ class cli(metaclass=singleton):
                 seed = option 
             else:
                 return False
-        
+
+        rules = SETTINGS.get("game/rules")
+        symb = ('V','X')
+        agents = {
+            "human": lambda an: Agent(number=an+1, dfunc=self.ask_human, name="human"),
+            "ai": lambda an: AIplayer(number=an+1, depth=SETTINGS.get(f"agent-{symb[an]}/depth"), rules=rules, eval_func=SETTINGS.get(f"agent-{symb[an]}/eval")),
+            "dummy": lambda an: Agent(number=an+1) 
+            }
+        if tokens[1] not in agents or tokens[2] not in agents:
+            return False
+        agent1 = agents.get(tokens[1])(0)
+        agent2 = agents.get(tokens[2])(1)
         self.msgout("\tGAME STARTED")
-        #self.msgout(self.stringify_board())
         self.game.start(agent1, agent2, rules, first, seed)
         return True
     
@@ -206,14 +209,9 @@ class cli(metaclass=singleton):
     def toggle_option(self, tokens):
         option = tokens[0]
         value = tokens[1:]
-        settings = SETTINGS.get("all")
-        success = False
-        for group in settings:
-            if option in settings[group]:
-                success = SETTINGS.set(f"{group}/{option}", value)
-                break
+        success = SETTINGS.set(option, value)
         if success:
-            self.msgout(f"{option} has been set to {SETTINGS.get(f'{group}/{option}')}")
+            self.msgout(f"{option} has been set to {SETTINGS.get(option)}")
         else:
             self.msgout("warn")
         

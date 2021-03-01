@@ -39,7 +39,7 @@ class Game():
         self.__turn = None
         self.__onmove = onmove
         self.__onvictory = onvictory
-        self.__logging_brief = SETTINGS.get("dev/brieflog")
+        self.__logging_brief = SETTINGS.get("logs/brief")
         self.__game_timestamp = None
         if self.__logging_brief:
             self._brieflog = Report("senet_log", None, "csv", "logs/brief", brieflog_headers, False)
@@ -65,8 +65,8 @@ class Game():
         @param agent1: Agent
         @param agent2: Agent
         """
-        self.__logging_game = SETTINGS.get("dev/gamelogs")
-        self.__logging_brief = SETTINGS.get("dev/brieflog")
+        self.__logging_game = SETTINGS.get("logs/game")
+        self.__logging_brief = SETTINGS.get("logs/brief")
         self._rules = rules
 
         #agents duck typing
@@ -117,7 +117,7 @@ class Game():
         looser = winner % 2 + 1
         score = sum(self.state.board) / looser
         agents = [self.__agent1._name, self.__agent2._name]
-        timer = SETTINGS.get("ai/timer")
+        timer = SETTINGS.get("game/timer")
 
         if agents[0].lower() == "ai":
             agents[0] += f"-{str(self.__agent1._depth)}"

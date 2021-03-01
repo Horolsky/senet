@@ -19,10 +19,10 @@ class AIplayer():
             raise ValueError("inalid eval arg")
             
         
-        self.__log = SETTINGS.get("dev/ailogs")
+        self.__log = SETTINGS.get("logs/ai")
         self._agent = number
         self._name = "AI"
-        self._timer = SETTINGS.get("ai/timer")
+        self._timer = SETTINGS.get("game/timer")
         self._depth = depth
 
         self._eval_func = eval_func
