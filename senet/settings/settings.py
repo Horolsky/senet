@@ -30,11 +30,14 @@ class settings(metaclass=singleton):
         pass a setting path in form "group/setting"
         or "all" to get all settings as 2d dict
         """
+        if type(path) is not str:
+            return None
+        path = path.lower()
         settings = self.__getall()
         if path == "all":
             return settings
-        if type(path) is not str or "/" not in path:
-            return None
+        if "/" not in path:
+            return None    
         group, st = path.split("/")
         try:
             value = settings[group][st]["value"] 
@@ -48,6 +51,7 @@ class settings(metaclass=singleton):
         """
         if type(path) is not str or "/" not in path:
             return False
+        path = path.lower()
         
         f = open(self._fpath, "r") 
         settings = load(f) 
@@ -56,7 +60,6 @@ class settings(metaclass=singleton):
         value = None
         try:
             options = settings[group][st]["options"]
-            oldval = settings[group][st]["value"]
             stype = settings[group][st]["type"]
             vtype = type(options[0])
             
