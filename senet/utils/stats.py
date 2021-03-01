@@ -43,35 +43,37 @@ class Stats(metaclass=singleton):
         if self._df["brief"] is None:
             return False
         src = self._df["brief"]
-        trg = pd.DataFrame(columns=["params", "position", "plays", "wins", "efficiency", "score"])
-        groups1 = src.groupby(["agent 1", "depth 1", "eval 1", "coefs 1"])
-        groups2 = src.groupby(["agent 2", "depth 2", "eval 2", "coefs 2"])
-        for g in groups1.groups:
-            subdf = groups1.get_group(g)
-            plays= len(subdf)
-            wins = len(subdf[subdf["winner"] == 1])
-            score = sum(subdf[subdf["winner"] == 1]["score"]) / sum(subdf["score"])
-            trg = trg.append({
-                "params": g,
-                "position": 1,
-                "plays": plays,
-                "wins": wins,
-                "efficiency": round(wins/plays, 2),
-                "score": score
-            }, ignore_index=True)
-        for g in groups2.groups:
-            subdf = groups2.get_group(g)
-            plays= len(subdf)
-            wins = len(subdf[subdf["winner"] == 2])
-            score = sum(subdf[subdf["winner"] == 2]["score"]) / sum(subdf["score"])
-            trg = trg.append({
-                "params": g,
-                "position": 2,
-                "plays": plays,
-                "wins": wins,
-                "efficiency": round(wins/plays, 2),
-                "score": score
-            }, ignore_index=True)
-
-        trg.sort_values("score")
+        trg = pd.DataFrame(columns=["agent"])#columns=["params", "position", "plays", "wins", "efficiency", "score"]
+        L_super = src.groupby(["agent 1", "depth 1", "eval 1", "coefs 1"])
+        def grp_to_id(g):
+            _coefs = g[3][1:-1].split(', ')
+            coefs = []
+            for c in _coefs:
+                coefs.append((" "* (3-len(c))) + c)
+            return f"{g[0]}-{g[1]}-{g[2][0].upper()}[{','.join(coefs)}]"
+        for g in L_super.groups:
+            L_to_R = L_super.get_group(g).groupby(["agent 2", "depth 2", "eval 2", "coefs 2"])
+            record = {
+                "agent": grp_to_id(g)
+            }
+            for sub in L_to_R.groups:
+                subset = L_to_R.get_group(sub)
+                plays= len(subset)
+                wins = len(subset[subset["winner"] == 1])
+                efficiency = round(wins/plays, 3)
+                score = sum(subset[subset["winner"] == 1]["score"]) / sum(subset["score"])
+                score = round(score, 3)
+                record.update({
+                    f"{grp_to_id(sub)}": f"[ {plays} , {efficiency:.3f} , {score:.3f} ]"
+                })
+                #trg = trg.append({
+                #    "params": g,
+                #    "position": 1,
+                #    "plays": plays,
+                #    "wins": wins,
+                #    "efficiency": round(wins/plays, 2),
+                #    "score": score
+                #}, ignore_index=True)
+            trg = trg.append(record, ignore_index=True)
+        
         return trg
