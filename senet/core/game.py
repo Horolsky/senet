@@ -6,7 +6,7 @@ from senet.settings import SETTINGS
 from json import dumps
 from datetime import datetime
 
-brieflog_headers = f"end time;rules;timer;agent 1;agent 2;winner;score;\n"
+brieflog_headers = f"end time;rules;timer;agent 1;depth 1;eval 1;coefs 1;agent 2;depth 2;eval 2;coefs 2;winner;score;\n"
 
 class Game():
     @staticmethod
@@ -116,14 +116,32 @@ class Game():
         winner = self.state.event[1]
         looser = winner % 2 + 1
         score = sum(self.state.board) / looser
-        agents = [self.__agent1._name, self.__agent2._name]
+        if winner == 2:
+            score *= -1
+        agent1, agent2 = self.__agent1._name, self.__agent2._name
         timer = SETTINGS.get("game/timer")
+        msg = f"{self.__game_timestamp};{self._rules};{timer};"
+        depth1, eval1, coefs1, depth2, eval2, coefs2 = [None for _ in range(6)]
 
-        if agents[0].lower() == "ai":
-            agents[0] += f"-{str(self.__agent1._depth)}"
-        if agents[1].lower() == "ai":
-            agents[1] += f"-{str(self.__agent2._depth)}"
-        self._brieflog.write(f"{self.__game_timestamp};{self._rules};{timer};{agents[0]};{agents[1]};{winner};{score}\n")
+
+        if agent1.lower() == "ai":
+            depth1 = str(self.__agent1._depth)
+            eval1 = self.__agent1._eval_func
+            if self.__agent1._eval_func == "linear":
+                coefs1 = str(self.__agent1._coefs)
+            elif self.__agent1._eval_func == "basic":
+                coefs1 = "[1,0,0,0]"
+        if agent2.lower() == "ai":
+            depth2 = str(self.__agent2._depth)
+            eval2 = self.__agent2._eval_func
+            if self.__agent2._eval_func == "linear":
+                coefs2 = str(self.__agent2._coefs)
+            elif self.__agent2._eval_func == "basic":
+                coefs2 = "[1,0,0,0]"
+        msg += f"{agent1};{depth1};{eval1};{coefs1};{agent2};{depth2};{eval2};{coefs2};"
+        msg += f"{winner};{score}\n"
+
+        self._brieflog.write(msg)
 
     def __move(self):  #manage_movement
         """

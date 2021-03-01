@@ -29,7 +29,7 @@ class AIplayer():
         self._coefs = coefs
         self._rules = rules
         if self.__log:
-            header = f"seed;t, ns;t, ~sec;leaves searched;agent: {self._agent}, timer: {self._timer}, depth: {self._depth}\n"
+            header = f"seed;t, ns;t, ~sec;leaves searched;agent: {self._agent}, timer: {self._timer}, depth: {self._depth}, eval: {self._eval_func}, coefs: {self._coefs}\n"
             self._report = Report(f"ai-{number}", None, "csv", "logs/ai", header)
 
     def __del__(self):
