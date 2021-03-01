@@ -43,21 +43,35 @@ class Stats(metaclass=singleton):
         if self._df["brief"] is None:
             return False
         src = self._df["brief"]
-        trg = pd.DataFrame(columns=["params", "position", "score"])
+        trg = pd.DataFrame(columns=["params", "position", "plays", "wins", "efficiency", "score"])
         groups1 = src.groupby(["agent 1", "depth 1", "eval 1", "coefs 1"])
         groups2 = src.groupby(["agent 2", "depth 2", "eval 2", "coefs 2"])
         for g in groups1.groups:
             subdf = groups1.get_group(g)
+            plays= len(subdf)
+            wins = len(subdf[subdf["winner"] == 1])
+            score = sum(subdf[subdf["winner"] == 1]["score"]) / sum(subdf["score"])
             trg = trg.append({
                 "params": g,
                 "position": 1,
-                "score": sum(subdf["score"])
+                "plays": plays,
+                "wins": wins,
+                "efficiency": round(wins/plays, 2),
+                "score": score
             }, ignore_index=True)
         for g in groups2.groups:
             subdf = groups2.get_group(g)
+            plays= len(subdf)
+            wins = len(subdf[subdf["winner"] == 2])
+            score = sum(subdf[subdf["winner"] == 2]["score"]) / sum(subdf["score"])
             trg = trg.append({
                 "params": g,
                 "position": 2,
-                "score": sum(subdf["score"])
+                "plays": plays,
+                "wins": wins,
+                "efficiency": round(wins/plays, 2),
+                "score": score
             }, ignore_index=True)
+
+        trg.sort_values("score")
         return trg
