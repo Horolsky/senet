@@ -1,5 +1,6 @@
 #ifndef SENET_XPLY
 #define SENET_XPLY
+typedef signed char si8;
 typedef unsigned char ui8;
 typedef unsigned int ui16;
 typedef unsigned long int ui32; 
@@ -47,10 +48,11 @@ static const float P[5] = {.25, .375, .25, .0625, .0625};//chance probabilities
 
 typedef ui64 (*state_increment_func)(ui64 seed, ui8 move);
 typedef ui32 (*state_legal_moves_func)(ui64 seed);
-typedef float (*state_evaluation_func)(ui64 seed);
+typedef float (*state_evaluation_func)(ui64 seed, float *coefs);
 
 typedef enum _eval_id {
     id_eval_basic,
+    id_eval_linear,
     id_eval_meub
 } eval_e;
 typedef enum _rules_id {
@@ -62,18 +64,14 @@ state_increment_func get_increment_func(rules_e id);
 state_legal_moves_func get_legal_moves_func(rules_e id);
 state_evaluation_func get_evaluation_func(eval_e id);
 
-ui32 get_moves_meub(ui64 seed);
-ui64 increment_meub(ui64 seed, ui8 m);
-
-float eval_basic(ui64 seed);
-float eval_meub(ui64 seed);
-
-
-
 typedef struct _emax_res {
     ui8 strategy;
     ui32 searched_nodes;
 } emax_res;
 
-emax_res get_strategy_emax_mt(ui64 seed, ui8 depth, ui8 sec, eval_e id_eval, rules_e id_incr);
+/*
+ * multithread expectiminimax strategy search
+ * result is the best strategy for a current agent of a given state seed
+ */
+emax_res get_strategy_emax_mt(ui64 seed, ui8 depth, ui8 sec, eval_e id_eval, rules_e id_incr, float *coefs);
 #endif

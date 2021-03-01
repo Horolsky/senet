@@ -17,10 +17,11 @@ cdef extern from "src-xtc.h":
 
     ctypedef ui64 (*state_increment_func)(ui64 seed, ui8 move)
     ctypedef ui32 (*state_legal_moves_func)(ui64 seed)
-    ctypedef float (*state_evaluation_func)(ui64 seed)
+    ctypedef float (*state_evaluation_func)(ui64 seed, float* coefs)
 
     cdef enum _eval_id:
         id_eval_basic,
+        if_eval_linear,
         id_eval_meub
     ctypedef _eval_id eval_e
     cdef enum _rules_id:
@@ -36,5 +37,5 @@ cdef extern from "src-xtc.h":
         ui8 strategy
         ui32 searched_nodes
     ctypedef _emax_res emax_res
-    cdef emax_res get_strategy_emax_mt(ui64 seed, ui8 depth, ui8 sec, eval_e id_eval, rules_e id_incr)
+    cdef emax_res get_strategy_emax_mt(ui64 seed, ui8 depth, ui8 sec, eval_e id_eval, rules_e id_incr, float *coefs)
     

@@ -7,9 +7,9 @@ from xtc cimport ui8, ui32, ui64, eval_e, rules_e
 from json import dumps
 
 INCREMENT_RULES = ("Meub", "Kendal")
-EVALUATION_FUNCS = ("basic", "Meub")
+EVALUATION_FUNCS = ("basic", "linear", "Meub")
 
-def emax(ui64 state, ui8 depth, ui8 sec, incr_func="Kendal", eval_func="basic"):
+def emax(ui64 state, ui8 depth, ui8 sec, incr_func="Kendal", eval_func="linear", coefs=(1,0,0,0)):
     """
     best strategy expectiminimax multithread search
     @param state: 64-bit uint state seed
@@ -18,10 +18,19 @@ def emax(ui64 state, ui8 depth, ui8 sec, incr_func="Kendal", eval_func="basic"):
     @param incr_func: game rules descriptor
     @param eval_func: state evaluation descriptor
     """
+    if type(coefs) not in (list, tuple):
+        raise TypeError("invalid coefs arg")
+    elif len(coefs) != 4:
+        raise ValueError("invalid coefs len")
+    cdef float* _coefs = <float*>malloc(4 * sizeof(float))
+    cdef ui8 i
+    for i from 0 <= i < 4 by 1:
+        _coefs[i] = coefs[i]
     cdef eval_e id_eval = EVALUATION_FUNCS.index(eval_func)
     cdef rules_e id_incr = INCREMENT_RULES.index(incr_func)
     cdef xtc.emax_res result
-    result = xtc.get_strategy_emax_mt(state, depth, sec, id_eval, id_incr)
+    result = xtc.get_strategy_emax_mt(state, depth, sec, id_eval, id_incr, _coefs)
+    free(_coefs)
     return (result.strategy, result.searched_nodes)
 
 
@@ -213,8 +222,20 @@ cdef class Ply():
     @property
     def utility(self):
         if self.__cache["utility"] is None:
-            self.__cache["utility"] = self._eval(self.__xstate._seed)
+            self.__cache["utility"] = self._eval(self.__xstate._seed, NULL)
         return self.__cache["utility"]
+
+    def evaluate(self, coefs):
+        if type(coefs) not in (list, tuple):
+            return None
+        elif len(coefs) != 4:
+            return None
+        cdef float* _coefs = <float*>malloc(4 * sizeof(float))
+        for i from 0 <= i < 4 by 1:
+            _coefs[i] = coefs[i]
+        result = self._eval(self.__xstate._seed, _coefs)
+        free(_coefs)
+        return result
     
     def to_json(self):
         return dumps(self.event)
