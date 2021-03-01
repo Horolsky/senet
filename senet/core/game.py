@@ -116,8 +116,6 @@ class Game():
         winner = self.state.event[1]
         looser = winner % 2 + 1
         score = sum(self.state.board) / looser
-        if winner == 2:
-            score *= -1
         agent1, agent2 = self.__agent1._name, self.__agent2._name
         timer = SETTINGS.get("game/timer")
         msg = f"{self.__game_timestamp};{self._rules};{timer};"
