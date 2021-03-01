@@ -1,129 +1,4 @@
 {
-    "game": {
-        "rules": {
-            "value": "Meub",
-            "type": "flag",
-            "options": [ "Meub", "Kendal" ],
-            "descr": [
-                "rules of game"
-            ]
-        },
-        "pawns": {
-            "value": 5,
-            "type": "number",
-            "options": [ 3, 7 ],
-            "descr": [
-                "number of pawns on game start"
-            ]
-        }
-    },
-    "dev": {
-        "brieflog":{
-            "value": false,
-            "type": "flag",
-            "options": [ true, false ],
-            "descr": [
-                "maintaining brief session log",
-                "file are stored in logs/brief"
-            ]
-        },
-        "gamelogs": {
-            "value": false,
-            "type": "flag",
-            "options": [ true, false ],
-            "descr": [
-                "saving game log to csv file",
-                "files are stored in logs/games"
-            ]
-        },
-        "ailogs": {
-            "value": false,
-            "type": "flag",
-            "options": [ true, false ],
-            "descr": [
-                "saving ai working log to csv file",
-                "files are stored in logs/ai"
-            ]
-        }
-    }, 
-    "ai": {
-        "eval1": {
-            "value": "basic",
-            "type": "flag",
-            "options": [ "basic", "linear", "Meub" ],
-            "descr": [
-                "state evaluation function of 1st ai player"
-            ]
-        },
-        "eval2": {
-            "value": "basic",
-            "type": "flag",
-            "options": [ "basic", "linear", "Meub" ],
-            "descr": [
-                "state evaluation function of 2nd ai player"
-            ]
-        },
-        "coefs1": {
-            "value": [1,0,0,0],
-            "type": "list",
-            "options": [0,1000],
-            "descr": [
-                "coefficients for linear evaluation of 1st ai player"
-            ],
-            "lrange": [4,4]
-        },
-        "coefs2": {
-            "value": [1,0,0,0],
-            "type": "list",
-            "options": [0,1000],
-            "descr": [
-                "coefficients for linear evaluation of 2nd ai player"
-            ],
-            "lrange": [4,4]
-        },
-        "depth": {
-            "value": 1,
-            "type": "number",
-            "options": [1,8],
-            "descr": [
-                "depth of tree search"
-            ]
-        },
-        "autoplayers": {
-            "value": ["ai", "dummy"],
-            "type": "list",
-            "options": ["ai", "dummy"],
-            "descr": [
-                "agent types for autoplay"
-            ],
-            "lrange": [2,2]
-        },
-        "autodepth": {
-            "value": [1, 1],
-            "type": "list",
-            "options": [1,12],
-            "descr": [
-                "search depth of ai agents in autoplay"
-            ],
-            "lrange": [2,2]
-        },
-        "timer": {
-            "value": 2,
-            "type": "number",
-            "options": [1,255],
-            "descr": [
-                "working timer for ai"
-            ]
-        },
-        "autofirst": {
-            "value": 1,
-            "type": "flag",
-            "options": [1,2],
-            "descr": [
-                "first moving player in autoplay"
-            ]
-        }
-    },
     "cli": {
         "crd": {
             "value": "tbl",
@@ -147,5 +22,138 @@
                 "this option does not affect the crd mode"
             ]
         } 
-    } 
+    },
+    "logs": {
+        "brief":{
+            "value": false,
+            "type": "flag",
+            "options": [ true, false ],
+            "descr": [
+                "maintaining brief session log",
+                "file are stored in logs/brief"
+            ]
+        },
+        "game": {
+            "value": false,
+            "type": "flag",
+            "options": [ true, false ],
+            "descr": [
+                "saving game log to csv file",
+                "files are stored in logs/games"
+            ]
+        },
+        "ai": {
+            "value": false,
+            "type": "flag",
+            "options": [ true, false ],
+            "descr": [
+                "saving ai working log to csv file",
+                "files are stored in logs/ai"
+            ]
+        }
+    },
+    "agent-v": {
+        "type": {
+            "value": "ai",
+            "type": "flag",
+            "options": ["ai", "dummy"],
+            "descr": [
+                "agent types for autoplay"
+            ]
+        },
+        "depth": {
+            "value": 1,
+            "type": "number",
+            "options": [1,12],
+            "descr": [
+                "search depth of ai agents in autoplay"
+            ]
+        },
+        "eval": {
+            "value": "basic",
+            "type": "flag",
+            "options": [ "basic", "linear", "Meub" ],
+            "descr": [
+                "state evaluation function of 1st ai player"
+            ]
+        },
+        "coefs": {
+            "value": [1,0,0,0],
+            "type": "list",
+            "options": [0,1000],
+            "descr": [
+                "coefficients for linear evaluation of 1st ai player"
+            ],
+            "lrange": [4,4]
+        }
+    },
+    "agent-x": {
+        "type": {
+            "value": "ai",
+            "type": "flag",
+            "options": ["ai", "dummy"],
+            "descr": [
+                "agent types for autoplay"
+            ]
+        },
+        "depth": {
+            "value": 1,
+            "type": "number",
+            "options": [1,12],
+            "descr": [
+                "search depth of ai agents in autoplay"
+            ]
+        },
+        "eval": {
+            "value": "basic",
+            "type": "flag",
+            "options": [ "basic", "linear", "Meub" ],
+            "descr": [
+                "state evaluation function of 1st ai player"
+            ]
+        },
+        "coefs": {
+            "value": [1,0,0,0],
+            "type": "list",
+            "options": [0,1000],
+            "descr": [
+                "coefficients for linear evaluation of 1st ai player"
+            ],
+            "lrange": [4,4]
+        }
+    },
+    "game": {
+        "rules": {
+            "value": "Meub",
+            "type": "flag",
+            "options": [ "Meub", "Kendal" ],
+            "descr": [
+                "rules of game"
+            ]
+        },
+        "pawns": {
+            "value": 5,
+            "type": "number",
+            "options": [ 3, 7 ],
+            "descr": [
+                "number of pawns on game start"
+            ]
+        },
+        "first": {
+            "value": 1,
+            "type": "flag",
+            "options": [1,2],
+            "descr": [
+                "first moving player in autoplay"
+            ]
+        },
+        "timer": {
+            "value": 2,
+            "type": "number",
+            "options": [1,255],
+            "descr": [
+                "working timer for ai"
+            ]
+        }
+    }
 }
