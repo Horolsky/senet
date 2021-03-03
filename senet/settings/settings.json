@@ -25,7 +25,7 @@
     },
     "logs": {
         "brief":{
-            "value": false,
+            "value": true,
             "type": "flag",
             "options": [ true, false ],
             "descr": [
@@ -80,7 +80,7 @@
         "coefs": {
             "value": [1,0,0,0],
             "type": "list",
-            "options": [0,1000],
+            "options": [0,100],
             "descr": [
                 "coefficients for linear evaluation of 1st ai player"
             ],
@@ -115,7 +115,7 @@
         "coefs": {
             "value": [1,0,0,0],
             "type": "list",
-            "options": [0,1000],
+            "options": [0,100],
             "descr": [
                 "coefficients for linear evaluation of 1st ai player"
             ],
