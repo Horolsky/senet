@@ -1,3 +1,3 @@
 from .singleton import singleton
 from .report import Report
-from .stats import Stats
+from .stats import STATS

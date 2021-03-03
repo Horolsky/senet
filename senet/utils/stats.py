@@ -77,3 +77,5 @@ class Stats(metaclass=singleton):
             trg = trg.append(record, ignore_index=True)
         
         return trg
+
+STATS = Stats()
