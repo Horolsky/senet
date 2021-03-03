@@ -59,7 +59,7 @@ class MeubPlayer(metaclass=singleton):
         #if report:
         #    headers = "seed;move"
         #    self._report = Report("webplayer-meub", None, "csv", "logs/meub", headers, False)
-    def launch(self, browser="Chrome", local=True):
+    def launch(self, browser="Chrome", local=False):
         if self._browser != None:
             print("browser is running")
             return
@@ -95,7 +95,7 @@ class MeubPlayer(metaclass=singleton):
             return
         
         while self.game_state['state_index'] < 2:
-            #sleep(1)
+            sleep(1)#fast play can break the state because of animation
             seed = self.state.seed
             moves = self.state.moves
             strategy = emax(state=seed, depth=6, sec=4, incr_func="Meub", eval_func="linear", coefs=(70,15,8,7))[0]
