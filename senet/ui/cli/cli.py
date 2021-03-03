@@ -2,14 +2,14 @@ from senet.core import Game, Agent
 from senet.ai import AIplayer
 from .msg_cli import msgout#messages as msg
 from senet.ui.rules import rules
-from senet.utils import singleton
+from senet.utils import singleton, STATS
 from senet.settings import SETTINGS
+
 
 class cli(metaclass=singleton):
     def __init__(self):
         self.__game = Game(self._on_move, self._on_victory)
         self.__running = True
-        print(self)
 
     @property
     def game(self):
@@ -141,7 +141,12 @@ class cli(metaclass=singleton):
                 elif len(tks) > 1:
                     self.toggle_option(tks[1:])
                 continue
-            
+            if cmd == "stats":
+                STATS.update_src()
+                STATS.update_brief()
+                s = STATS.parse_brief()
+                msgout("\n"+str(s))
+            #game actions
             if cmd == 'a':
                 if self.game.running:
                     self.msgout("to start autoplay break the current game")
@@ -151,7 +156,6 @@ class cli(metaclass=singleton):
                         self.msgout("warn")
                     #break
                 continue
-            # actions
             if cmd == 's':
                 if self.game.running:
                     self.msgout("confirm_s")
@@ -218,7 +222,7 @@ class cli(metaclass=singleton):
     def print_options(self):
         settings = SETTINGS.get("all")
         msg = f"\n  {'='*55} SETTINGS {'='*55}\n"
-        msg += f"\n  KEY{' '*10}VALUE{' '*7}OPTIONS{' '*36}DESCRIPTION\n" 
+        msg += f"\n  KEY{' '*13}VALUE{' '*10}OPTIONS{' '*30}DESCRIPTION\n" 
         msg += f"  {'='*120}\n\n"
         for group in settings:
             msg += f"  {group.upper()}:\n  {'`'*120}\n" #group separator
@@ -234,9 +238,9 @@ class cli(metaclass=singleton):
                 dlines = descr[0] + "\n"
                 for line in descr[1:]:
                     dlines += " " * 70 + line + "\n"
-                ws1 = " " * (12 - len(option))#whitespase
-                ws2 = " " * (12 - len(str(value)))#whitespase
-                ws3 = " " * (43 - len(str(options)))#whitespase
+                ws1 = " " * (15 - len(option))#whitespase
+                ws2 = " " * (15 - len(str(value)))#whitespase
+                ws3 = " " * (37 - len(str(options)))#whitespase
                 msg += f"  {option}:{ws1}{value}{ws2}{options}{ws3}{dlines}\n"
         msg += f"  {'='*120}\n"
         self.msgout(msg)
