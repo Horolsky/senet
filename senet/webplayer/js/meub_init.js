@@ -1,6 +1,7 @@
 
-__bb_to_board = function(bb){
+__bb_to_board = function(_bb){
     board = []
+    bb = JSON.parse(JSON.stringify(_bb));
     bb[1].reverse()
     bb.reverse()
     for (let row = 0; row < 3; row++){
@@ -24,7 +25,7 @@ __state_to_seed = function(agent, steps, board){
 }
 
 _get_index = function(move){
-    if (!move.length) return 30;//skippingi
+    if (!move.length) return 30;//skipping
     let row = 2 - move[0][1];
     let _m = row == 1 ? 9 - move[0][0] : move[0][0];
     _m += (row*10);
@@ -39,11 +40,15 @@ _get_state = function() {
         bb: JSON.stringify(game_obj.bb)
     }
 }
-/*
+
 _log = [];
-_orig_move = game_obj.generic_move
+game_obj._orig_move = game_obj.generic_move
 game_obj.generic_move = function (move, callback){
-    _log.push(move);
-    return _orig_move(move, callback);
+    _log.push({
+        move: _get_index(move),
+        seed: __state_to_seed(
+            move[3], 
+            game_obj.dice_value, 
+            __bb_to_board(game_obj.bb))});
+    return game_obj._orig_move(move, callback);
 }
-*/
