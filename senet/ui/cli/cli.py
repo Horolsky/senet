@@ -142,7 +142,7 @@ class cli(metaclass=singleton):
                     self.toggle_option(tks[1:])
                 continue
             if cmd == "stats":
-                msgout("rendering report in the web browser...")
+                msgout("rendering report in the web browser...\n")
                 STATS.show_brief_in_browser()
             #game actions
             if cmd == 'a':
