@@ -1,6 +1,7 @@
 import pandas as pd
+import webbrowser
+from tempfile import NamedTemporaryFile
 from .singleton import singleton
-from .report import Report
 from os import listdir
 from os.path import isfile, join
 
@@ -14,7 +15,6 @@ class Stats(metaclass=singleton):
         "ai": [],
         "meub": []
     }
-    _report = None
     _df = {
         "brief": None,
         "games": None,
@@ -22,8 +22,7 @@ class Stats(metaclass=singleton):
         "meub": None
     }
     def __init__(self):
-        self._report = Report("stats", None, "txt", "logs/stats", stats_header, False)
-        self.update_src()
+        pass
         
     def update_src(self):
         for dr in self._src:
@@ -43,9 +42,11 @@ class Stats(metaclass=singleton):
         if self._df["brief"] is None:
             return False
         src = self._df["brief"]
-        trg = pd.DataFrame(columns=["agent"])#columns=["params", "position", "plays", "wins", "efficiency", "score"]
+        trg = pd.DataFrame(columns=["V\X"])#columns=["params", "position", "plays", "wins", "efficiency", "score"]
         L_super = src.groupby(["agent 1", "depth 1", "eval 1", "coefs 1"])
         def grp_to_id(g):
+            if g[0] in ["dummy", "human"]:
+                return g[0]
             _coefs = g[3][1:-1].split(', ')
             coefs = []
             for c in _coefs:
@@ -54,7 +55,7 @@ class Stats(metaclass=singleton):
         for g in L_super.groups:
             L_to_R = L_super.get_group(g).groupby(["agent 2", "depth 2", "eval 2", "coefs 2"])
             record = {
-                "agent": grp_to_id(g)
+                "V\X": grp_to_id(g)
             }
             for sub in L_to_R.groups:
                 subset = L_to_R.get_group(sub)
@@ -77,5 +78,12 @@ class Stats(metaclass=singleton):
             trg = trg.append(record, ignore_index=True)
         
         return trg
-
+    
+    def show_brief_in_browser(self):
+        self.update_src()
+        self.update_brief()
+        df = self.parse_brief()
+        f = NamedTemporaryFile(delete=True, suffix='.html')
+        df.to_html(f.name)
+        webbrowser.open(f.name)
 STATS = Stats()
