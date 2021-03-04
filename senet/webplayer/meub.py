@@ -54,11 +54,11 @@ class MeubPlayer(metaclass=singleton):
         bb.reverse()
         return [cell for row in bb for cell in row]
 
-    def __init__(self, report=False):
+    def __init__(self, report=True):
         pass
-        #if report:
-        #    headers = "seed;move"
-        #    self._report = Report("webplayer-meub", None, "csv", "logs/meub", headers, False)
+        if report:
+            headers = "winer;score"
+            self._report = Report("webplayer-meub", None, "csv", "logs/meub", headers, False)
     def launch(self, browser="Chrome", local=False):
         if self._browser != None:
             print("browser is running")
@@ -87,7 +87,7 @@ class MeubPlayer(metaclass=singleton):
             self._browser = None
     
     def __del__(self):
-        #self._report.close()
+        self._report.close()
         self.quit()
 
     def play(self):
@@ -95,7 +95,7 @@ class MeubPlayer(metaclass=singleton):
             return
         
         while self.game_state['state_index'] < 2:
-            sleep(1)#fast play can break the state because of animation
+            
             seed = self.state.seed
             moves = self.state.moves
             strategy = emax(state=seed, depth=6, sec=4, incr_func="Meub", eval_func="linear", coefs=(70,15,8,7))[0]
@@ -109,16 +109,23 @@ class MeubPlayer(metaclass=singleton):
                 print("non clickable move handled")
                 sleep(1)
                 self.cells[move].click()
+            sleep(1)#fast play can break the state because of animation
             while self.game_state['state_index'] == 1:
                 sleep(0.2)
             
             
-            
+        msg = "game ended"
+        winner = 0
         if self.game_state['state_index'] == 2:
-            print("Victory is ours!")
+            msg = "You won!"
+            winner = 1
         elif self.game_state['state_index'] == 3:
-            print("You loose!")
-    
+            msg = "You loose!"
+            winner = 2
+        print(msg)
+        if self._report:
+            score = sum(self.state.board)/winner
+            self._report.write(f"{winner};{score}\n")
     def restart(self):
         if self._browser != None:
             self.__cells = None
