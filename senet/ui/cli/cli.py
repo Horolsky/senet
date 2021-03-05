@@ -10,7 +10,7 @@ class cli(metaclass=singleton):
     def __init__(self):
         self.__game = Game(self._on_move, self._on_victory)
         
-        self.__autogame = Game(None,None)
+        self.__autogame = Game(None,None,"senet_autogames")
         self.__running = True
 
     @property
@@ -55,11 +55,12 @@ class cli(metaclass=singleton):
         agent1 = AIplayer(number=1, depth=depth1, rules=rules, eval_func=eval1, coefs=coefs1)
         agent2 = AIplayer(number=2, depth=depth2, rules=rules, eval_func=eval2, coefs=coefs2)
 
-        self.msgout(f"\tLAUNCHING {repeats} AUTOGAMES")        
+        self.msgout(f"launching {repeats} autogames")        
         for i in range(repeats):    
             self.__autogame.start(agent1, agent2, rules, autofirst, seed)
             if (i+1) % 10 == 0:
-                self.msgout(f"{i+1} games over")        
+                self.msgout(f"{i+1} games over")  
+        self.msgout(f"{repeats} autogames completed")          
         return True
 
     def start(self, tokens):

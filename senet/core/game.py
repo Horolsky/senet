@@ -6,7 +6,22 @@ from senet.settings import SETTINGS
 from json import dumps
 from datetime import datetime
 
-brieflog_headers = f"end time;rules;timer;first move;agent 1;depth 1;eval 1;coefs 1;agent 2;depth 2;eval 2;coefs 2;winner;score;\n"
+BRIEFLOG_HEADERS = [
+    "end time",
+    "rules",
+    "timer",
+    "first move",
+    "agent 1",
+    "depth 1",
+    "eval 1",
+    "coefs 1",
+    "agent 2",
+    "depth 2",
+    "eval 2",
+    "coefs 2",
+    "winner",
+    "score"
+    ]
 
 class Game():
     @staticmethod
@@ -29,7 +44,7 @@ class Game():
             res = False
         return res
         
-    def __init__(self, onmove, onvictory):
+    def __init__(self, onmove, onvictory, prefix="senet_games"):
         """
         game logic manager
         """
@@ -46,7 +61,7 @@ class Game():
         self.__logging_brief = SETTINGS.get("logs/brief")
         self.__game_timestamp = None
         if self.__logging_brief:
-            self._brieflog = Report("senet_log", None, "csv", "logs/brief", brieflog_headers, False)
+            self._brieflog = Report(prefix, str(datetime.now()), "csv", "logs/brief", ';'.join(BRIEFLOG_HEADERS)+"\n", False)
         else:
             self._brieflog = None
     
@@ -115,11 +130,11 @@ class Game():
                 
     def __record_to_brieflog(self):
         if self._brieflog == None:
-            self._brieflog = Report("senet_log", None, "csv", "logs/brief", brieflog_headers, False)
+            self._brieflog = Report("senet_log", str(datetime.now()), "csv", "logs/brief", ';'.join(BRIEFLOG_HEADERS)+"\n", False)
 
         winner = self.state.event[1]
         looser = winner % 2 + 1
-        score = sum(self.state.board) / looser
+        score = sum(self.state.board) // looser
         agent1, agent2 = self.__agent1._name, self.__agent2._name
         timer = SETTINGS.get("game/timer")
         first = SETTINGS.get("game/first")
