@@ -24,7 +24,7 @@ messages = {
     To start new game enter next command with desired options:
       s <player 1> <player 2> <seed/first> 
     options for this command:
-      <player #> - choose "human", "ai" or "dummy"
+      <player #> - choose "human" or "ai"
       <seed/first> - choose pawns troupe (1 or 2) for the first player
       or set a game seed for replay
       if omitted, first player will start with Y by default

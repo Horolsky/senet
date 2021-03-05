@@ -53,18 +53,10 @@
         }
     },
     "agent-v": {
-        "type": {
-            "value": "ai",
-            "type": "flag",
-            "options": ["ai", "dummy"],
-            "descr": [
-                "agent types for autoplay"
-            ]
-        },
         "depth": {
             "value": 1,
             "type": "number",
-            "options": [1,12],
+            "options": [0,12],
             "descr": [
                 "search depth of ai agents in autoplay"
             ]
@@ -88,18 +80,10 @@
         }
     },
     "agent-x": {
-        "type": {
-            "value": "ai",
-            "type": "flag",
-            "options": ["ai", "dummy"],
-            "descr": [
-                "agent types for autoplay"
-            ]
-        },
         "depth": {
             "value": 1,
             "type": "number",
-            "options": [1,12],
+            "options": [0,12],
             "descr": [
                 "search depth of ai agents in autoplay"
             ]

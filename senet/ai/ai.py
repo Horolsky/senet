@@ -1,9 +1,6 @@
-import threading
-import time
-import ctypes
-from math import inf
-from senet.utils.report import Report
+from random import choice
 from time import perf_counter_ns
+from senet.utils.report import Report
 from senet.settings import SETTINGS
 from senet.xtc import emax, INCREMENT_RULES, EVALUATION_FUNCS
 
@@ -44,6 +41,8 @@ class AIplayer():
             return 0
         elif len(state.moves) == 1:
             return state.moves[0]
+        elif self._depth < 1:
+            return choice(state.moves)
 
         timeA = perf_counter_ns()
         res = emax(state=state.seed, depth=self._depth, sec=self._timer, coefs=self._coefs, incr_func=self._rules, eval_func=self._eval_func)

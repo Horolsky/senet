@@ -6,7 +6,7 @@ from senet.settings import SETTINGS
 from json import dumps
 from datetime import datetime
 
-brieflog_headers = f"end time;rules;timer;agent 1;depth 1;eval 1;coefs 1;agent 2;depth 2;eval 2;coefs 2;winner;score;\n"
+brieflog_headers = f"end time;rules;timer;first move;agent 1;depth 1;eval 1;coefs 1;agent 2;depth 2;eval 2;coefs 2;winner;score;\n"
 
 class Game():
     @staticmethod
@@ -37,6 +37,10 @@ class Game():
         self.__state = None       
         self.__sticks = None
         self.__turn = None
+        if not callable(onmove):
+            onmove = lambda: None
+        if not callable(onvictory):
+            onvictory = lambda v: None
         self.__onmove = onmove
         self.__onvictory = onvictory
         self.__logging_brief = SETTINGS.get("logs/brief")
@@ -118,7 +122,8 @@ class Game():
         score = sum(self.state.board) / looser
         agent1, agent2 = self.__agent1._name, self.__agent2._name
         timer = SETTINGS.get("game/timer")
-        msg = f"{self.__game_timestamp};{self._rules};{timer};"
+        first = SETTINGS.get("game/first")
+        msg = f"{self.__game_timestamp};{self._rules};{timer};{first};"
         depth1, eval1, coefs1, depth2, eval2, coefs2 = [None for _ in range(6)]
 
 

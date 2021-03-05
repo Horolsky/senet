@@ -9,6 +9,8 @@ from senet.settings import SETTINGS
 class cli(metaclass=singleton):
     def __init__(self):
         self.__game = Game(self._on_move, self._on_victory)
+        
+        self.__autogame = Game(None,None)
         self.__running = True
 
     @property
@@ -39,8 +41,6 @@ class cli(metaclass=singleton):
                     repeats = int(tokens[2])
             except:
                 return False
-        player1 = SETTINGS.get("agent-V/type")
-        player2 = SETTINGS.get("agent-X/type")
         depth1 = SETTINGS.get("agent-V/depth")
         depth2 = SETTINGS.get("agent-X/depth")
         
@@ -52,27 +52,22 @@ class cli(metaclass=singleton):
         rules = SETTINGS.get("game/rules")
         autofirst = SETTINGS.get("game/first")
 
-        agent1, agent2 = None, None
-        if player1 == "ai":
-            agent1 = AIplayer(number=1, depth=depth1, rules=rules, eval_func=eval1, coefs=coefs1)
-        else:
-            agent1 = Agent(1)
-        if player2 == "ai":
-            agent2 = AIplayer(number=2, depth=depth2, rules=rules, eval_func=eval2, coefs=coefs2)
-        else:
-            agent2 = Agent(2)
-        
-        for _ in range(repeats):    
-            self.msgout("\tGAME STARTED")
-            self.game.start(agent1, agent2, rules, autofirst, seed)
+        agent1 = AIplayer(number=1, depth=depth1, rules=rules, eval_func=eval1, coefs=coefs1)
+        agent2 = AIplayer(number=2, depth=depth2, rules=rules, eval_func=eval2, coefs=coefs2)
+
+        self.msgout(f"\tLAUNCHING {repeats} AUTOGAMES")        
+        for i in range(repeats):    
+            self.__autogame.start(agent1, agent2, rules, autofirst, seed)
+            if (i+1) % 10 == 0:
+                self.msgout(f"{i+1} games over")        
         return True
 
     def start(self, tokens):
         """
         @param tokens: list
         0: <cmd>        "s"
-        1: <player 1>   "human", "ai", "dummy"
-        2: <player 2>   "human", "ai", "dummy"
+        1: <player 1>   "human", "ai"
+        2: <player 2>   "human", "ai"
         3: <option>      starting player (1, 2) or game seed
         """
         if type(tokens) is not list or len(tokens) < 3:
@@ -92,8 +87,7 @@ class cli(metaclass=singleton):
         symb = ('V','X')
         agents = {
             "human": lambda an: Agent(number=an+1, dfunc=self.ask_human, name="human"),
-            "ai": lambda an: AIplayer(number=an+1, depth=SETTINGS.get(f"agent-{symb[an]}/depth"), rules=rules, eval_func=SETTINGS.get(f"agent-{symb[an]}/eval")),
-            "dummy": lambda an: Agent(number=an+1) 
+            "ai": lambda an: AIplayer(number=an+1, depth=SETTINGS.get(f"agent-{symb[an]}/depth"), rules=rules, eval_func=SETTINGS.get(f"agent-{symb[an]}/eval"))
             }
         if tokens[1] not in agents or tokens[2] not in agents:
             return False
