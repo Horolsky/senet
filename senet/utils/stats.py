@@ -41,43 +41,71 @@ class Stats(metaclass=singleton):
     def parse_brief(self):
         if self._df["brief"] is None:
             return False
-        src = self._df["brief"]
-        trg = pd.DataFrame(columns=["V\X"])#columns=["params", "position", "plays", "wins", "efficiency", "score"]
-        L_super = src.groupby(["agent 1", "depth 1", "eval 1", "coefs 1"])
-        def grp_to_id(g):
-            if g[0] in ["dummy", "human"]:
-                return g[0]
-            _coefs = g[3][1:-1].split(', ')
-            coefs = []
-            for c in _coefs:
-                coefs.append((" "* (3-len(c))) + c)
-            return f"{g[0]}-{g[1]}-{g[2][0].upper()}[{','.join(coefs)}]"
-        for g in L_super.groups:
-            L_to_R = L_super.get_group(g).groupby(["agent 2", "depth 2", "eval 2", "coefs 2"])
-            record = {
-                "V\X": grp_to_id(g)
-            }
-            for sub in L_to_R.groups:
-                subset = L_to_R.get_group(sub)
-                plays= len(subset)
-                wins = len(subset[subset["winner"] == 1])
-                efficiency = round(wins/plays, 3)
-                score = sum(subset[subset["winner"] == 1]["score"]) / sum(subset["score"])
-                score = round(score, 3)
-                record.update({
-                    f"{grp_to_id(sub)}": f"[ {plays} , {efficiency:.3f} , {score:.3f} ]"
-                })
-                #trg = trg.append({
-                #    "params": g,
-                #    "position": 1,
-                #    "plays": plays,
-                #    "wins": wins,
-                #    "efficiency": round(wins/plays, 2),
-                #    "score": score
-                #}, ignore_index=True)
-            trg = trg.append(record, ignore_index=True)
+        brief = self._df["brief"]
+        src = brief[(brief["agent 1"] == "AI") & (brief["agent 2"] == "AI")]
+        #src = src[src["agent 1"] == "AI"]
+        #src = src[src["agent 2"] == "AI"]
+        trgattrs=[
+            "Pos",
+            "First Move",
+            "Timer",
+            "Rules",
+            "Depth",
+            "Eval",
+            "Coefs",
+            "Opponent's Depth",
+            "Opponent's Eval",
+            "Opponent's Coefs",
+            "Plays",
+            "Wins",
+            "Score"
+        ]
+        summary = pd.DataFrame(columns=trgattrs)
+        srcattrs = [
+            "first move",
+            "timer",
+            "rules",
+            "depth 1",
+            "eval 1",
+            "coefs 1",
+            "depth 2",
+            "eval 2",
+            "coefs 2"
+            ]
+        superset = src.groupby(srcattrs)
         
-        return trg
+        for group in superset.groups:
+            data = superset.get_group(group)
+            if "human" in group:
+                continue
+            record1 = {"Pos": 1}
+            record2 = {"Pos": 2}
+            for i in range(3):
+                record1.update({f"{trgattrs[i+1]}": group[i]})
+                record2.update({f"{trgattrs[i+1]}": group[i]})
+            for i in range(3,9):
+                i2 = (i+3,i-3)[i>5]
+                record1.update({f"{trgattrs[i+1]}": group[i]})
+                record2.update({f"{trgattrs[i+1]}": group[i2]})
+
+            plays = len(data)
+            wins = len(data[data["winner"] == 1]) / plays
+            score = sum(data[data["winner"] == 1]["score"]) / sum(data["score"])
+            record1.update({
+                "Plays": plays,
+                "Wins": round(wins, 3),
+                "Score": round(score,3)
+                })
+            record2.update({
+                "Plays": plays,
+                "Wins": round(1-wins, 3),
+                "Score": round(1-score,3)
+                })
+                        
+            summary = summary.append(record1, ignore_index=True)
+            summary = summary.append(record2, ignore_index=True)
+        
+        return summary
     
     def show_brief_in_browser(self):
         self.update_src()
