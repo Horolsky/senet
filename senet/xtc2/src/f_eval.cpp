@@ -1,7 +1,7 @@
 #include "f_eval.hpp"
 namespace senet
 {
-    inline float evaluate_state(const xState &state)
+    float evaluate_state(const xState &state)
     {
         return evaluate_state(state._seed);
     }
