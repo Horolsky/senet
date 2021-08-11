@@ -29,7 +29,20 @@ namespace senet
     class xEvent;
     class xPly;
 
-    enum class game_rules;
-    double evaluate_state(const xState &, game_rules);
-    xState increment_state(const xState &, game_rules);
+    float evaluate_state(const xState &);
+    float evaluate_state(const uint64_t);
+
+    //game rules
+    enum class rules_id : std::uint8_t
+    {
+        meub,
+        kendall
+    };
+    xMoves available_moves(const xState &, rules_id);
+    xState increment_state(const xState &, rules_id);
+
+    uint32_t available_moves_kendall(const uint64_t);
+    uint32_t available_moves_meub(const uint64_t);
+    uint64_t increment_state_kendall(const uint64_t);
+    uint64_t increment_state_meub(const uint64_t);
 }
