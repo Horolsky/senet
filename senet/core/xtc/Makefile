@@ -4,7 +4,7 @@ PROJ_V = 0.0.1
 PROJ_N = senet_xtc
 PROJ_SO = $(PROJ_N)-$(PROJ_V)-$(MACHINE_NAME)-$(KERNEL_NAME).so
 
-.PHONY: all clean clean_test build test format tidy check check_dep
+.PHONY: all clean clean_test build test format tidy check check_dep update_libs
 
 CPPFLAGS += -isystem $(GTEST_DIR)/include
 CXXFLAGS += -pthread -fPIC -g -std=gnu++14 -Wall -Wextra -pedantic 
@@ -16,6 +16,9 @@ LIB_D := lib
 TST_D := test
 BLD_D := build
 
+#external dependencies
+DEPS = $(LIB_D)/bitf
+
 UNITS_H = $(SRC_D)/*.hpp
 # UNITS_O := $(patsubst $(SRC_D)/%.cpp, $(BLD_D)/%.o, $(wildcard $(SRC_D)/*.cpp))
 # not working because of f_rules
@@ -23,12 +26,17 @@ UNITS_O = $(BLD_D)/s_state.o $(BLD_D)/s_moves.o $(BLD_D)/s_event.o $(BLD_D)/s_pl
 source = $(patsubst $(BLD_D)/%.o, $(SRC_D)/%.cpp, $(1))
 
 #build object file
-$(UNITS_O): $(UNITS_H)
+$(UNITS_O): $(UNITS_H) $(DEPS)
 	$(CXX) $(CPPFLAGS) -I$(SRC_D) $(CXXFLAGS) -c \
             $(call source, $@) -o $@
 
 print:
 	@echo $(PROJ_SO)
+
+$(DEPS): update_libs
+
+update_libs:
+	make -C $(LIB_D) update
 
 build: $(UNITS_O)
 	$(CXX) $(CPPFLAGS) $(UNITS_O) -shared -o $(BLD_D)/$(PROJ_SO)
@@ -74,7 +82,7 @@ $(GTEST_MAIN) : $(GTEST_O)
 # GOOGLE_TEST: PROJECT SPECIFIC TASKS
 TEST_ENTRY = $(TST_D)/gtest_entry.cpp
 
-$(TST_D)/gtest_entry.o : $(TEST_ENTRY) $(TST_D)/*.hpp $(SRC_D)/*.hpp $(GTEST_HEADERS)
+$(TST_D)/gtest_entry.o : $(TEST_ENTRY) $(TST_D)/*.hpp $(SRC_D)/*.hpp $(GTEST_HEADERS) $(DEPS)
 	$(CXX) $(CPPFLAGS) -I$(SRC_D) $(CXXFLAGS) -c $(TEST_ENTRY) -o $@
 
 $(TST_D)/gtest_entry : $(TST_D)/gtest_entry.o $(GTEST_MAIN) $(UNITS_O)
