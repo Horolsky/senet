@@ -1,6 +1,6 @@
 #include "s_moves.hpp"
 
-namespace senet
+namespace xtc
 {
     xMoves &xMoves::operator=(const xMoves &other)
     {

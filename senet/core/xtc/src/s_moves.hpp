@@ -1,10 +1,10 @@
 #pragma once
 #include "../lib/bitf/src/bitf_solid.hpp"
-#include "senet.fwd.hpp"
+#include "xtc.fwd.hpp"
 
 #include <vector>
 
-namespace senet
+namespace xtc
 {
     /**
  *  2 bits: direction of obligatory movement, 0: skip, 1: move, 2: retreat

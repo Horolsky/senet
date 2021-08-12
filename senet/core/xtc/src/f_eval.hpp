@@ -1,9 +1,9 @@
 #pragma once
-#include "senet.fwd.hpp"
+#include "xtc.fwd.hpp"
 #include "s_ply.hpp"
 
-namespace senet
+namespace xtc
 {
     float evaluate_state(const xState &state);
     float evaluate_state(const uint64_t seed);
-} // namespace senet
+} // namespace xtc

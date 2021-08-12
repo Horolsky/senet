@@ -2,7 +2,7 @@
 
 #include <vector>
 
-namespace senet
+namespace xtc
 {
     xState &xState::operator=(const xState &other)
     {

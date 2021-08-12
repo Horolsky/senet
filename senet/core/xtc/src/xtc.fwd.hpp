@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-namespace senet
+namespace xtc
 {
     using uint8_t = std::uint8_t;
     using uint16_t = std::uint16_t;
@@ -25,10 +25,10 @@ namespace senet
         drow
     };
 
-    class xState;
-    class xMoves;
-    class xEvent;
-    class xPly;
+    struct xState;
+    struct xMoves;
+    struct xEvent;
+    struct xPly;
 
     float evaluate_state(const xState &);
     float evaluate_state(const uint64_t);
@@ -46,4 +46,4 @@ namespace senet
     uint32_t available_moves_meub(const uint64_t);
     uint64_t increment_state_kendall(const uint64_t);
     uint64_t increment_state_meub(const uint64_t);
-}
+} // namespace xtc

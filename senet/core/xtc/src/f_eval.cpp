@@ -1,5 +1,5 @@
 #include "f_eval.hpp"
-namespace senet
+namespace xtc
 {
     float evaluate_state(const xState &state)
     {
@@ -27,4 +27,4 @@ namespace senet
             res = (float)(minSum) / (maxSum + minSum);
         return res;
     }
-} // namespace senet
+} // namespace xtc

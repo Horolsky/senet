@@ -5,6 +5,6 @@
 
 TEST (xPly, init)
 {
-    auto x = senet::xPly();
+    auto x = xtc::xPly();
     EXPECT_EQ(static_cast<uint8_t>(x.agent()), 0);
 }

@@ -1,12 +1,12 @@
 #pragma once
 #include "../lib/bitf/src/bitf_solid.hpp"
-#include "senet.fwd.hpp"
+#include "xtc.fwd.hpp"
 
-namespace senet
+namespace xtc
 {
     /**
  * 1 bit:  active agent
- * 3 bits: event code (see senet::event)
+ * 3 bits: event code (see xtc::event)
  * 5 bits: movement chain start position
  * 5 bits: movement chain destination
  */

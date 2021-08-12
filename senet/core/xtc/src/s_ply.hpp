@@ -1,11 +1,11 @@
 #pragma once
 #include "../lib/bitf/src/bitf_solid.hpp"
-#include "senet.fwd.hpp"
+#include "xtc.fwd.hpp"
 #include "s_state.hpp"
 #include "s_moves.hpp"
 #include "s_event.hpp"
 
-namespace senet
+namespace xtc
 {
     class xPly
     {

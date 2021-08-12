@@ -1,6 +1,6 @@
 #include "s_event.hpp"
 
-namespace senet
+namespace xtc
 {
     xEvent &xEvent::operator=(const xEvent &other)
     {

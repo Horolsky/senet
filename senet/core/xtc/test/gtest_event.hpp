@@ -5,5 +5,5 @@
 
 TEST (xEvent, init)
 {
-    EXPECT_NO_THROW(senet::xEvent());
+    EXPECT_NO_THROW(xtc::xEvent());
 }

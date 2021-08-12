@@ -1,6 +1,6 @@
 #include "s_ply.hpp"
 
-namespace senet
+namespace xtc
 {
     unit_id xPly::operator[](uint8_t index) const
     {

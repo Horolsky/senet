@@ -5,5 +5,5 @@
 
 TEST (xMoves, init)
 {
-    EXPECT_NO_THROW(senet::xMoves());
+    EXPECT_NO_THROW(xtc::xMoves());
 }

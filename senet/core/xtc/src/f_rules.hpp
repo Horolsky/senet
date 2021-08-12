@@ -1,8 +1,8 @@
 #pragma once
-#include "senet.fwd.hpp"
+#include "xtc.fwd.hpp"
 #include "s_ply.hpp"
 
-namespace senet
+namespace xtc
 {
     //chance probabilities
     static const float P[5] = {.25, .375, .25, .0625, .0625};
@@ -16,4 +16,4 @@ namespace senet
     xMoves available_moves(const xState &state, rules_id rules);
     xState increment_state(const xState &state, rules_id rules);
 
-} // namespace senet
+} // namespace xtc

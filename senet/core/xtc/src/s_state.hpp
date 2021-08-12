@@ -1,10 +1,10 @@
 #pragma once
 #include "../lib/bitf/src/bitf_solid.hpp"
-#include "senet.fwd.hpp"
+#include "xtc.fwd.hpp"
 
 #include <vector>
 
-namespace senet
+namespace xtc
 {
 
     /**

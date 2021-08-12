@@ -1,6 +1,6 @@
 #include "f_rules.hpp"
 
-namespace senet
+namespace xtc
 {
     xMoves available_moves(const xState &state, rules_id rules)   
     {
@@ -31,9 +31,20 @@ namespace senet
         }
     }
 
-    xMoves available_moves_kendall(const xState &);
-    xMoves available_moves_meub(const xState &);
-    
-    xState increment_state_kendall(const xState &);
-    xState increment_state_meub(const xState &);
-} // namespace senet
+    xMoves available_moves_kendall(const xState &)
+    {
+        return xMoves();
+    }
+    xMoves available_moves_meub(const xState &)
+    {
+        return xMoves();
+    }
+    xState increment_state_kendall(const xState &)
+    {
+        return xState();
+    }
+    xState increment_state_meub(const xState &)
+    {
+        return xState();
+    }
+} // namespace xtc

@@ -5,5 +5,5 @@
 
 TEST (xState, init)
 {
-    EXPECT_NO_THROW(senet::xState());
+    EXPECT_NO_THROW(xtc::xState());
 }
