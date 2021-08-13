@@ -13,13 +13,17 @@ namespace xtc
         return *this;
     };
 
+    uint16_t xEvent::seed() const
+    {
+        return _seed;
+    }
     unit_id xEvent::agent() const
     {
         return static_cast<unit_id>(bitf::solid::get_scalar<uint64_t, uint8_t>(_seed, 0, 1));
     }
-    event_id xEvent::code() const
+    action_id xEvent::action() const
     {
-        return static_cast<event_id>(bitf::solid::get_scalar<uint64_t, uint8_t>(_seed, 1, 3));
+        return static_cast<action_id>(bitf::solid::get_scalar<uint64_t, uint8_t>(_seed, 1, 3));
     }
     uint8_t xEvent::start() const
     {

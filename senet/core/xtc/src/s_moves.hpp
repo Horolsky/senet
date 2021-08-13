@@ -14,9 +14,9 @@ namespace xtc
     struct xMoves
     {
         static const uint32_t def_state{0b0};
-        static uint32_t get_seed(event_id direction, uint8_t mobility, std::vector<uint8_t> moves)
+        static uint32_t get_seed(action_id direction, uint8_t mobility, std::vector<uint8_t> moves)
         {
-            if (direction > event_id::retreat || mobility > 5 || moves.size() > 5)
+            if (direction > action_id::retreat || mobility > 5 || moves.size() > 5)
             {
                 throw std::logic_error("invalid xMoves parameters");
             }
@@ -28,14 +28,16 @@ namespace xtc
         uint32_t _seed;
         xMoves() : _seed(def_state){};
         xMoves(uint32_t seed) : _seed(seed){};
-        xMoves(event_id direction, uint8_t mobility, std::vector<uint8_t> moves)
+        xMoves(action_id direction, uint8_t mobility, std::vector<uint8_t> moves)
             : _seed(get_seed(direction, mobility, moves)){};
         xMoves(const xMoves &other) : _seed(other._seed){};
         xMoves(xMoves &&other) : _seed(other._seed){};
         ~xMoves() = default;
         xMoves &operator=(const xMoves &other);
         xMoves &operator=(xMoves &&other);
-        event_id direction() const;
+
+        uint32_t seed() const;
+        action_id direction() const;
         uint8_t mobility() const;
         uint8_t operator[](uint8_t index) const;
         std::vector<uint8_t> moves() const;

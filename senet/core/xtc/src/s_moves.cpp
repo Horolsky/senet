@@ -13,9 +13,14 @@ namespace xtc
         return *this;
     };
 
-    event_id xMoves::direction() const
+    uint32_t xMoves::seed() const
     {
-        return static_cast<event_id>(bitf::solid::get_scalar<uint64_t, uint8_t>(_seed, 0, 2));
+        return _seed;
+    }
+
+    action_id xMoves::direction() const
+    {
+        return static_cast<action_id>(bitf::solid::get_scalar<uint64_t, uint8_t>(_seed, 0, 2));
     }
     uint8_t xMoves::mobility() const
     {

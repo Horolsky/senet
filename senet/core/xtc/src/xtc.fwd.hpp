@@ -15,7 +15,7 @@ namespace xtc
         empty
     };
     //move event type
-    enum class event_id : uint8_t
+    enum class action_id : uint8_t
     {
         skip,
         move,

@@ -14,7 +14,7 @@ namespace xtc
  */
     struct xState
     {
-        static const uint64_t def_state{0b010001000100010001000000};
+        static const uint64_t def_state{0b1010101010101010101010101010101010101010010001000100010001000000};
         static uint64_t get_seed(unit_id agent, uint8_t steps, std::vector<uint8_t> board)
         {
             if (agent != unit_id::empty || steps > 5 || board.size() != 30)
@@ -39,6 +39,7 @@ namespace xtc
         xState &set_agent(unit_id agn);
         xState &set_steps(uint8_t stp);
 
+        uint64_t seed() const;
         unit_id agent() const;
         uint8_t steps() const;
         unit_id operator[](uint8_t index) const;

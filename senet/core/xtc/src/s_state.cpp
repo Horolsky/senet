@@ -14,7 +14,11 @@ namespace xtc
         _seed = other._seed;
         return *this;
     };
-
+    
+    uint64_t xState::seed() const
+    {
+        return _seed;
+    }
     unit_id xState::agent() const
     {
         return static_cast<unit_id>(bitf::solid::get_scalar<uint64_t, uint8_t>(_seed, 0, 1));
@@ -29,7 +33,7 @@ namespace xtc
     }
     std::vector<uint8_t> xState::board() const
     {
-        return bitf::solid::get_vector<uint64_t, uint8_t>(_seed, 4, 2, 2);
+        return bitf::solid::get_vector<uint64_t, uint8_t>(_seed, 4, 2, 30);
     }
 
     xState &xState::set_agent(unit_id agn)
