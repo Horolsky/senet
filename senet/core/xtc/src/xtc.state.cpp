@@ -1,14 +1,13 @@
 #pragma once
-#include "xtc.state.hpp"
 #include "xtc.common.hpp"
 #include "xtc.fwd.hpp"
 
 namespace xtc
 {
 
-template static State::seed<int *> (constants::unit_id _agent, int _steps,
+template uint64_t State::seed<int *> (constants::unit_id _agent, int _steps,
                                     int *_board);
-template static State::seed<std::vector<int>::iterator> (
+template uint64_t State::seed<std::vector<int>::iterator> (
     constants::unit_id _agent, int _steps, std::vector<int>::iterator _board);
 
 /**
@@ -27,24 +26,24 @@ State::board<std::vector<int>::iterator> (std::vector<int>::iterator buffer);
 constants::unit_id
 State::agent () const
 {
-  return _data._agent;
+  return (constants::unit_id) _data._agent;
 }
 int
 State::steps () const
 {
-  return _data._steps;
+  return (int) _data._steps;
 }
 
 State &
 State::operator= (const State &other)
 {
-  _data._data = other._data;
+  _data = other._data;
   return *this;
 }
 State &
 State::operator= (State &&other)
 {
-  _data._data = other._data;
+  _data = other._data;
   return *this;
 }
 void
@@ -58,25 +57,28 @@ State::set_steps (int steps)
   _data._steps = steps;
 }
 
+
 Moves
-State::moves (constants::rules_id rules)
+moves_kendall (State state){ return Moves (); } 
+
+Moves moves_meub (State state)
+{
+  return Moves ();
+}
+
+Moves
+State::moves (constants::rules_id rules) const
 {
   if (rules == constants::rules_id::RULES_KENDALL)
     {
-      return moves_kendall (this);
+      return Moves();//moves_kendall (this);
     }
   else if (rules == constants::rules_id::RULES_MEUB)
     {
-      return moves_meub (this);
+      return Moves();//moves_meub (this);
     }
   else
     throw "invalid rules";
-}
-Moves
-moves_kendall (State state){ return Moves () : } Moves
-    moves_kendall (State state)
-{
-  return Moves () :
 }
 
 float

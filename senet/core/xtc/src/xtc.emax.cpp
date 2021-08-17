@@ -1,5 +1,5 @@
 #pragma once
-#include "util.deque.hpp"
+// #include "util.deque.hpp"
 #include "xtc.common.hpp"
 #include "xtc.fwd.hpp"
 namespace xtc

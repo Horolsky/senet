@@ -1,29 +1,30 @@
 #pragma once
 #include "xtc.common.hpp"
+#include "xtc.fwd.hpp"
 namespace xtc
 {
 Event &
 Event::operator= (const Event &other)
 {
-  _data._data = other._data;
+  _data = other._data;
   return *this;
 }
 Event &
 Event::operator= (Event &&other)
 {
-  _data._data = other._data;
+  _data = other._data;
   return *this;
 }
 
-constants::agent_id
+constants::unit_id
 Event::agent () const
 {
-  return _data._agent;
+  return (constants::unit_id) _data._agent;
 }
 constants::action_id
 Event::action () const
 {
-  return _data._action;
+  return (constants::action_id) _data._action;
 }
 int
 Event::start () const

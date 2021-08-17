@@ -1,16 +1,15 @@
 #pragma once
-#include "xtc.moves.hpp"
 #include "xtc.common.hpp"
 #include "xtc.fwd.hpp"
 
 namespace xtc
 {
 
-template static Moves::seed<int *> (constants::unit_id _agent, int _steps,
-                                    int *_board);
-template static Moves::seed<std::vector<int>::iterator> (
-    constants::unit_id _agent, int _steps, std::vector<int>::iterator _board);
+template uint64_t Moves::seed<int *> (constants::unit_id _agent, constants::action_id _direction,
+               int _mobility, int* _indici, int* _actions);
 
+template uint64_t Moves::seed<std::vector<int>::iterator> (constants::unit_id _agent, constants::action_id _direction,
+               int _mobility, std::vector<int>::iterator _indici, std::vector<int>::iterator _actions);
 template int *Moves::indici<int *> (int *buffer);
 template std::vector<int>::iterator
 Moves::indici<std::vector<int>::iterator> (std::vector<int>::iterator buffer);
@@ -22,7 +21,7 @@ Moves::actions<std::vector<int>::iterator> (std::vector<int>::iterator buffer);
 constants::unit_id
 Moves::agent () const
 {
-  return _data._agent;
+  return (constants::unit_id) _data._agent;
 }
 int
 Moves::mobility () const
@@ -32,19 +31,19 @@ Moves::mobility () const
 constants::action_id
 Moves::direction () const
 {
-  return _data._direction;
+  return (constants::action_id) _data._direction;
 }
 
-State &
+Moves &
 Moves::operator= (const Moves &other)
 {
-  _data._data = other._data;
+  _data = other._data;
   return *this;
 }
-State &
+Moves &
 Moves::operator= (Moves &&other)
 {
-  _data._data = other._data;
+  _data = other._data;
   return *this;
 }
 

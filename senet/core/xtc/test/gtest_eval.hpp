@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../src/f_eval.hpp"
+#include "../src/xtc.fwd.hpp"
 #include "gtest/gtest.h"
 
-TEST (eval, init)
+TEST (State_eval, init)
 {
-    auto x = xtc::xState();
-    EXPECT_NO_THROW(xtc::evaluate_state(x));
+    auto x = xtc::State();
+    EXPECT_NO_THROW(x.evaluate());
 }

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../src/s_event.hpp"
+#include "../src/xtc.fwd.hpp"
 #include "gtest/gtest.h"
 
-TEST (xEvent, init)
+TEST (Event, init)
 {
-    EXPECT_NO_THROW(xtc::xEvent());
+    EXPECT_NO_THROW(xtc::Event());
 }

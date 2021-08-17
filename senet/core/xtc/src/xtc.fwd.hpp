@@ -21,13 +21,12 @@ const size_t board_offset{ 2UL };
 const size_t indici_offset{ 5UL };
 const size_t actions_offset{ 5UL };
 
-const size_t board_size { 30UL };
-const size_t max_moves  { 7UL };
-
+const size_t board_size{ 30UL };
+const size_t max_moves{ 7UL };
 
 const float P[5]{ 1, 1, 1, 1, 1 };
 const int max_deque{ 524288 }; // 0.5 Mb
-const int max_branching{ 7 };  
+const int max_branching{ 7 };
 
 enum house_id
 {
@@ -37,7 +36,7 @@ enum house_id
   HOUSE_OF_TRUTHS = 27,
   HOUSE_OF_ATOUM = 28,
   HOUSE_OF_SCARAB = 29
-}
+};
 
 // board cell unit
 enum unit_id
@@ -65,6 +64,9 @@ enum rules_id
   RULES_KENDALL
 };
 } // namespace constants
+class Moves;
+class Event;
+class Emax;
 
 class State
 {
@@ -73,50 +75,73 @@ class State
    * 3 bits: steps
    * 30x2bits: board
    */
-  typedef struct {
-    union {
-        uint64_t _seed; 
-        struct {
-            uint64_t _agent:1; // current ply active agent 
-            uint64_t _steps:3; // 1-5, 0 for unset
-            uint64_t _board:60;// 30x array, 
-        };
+  typedef struct
+  {
+    union
+    {
+      uint64_t _seed;
+      struct
+      {
+        uint64_t _agent : 1;  // current ply active agent
+        uint64_t _steps : 3;  // 1-5, 0 for unset
+        uint64_t _board : 60; // 30x array,
+      };
     };
   } bitfield;
-  bitfield _data {._seed=0UL};
+  bitfield _data{ ._seed = 0UL };
 
 public:
   using seed_type = uint64_t;
   template <class Iterator>
-  static uint64_t seed (constants::unit_id agent, int steps, Iterator board);
+  uint64_t seed (constants::unit_id _agent, int _steps, Iterator _board)
+  {
+    bitfield data{ ._seed = 0UL };
+    data._agent = _agent;
+    data._steps = _steps;
+    data._board = bitf::solid::set_bulk<Iterator, uint64_t> (
+        _board, _board + constants::board_size, 0UL, constants::board_offset);
+    return data._seed;
+  }
 
-  State() {_data._seed = constants::def_state; }
-  State(uint64_t seed) { _data._seed = seed; }
-  State(const State &other) : _data(other._data){}
-  State(State &&other) : _data(other._data){}
+  State () { _data._seed = constants::def_state; }
+  State (uint64_t _seed) { _data._seed = _seed; }
+  State (const State &other) : _data (other._data) {}
+  State (State &&other) : _data (other._data) {}
 
-  State(constants::unit_id agent, int steps, int* board) 
-  { _data._seed = State::seed(agent, steps, board); }
-  State(constants::unit_id agent, int steps, std::vector<int>::iterator board) 
-  { _data._seed = State::seed(agent, steps, board); }
-  
-  ~State() = default;
+  State (constants::unit_id _agent, int _steps, int *_board)
+  {
+    _data._seed = seed (_agent, _steps, _board);
+  }
+  State (constants::unit_id _agent, int _steps,
+         std::vector<int>::iterator _board)
+  {
+    _data._seed = seed (_agent, _steps, _board);
+  }
 
-  State &operator=(const State &other);
-  State &operator=(State &&other);
-  void set_agent(constants::unit_id agent);
-  void set_steps(int steps);
+  ~State () = default;
 
-  template <class Iterator> Iterator board (Iterator) const;
+  State &operator= (const State &other);
+  State &operator= (State &&other);
+  void set_agent (constants::unit_id _agent);
+  void set_steps (int _steps);
+
+  template <class Iterator>
+  Iterator
+  board (Iterator buffer)
+  {
+    bitf::solid::get_bulk<Iterator, uint64_t> (buffer, buffer + constants::board_size,
+                                               _data._board, constants::board_offset);
+    return buffer;
+  }
   Moves moves (constants::rules_id) const;
   Event increment (constants::rules_id) const;
-  
+
   float evaluate () const;
 
   constants::unit_id agent () const;
   int steps () const;
 
-} // namespace state
+}; // class state
 
 class Moves
 {
@@ -126,123 +151,188 @@ class Moves
    * 7x5bits: indici
    * 7x3bits: actions
    */
-  typedef struct {
-    union {
-        uint64_t _seed; 
-        struct {
-            uint64_t _agent:1;
-            uint64_t _mobility:3;
-            uint64_t _direction:4;
-            uint64_t _indici:35;
-            uint64_t _actions:21;
-            
-        };
+  typedef struct
+  {
+    union
+    {
+      uint64_t _seed;
+      struct
+      {
+        uint64_t _agent : 1;
+        uint64_t _mobility : 3;
+        uint64_t _direction : 4;
+        uint64_t _indici : 35;
+        uint64_t _actions : 21;
+      };
     };
   } bitfield;
-  bitfield _data {._seed=0UL};
-  
+  bitfield _data{ ._seed = 0UL };
+
 public:
   friend class State;
   using seed_type = uint64_t;
   template <class Iterator>
-  static uint64_t seed (constants::unit_id agent, constants::action_id direction, int mobility, Iterator indici, Iterator actions);
+  uint64_t
+  seed (constants::unit_id _agent, constants::action_id _direction,
+               int _mobility, Iterator _indici, Iterator _actions)
+  {
+    bitfield data{ ._seed = 0UL };
+    data._agent = _agent;
+    data._mobility = _mobility;
+    data._direction = _direction;
+    data._indici = bitf::solid::set_bulk<Iterator, uint64_t> (
+        _indici, _indici + constants::max_moves, 0UL, constants::indici_offset);
+    data._actions = bitf::solid::set_bulk<Iterator, uint64_t> (
+        _actions, _actions + constants::max_moves, 0UL, constants::actions_offset);
+    return data._seed;
+  }
   template <class Iterator>
-  static uint64_t seed (constants::unit_id agent, constants::action_id direction, int mobility, Iterator indici); //for internal use
+  uint64_t
+  seed (constants::unit_id _agent, constants::action_id _direction,
+               int _mobility, Iterator _indici)
+  {
+    bitfield data{ ._seed = 0UL };
+    data._agent = _agent;
+    data._mobility = _mobility;
+    data._direction = _direction;
+    data._indici = bitf::solid::set_bulk<Iterator, uint64_t> (
+        _indici, _indici + constants::max_moves, 0UL, constants::indici_offset);
+    return data._seed;
+  }
 
-  Moves() = default;
-  Moves(uint64_t seed) { _data._seed = seed; }
-  Moves(const Moves &other) : _data(other._data){}
-  Moves(Moves &&other) : _data(other._data){}
-  
-  Moves(constants::unit_id agent, constants::action_id direction, int mobility, int* indici, int* actions)
-   { _data._seed = Moves::seed(agent, direction, mobility, indici, actions); }
-  Moves(constants::unit_id agent, constants::action_id direction, int mobility, std::vector<int>::iterator indici, std::vector<int>::iterator actions)
-   { _data._seed = Moves::seed(agent, direction, mobility, indici, actions); }
+  Moves () = default;
+  Moves (uint64_t _seed) { _data._seed = _seed; }
+  Moves (const Moves &other) : _data (other._data) {}
+  Moves (Moves &&other) : _data (other._data) {}
 
-  Moves(constants::unit_id agent, constants::action_id direction, int mobility, int* indici)
-   { _data._seed = Moves::seed(agent, direction, mobility, indici); }
-  Moves(constants::unit_id agent, constants::action_id direction, int mobility, std::vector<int>::iterator indici)
-   { _data._seed = Moves::seed(agent, direction, mobility, indici); }
+  Moves (constants::unit_id _agent, constants::action_id _direction,
+         int _mobility, int *_indici, int *_actions)
+  {
+    _data._seed
+        = seed (_agent, _direction, _mobility, _indici, _actions);
+  }
+  Moves (constants::unit_id _agent, constants::action_id _direction,
+         int _mobility, std::vector<int>::iterator _indici,
+         std::vector<int>::iterator _actions)
+  {
+    _data._seed
+        = seed (_agent, _direction, _mobility, _indici, _actions);
+  }
 
-  Moves(const State &state, constants::rules_id rules) { this = state.moves(rules); }
-  
-  ~Moves() = default;
+  Moves (constants::unit_id _agent, constants::action_id _direction,
+         int _mobility, int *_indici)
+  {
+    _data._seed = seed (_agent, _direction, _mobility, _indici);
+  }
+  Moves (constants::unit_id _agent, constants::action_id _direction,
+         int _mobility, std::vector<int>::iterator _indici)
+  {
+    _data._seed = seed (_agent, _direction, _mobility, _indici);
+  }
 
-  State &operator=(const Moves &other) ;
-  State &operator=(Moves &&other);
+  Moves (const State &state, constants::rules_id rules)
+  {
+    _data = state.moves (rules)._data;
+  }
 
-  template <class Iterator> Iterator indici (Iterator) const;
-  template <class Iterator> Iterator actions (Iterator) const;
+  ~Moves () = default;
 
+  Moves &operator= (const Moves &other);
+  Moves &operator= (Moves &&other);
+
+  template <class Iterator>
+  Iterator
+  indici (Iterator buffer)
+  {
+    bitf::solid::get_bulk<Iterator, uint64_t> (buffer, buffer + constants::max_moves,
+                                               _data._indici, constants::indici_offset);
+    return buffer;
+  }
+
+  template <class Iterator>
+  Iterator
+  actions (Iterator buffer)
+  {
+    bitf::solid::get_bulk<Iterator, uint64_t> (buffer, buffer + constants::max_moves,
+                                               _data._actions, constants::actions_offset);
+    return buffer;
+  }
   constants::unit_id agent () const;
   int mobility () const;
   constants::action_id direction () const;
-} // namespace moves
+}; // class moves
 
 class Event
 {
-/**
+  /**
    * 1 bit: agent
    * 3 bits: mobility
    * 7x5bits: indici
    * 7x3bits: actions
    */
-  typedef struct {
-    union {
-        uint16_t _seed; 
-        struct {
-            uint16_t _agent:1;
-            uint16_t _action:5;
-            uint16_t _start:5;
-            uint16_t _destination:5;
-        };
+  typedef struct
+  {
+    union
+    {
+      uint16_t _seed;
+      struct
+      {
+        uint16_t _agent : 1;
+        uint16_t _action : 5;
+        uint16_t _start : 5;
+        uint16_t _destination : 5;
+      };
     };
   } bitfield;
-  bitfield _data {._seed=0UL};
+  bitfield _data{ ._seed = 0UL };
+
 public:
-friend class State;
-using seed_type = uint16_t;
-static uint64_t seed (constants::unit_id agent, constants::action_id action, int start, int _destination)
-{
-  bitfield data {._seed=0};
-  data._agent = agent;
-  data._action = action;
-  data._start = start;
-  data._destination = destination;
-  return data._seed;
-}
+  friend class State;
+  using seed_type = uint16_t;
+  static uint64_t
+  seed (constants::unit_id _agent, constants::action_id _action, int _start,
+        int _destination)
+  {
+    bitfield data{ ._seed = 0 };
+    data._agent = _agent;
+    data._action = _action;
+    data._start = _start;
+    data._destination = _destination;
+    return data._seed;
+  }
 
-  Event() = default;
-  Event(uint16_t seed) { _data._seed = seed; }
-  Event(const Event &other) : _data(other._data){}
-  Event(Event &&other) : _data(other._data){}
-  
-  Event(constants::unit_id agent, constants::action_id action, int start, int _destination)
-   { _data._seed = Moves::seed(agent, action, start, destination); }
+  Event () = default;
+  Event (uint16_t seed) { _data._seed = seed; }
+  Event (const Event &other) : _data (other._data) {}
+  Event (Event &&other) : _data (other._data) {}
 
+  Event (constants::unit_id _agent, constants::action_id _action, int _start,
+         int _destination)
+  {
+    _data._seed = seed (_agent, _action, _start, _destination);
+  }
 
-  ~Event() = default;
+  ~Event () = default;
 
-  Event &operator=(const Event &other);
-  Event &operator=(Event &&other);
- 
-  constants::agent_id agent () const;
+  Event &operator= (const Event &other);
+  Event &operator= (Event &&other);
+
+  constants::unit_id agent () const;
   constants::action_id action () const;
   int start () const;
   int destination () const;
-} // namespace event
+}; // class event
 
-//functor class
+// functor class
 class Emax
 {
-  public:
-  Emax() = default;
-  Emax(const Emax &other) = default;
-  Emax(Emax &&other) = default;
-  ~Emax() = default;
+public:
+  Emax () = default;
+  Emax (const Emax &other) = default;
+  Emax (Emax &&other) = default;
+  ~Emax () = default;
 
-  int operator()(State state);
-
-} 
+  int operator() (State state);
+};
 
 } // namespace xtc
