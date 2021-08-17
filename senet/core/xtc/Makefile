@@ -20,9 +20,7 @@ BLD_D := build
 DEPS = $(LIB_D)/bitf
 
 UNITS_H = $(SRC_D)/*.hpp
-# UNITS_O := $(patsubst $(SRC_D)/%.cpp, $(BLD_D)/%.o, $(wildcard $(SRC_D)/*.cpp))
-# not working because of f_rules
-UNITS_O = $(BLD_D)/s_state.o $(BLD_D)/s_moves.o $(BLD_D)/s_event.o $(BLD_D)/s_ply.o $(BLD_D)/f_eval.o 
+UNITS_O := $(patsubst $(SRC_D)/%.cpp, $(BLD_D)/%.o, $(wildcard $(SRC_D)/*.cpp))
 source = $(patsubst $(BLD_D)/%.o, $(SRC_D)/%.cpp, $(1))
 
 #build object file
