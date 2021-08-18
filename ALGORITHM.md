@@ -50,7 +50,7 @@ def expectiminimax(minimax, chance_node, depth):
     strategies = subnodes(decision_node)
     
     for subnode in subnodes:
-      chance_expect += emax(subnode, depth-1)
+      chance_expect += expectiminimax(subnode, depth-1)
 
     expectation = minimax(expectation, chance_expect)
     
