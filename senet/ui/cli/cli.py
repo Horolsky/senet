@@ -60,7 +60,8 @@ class cli(metaclass=singleton):
             self.__autogame.start(agent1, agent2, rules, autofirst, seed)
             if (i+1) % 10 == 0:
                 self.msgout(f"{i+1} games over")  
-        self.msgout(f"{repeats} autogames completed")          
+        self.msgout(f"{repeats} autogames completed")        
+        STATS.show_brief()  
         return True
 
     def start(self, tokens):
@@ -137,8 +138,9 @@ class cli(metaclass=singleton):
                     self.toggle_option(tks[1:])
                 continue
             if cmd == "stats":
-                msgout("rendering report in the web browser...\n")
-                STATS.show_brief_in_browser()
+                msgout("GAME STATS")
+                msgout("A: Agent, F: first move, T: timer, R: rules, D: depth, E: eval func, C: coefs, ~: opponents params\n")
+                STATS.show_brief()
             #game actions
             if cmd == 'a':
                 if self.game.running:
