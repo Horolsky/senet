@@ -84,10 +84,10 @@ static state_legal_moves_func _get_moves;
 static ui64 _node_counter;
 static time_t _stoptime;
 static ui8 _stopdepth;
-static float * user_coefs;
+static float * _user_coefs;
 static ui64 * _strat_seeds;
 static float * _strat_utils;
-static float * user_coefs;
+static int _player;
 
 float _expectimax(ui64 seed, ui8 depth);
 void * _threadwork(void * param);
@@ -483,7 +483,7 @@ float eval_linear(ui64 seed, float *coefs) {
 
 float _expectimax(ui64 seed, ui8 depth){
     _node_counter += 1;
-    float util = _eval(seed, user_coefs);
+    float util = _eval(seed, _user_coefs);
     if (util  == 1 || util == 0 || depth >= _stopdepth || clock() > _stoptime){
         
         return util;
@@ -503,7 +503,10 @@ float _expectimax(ui64 seed, ui8 depth){
             ui64 childstate = _increment(chance_state, chance_moves, MOVES_GET(chance_moves, move));            
             cutil += _expectimax(childstate, depth);
         }
-        util += chance_moves._len != 0 ? cutil * P[chance] / chance_moves._len : cutil * P[chance];
+        _player ? (util = cutil > util ? cutil : util) : (util = cutil < util ? cutil : util);
+        //wrong:
+        // _player ? (util = cutil < util ? cutil : util) : (util = cutil > util ? cutil : util);
+        // util += chance_moves._len != 0 ? cutil * P[chance] / chance_moves._len : cutil * P[chance];
     }
     return util;
 }
@@ -537,9 +540,10 @@ emax_res get_strategy_emax_mt(ui64 seed, ui8 depth, ui8 sec, eval_e eval_id, rul
     _node_counter = 0;
     _stoptime = clock() + sec * CLOCKS_PER_SEC;
     _stopdepth = depth;
-    user_coefs = coefs;
+    _user_coefs = coefs;
 
     xState state = {._seed=seed};
+    _player = state._agent ? 1 : 0;
     xMoves strat_moves = {._seed=_get_moves(seed)};
     _strat_seeds = malloc (sizeof(ui64) * strat_moves._len);
     _strat_utils = malloc (sizeof(float) * strat_moves._len);
