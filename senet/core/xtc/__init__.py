@@ -23,17 +23,19 @@ def __load_src():
     for smb in __SMBS:
         __internal[smb] = eval(f"cppyy.gbl.xtc.{smb}") 
     
-    globals()['__internal'] = __internal#cppyy.gbl.xtc
+    globals().update(__internal)#cppyy.gbl.xtc
     
 
 def __load_std():
+    _std = {}
     for symbols, header in __STD_T:
         if not cppyy.include(header):
             raise ImportError(f"unable to load {header}")
         for smb in symbols:
-            globals()['__internal'][smb] = eval(f"cppyy.gbl.std.{smb}")
+            _std[smb] = eval(f"cppyy.gbl.std.{smb}")
+    globals().update(_std)
         
 __load_src()
 __load_std()
 
-__all__ = ['__internal']
+# __all__ = ['__internal']

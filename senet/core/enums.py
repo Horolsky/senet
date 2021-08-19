@@ -1,28 +1,38 @@
 """
 builtin enums wrapping
 """
-from .xtc import unit_id, rules_id, action_id
+from .xtc import Rules as _Rules, Unit as _Unit, House as _House, Action as _Action
 from enum import Enum
 
+class House(Enum):
+    REBIRTH = _House.REBIRTH
+    BEAUTY = _House.BEAUTY
+    WATERS = _House.WATERS
+    TRUTHS = _House.TRUTHS
+    ATOUM = _House.ATOUM
+    SCARAB = _House.SCARAB
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}.{self.name}"
+
 class Rules(Enum):
-    MEUB = rules_id.meub
-    KENDALL = rules_id.kendall
+    MEUB = _Rules.MEUB
+    KENDALL = _Rules.KENDALL
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}.{self.name}"
 
 class Unit(Enum):
-    X = unit_id.X
-    Y = unit_id.Y
-    EMPTY = unit_id.empty
+    X = _Unit.X
+    Y = _Unit.Y
+    NONE = _Unit.NONE
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}.{self.name}"
 
 class Action(Enum):
-    SKIP = action_id.skip
-    MOVE = action_id.move
-    RETREAT = action_id.retreat
-    ATTACK = action_id.attack
-    ESCAPE = action_id.escape
-    DROW = action_id.drow
+    SKIP = _Action.SKIP
+    MOVE = _Action.MOVE
+    RETREAT = _Action.RETREAT
+    ATTACK = _Action.ATTACK
+    ESCAPE = _Action.ESCAPE
+    DROW = _Action.DROW
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}.{self.name}"
