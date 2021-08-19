@@ -81,8 +81,8 @@ class Stats(metaclass=singleton):
             data = superset.get_group(group)
             if "human" in group:
                 continue
-            record1 = {"A": "X"}
-            record2 = {"A": "Y"}
+            record1 = {"A": "V"}
+            record2 = {"A": "X"}
             for i in range(3):
                 record1.update({f"{trgattrs[i+1]}": group[i]})
                 record2.update({f"{trgattrs[i+1]}": group[i]})
