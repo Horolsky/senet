@@ -1,8 +1,19 @@
 #pragma once
 #include "xtc.common.hpp"
-#include "xtc.fwd.hpp"
+#include "xtc.internal.hpp"
 namespace xtc
 {
+uint64_t
+Event::seed (Unit _agent, Action _action, int _start, int _destination)
+{
+  bitfield data{ ._seed = 0 };
+  data._agent = static_cast<uint64_t>(_agent);
+  data._action = static_cast<uint64_t>(_action);
+  data._start = _start;
+  data._destination = _destination;
+  return data._seed;
+}
+
 Event &
 Event::operator= (const Event &other)
 {
@@ -16,15 +27,15 @@ Event::operator= (Event &&other)
   return *this;
 }
 
-constants::unit_id
+Unit
 Event::agent () const
 {
-  return (constants::unit_id) _data._agent;
+  return static_cast<Unit>(_data._agent);
 }
-constants::action_id
+Action
 Event::action () const
 {
-  return (constants::action_id) _data._action;
+  return static_cast<Action>(_data._action);
 }
 int
 Event::start () const

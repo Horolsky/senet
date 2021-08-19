@@ -1,37 +1,69 @@
 #pragma once
 #include "xtc.common.hpp"
-#include "xtc.fwd.hpp"
+#include "xtc.internal.hpp"
 
 namespace xtc
 {
 
-template uint64_t Moves::seed<int *> (constants::unit_id _agent, constants::action_id _direction,
-               int _mobility, int* _indici, int* _actions);
+uint64_t
+Moves::seed (Unit _agent, Action _direction, int _mobility, int *_indici,
+             int *_actions)
+{
+  bitfield data{ ._seed = 0UL };
+  data._agent = static_cast<uint64_t>(_agent);
+  data._mobility = _mobility;
+  data._direction = static_cast<uint64_t>(_direction);
+  data._indici = bitf::solid::set_bulk<int *, uint64_t> (
+      _indici, _indici + cnst::max_moves, 0UL, cnst::indici_offset);
+  data._actions = bitf::solid::set_bulk<int *, uint64_t> (
+      _actions, _actions + cnst::max_moves, 0UL, cnst::actions_offset);
+  return data._seed;
+}
 
-template uint64_t Moves::seed<std::vector<int>::iterator> (constants::unit_id _agent, constants::action_id _direction,
-               int _mobility, std::vector<int>::iterator _indici, std::vector<int>::iterator _actions);
-template int *Moves::indici<int *> (int *buffer);
-template std::vector<int>::iterator
-Moves::indici<std::vector<int>::iterator> (std::vector<int>::iterator buffer);
+uint64_t
+Moves::seed (Unit _agent, Action _direction, int _mobility, int *_indici)
+{
+  bitfield data{ ._seed = 0UL };
+  data._agent = static_cast<uint64_t>(_agent);
+  data._mobility = _mobility;
+  data._direction = static_cast<uint64_t>(_direction);
+  data._indici = bitf::solid::set_bulk<int *, uint64_t> (
+      _indici, _indici + cnst::max_moves, 0UL, cnst::indici_offset);
+  return data._seed;
+}
 
-template int *Moves::actions<int *> (int *buffer);
-template std::vector<int>::iterator
-Moves::actions<std::vector<int>::iterator> (std::vector<int>::iterator buffer);
+int *
+Moves::indici (int *buffer) const
+{
+  bitf::solid::get_bulk<int *, uint64_t> (buffer, buffer + cnst::max_moves,
+                                          _data._indici, cnst::indici_offset);
+  return buffer;
+}
 
-constants::unit_id
+int *
+Moves::actions (int *buffer) const
+{
+  bitf::solid::get_bulk<int *, uint64_t> (
+      buffer, buffer + cnst::max_moves, _data._actions, cnst::actions_offset);
+  return buffer;
+}
+
+Unit
 Moves::agent () const
 {
-  return (constants::unit_id) _data._agent;
+  return static_cast<Unit>(_data._agent);
 }
+
 int
 Moves::mobility () const
 {
   return _data._mobility;
 }
-constants::action_id
+
+Action
 Moves::direction () const
 {
-  return (constants::action_id) _data._direction;
+  return static_cast<Action>(_data._direction);
 }
 
 Moves &
@@ -40,6 +72,7 @@ Moves::operator= (const Moves &other)
   _data = other._data;
   return *this;
 }
+
 Moves &
 Moves::operator= (Moves &&other)
 {

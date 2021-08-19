@@ -1,7 +1,7 @@
 #pragma once
 // #include "util.deque.hpp"
 #include "xtc.common.hpp"
-#include "xtc.fwd.hpp"
+#include "xtc.internal.hpp"
 namespace xtc
 {
 

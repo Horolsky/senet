@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../src/xtc.fwd.hpp"
+#include "../src/xtc.internal.hpp"
 #include "gtest/gtest.h"
 
 TEST (xMoves, init)

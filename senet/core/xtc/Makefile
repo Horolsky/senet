@@ -7,6 +7,7 @@ PROJ_SO = $(PROJ_N)-$(PROJ_V)-$(MACHINE_NAME)-$(KERNEL_NAME).so
 .PHONY: all clean clean_test build test format tidy check check_dep update_libs
 
 CPPFLAGS += -isystem $(GTEST_DIR)/include
+# TODO: flag for clang -Wgnu-anonymous-struct to avoid -std=gnu++2a
 CXXFLAGS += -pthread -fPIC -g -std=gnu++14 -Wall -Wextra -pedantic 
 #  -fsanitize=address,undefined
 LDFLAGS += -fsanitize=address,undefined
@@ -53,7 +54,7 @@ tidy: .clang-tidy
 	clang-tidy --extra-arg-before=-xc++ --format-style=file src/* test/* 
 
 clean_test:
-	rm -fr test/*.o test/*.a gtest_entry
+	rm -fr test/*.o test/*.a test/gtest_entry
 
 clean: clean_test
 	rm -fr build/*

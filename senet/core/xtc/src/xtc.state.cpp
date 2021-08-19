@@ -1,37 +1,45 @@
 #pragma once
 #include "xtc.common.hpp"
-#include "xtc.fwd.hpp"
+#include "xtc.internal.hpp"
 
 namespace xtc
 {
+using namespace cnst;
 
-template uint64_t State::seed<int *> (constants::unit_id _agent, int _steps,
-                                    int *_board);
-template uint64_t State::seed<std::vector<int>::iterator> (
-    constants::unit_id _agent, int _steps, std::vector<int>::iterator _board);
+uint64_t
+State::seed (Unit _agent, int _steps, int *_board)
+{
+  bitfield data{ ._seed = 0UL };
+  data._agent = static_cast<uint64_t>(_agent);
+  data._steps = _steps;
+  data._board = bitf::solid::set_bulk<int *, uint64_t> (
+      _board, _board + cnst::board_size, 0UL, cnst::board_offset);
+  return data._seed;
+}
 
 /**
  * loads game state to array buffer of size 30
  * return buffer pointer
  * lookup! raw pointers, size not checked
  */
-template int *State::board<int *> (int *buffer);
-/**
- * loads game state to array buffer of size 30
- * return buffer iterator
- */
-template std::vector<int>::iterator
-State::board<std::vector<int>::iterator> (std::vector<int>::iterator buffer);
+int *
+State::board (int *buffer) const
+{
+  bitf::solid::get_bulk<int *, uint64_t> (
+      buffer, buffer + cnst::board_size, _data._board,
+      cnst::board_offset);
+  return buffer;
+}
 
-constants::unit_id
+Unit
 State::agent () const
 {
-  return (constants::unit_id) _data._agent;
+  return static_cast<Unit>(_data._agent);
 }
 int
 State::steps () const
 {
-  return (int) _data._steps;
+  return (int)_data._steps;
 }
 
 State &
@@ -47,9 +55,9 @@ State::operator= (State &&other)
   return *this;
 }
 void
-State::set_agent (constants::unit_id agent)
+State::set_agent (Unit agent)
 {
-  _data._agent = agent;
+  _data._agent = static_cast<uint64_t>(agent);
 }
 void
 State::set_steps (int steps)
@@ -57,25 +65,28 @@ State::set_steps (int steps)
   _data._steps = steps;
 }
 
-
 Moves
-moves_kendall (State state){ return Moves (); } 
-
-Moves moves_meub (State state)
+moves_kendall (State state)
 {
   return Moves ();
 }
 
 Moves
-State::moves (constants::rules_id rules) const
+moves_meub (State state)
 {
-  if (rules == constants::rules_id::RULES_KENDALL)
+  return Moves ();
+}
+
+Moves
+State::moves (Rules rules) const
+{
+  if (rules == Rules::KENDALL)
     {
-      return Moves();//moves_kendall (this);
+      return Moves (); // moves_kendall (this);
     }
-  else if (rules == constants::rules_id::RULES_MEUB)
+  else if (rules == Rules::MEUB)
     {
-      return Moves();//moves_meub (this);
+      return Moves (); // moves_meub (this);
     }
   else
     throw "invalid rules";
@@ -123,16 +134,16 @@ Moves moves_kendall(State state)
     board = xtc::state::board<uint8_t*>(board, state);
 
     // HOUSE OF WATER PENALTY
-    if (board[HOUSE_OF_WATERS] == agent){
+    if (board[WATERS] == agent){
         if (state._steps == 4){
-            indici[mobility++] = HOUSE_OF_WATERS; //escaping actions[mobility]
-= ACTION_MOVE;
+            indici[mobility++] = WATERS; //escaping actions[mobility]
+= MOVE;
         }
-        else if (board[HOUSE_OF_REBIRTH] == unit_id::NONE::value){
-            indici[mobility++] = HOUSE_OF_WATERS;
-            actions[mobility] = ACTION_RETREAT;
-            moves[mobility++] = HOUSE_OF_WATERS;
-            actions[mobility] = ACTION_SKIP;
+        else if (board[REBIRTH] == unit_id::NONE::value){
+            indici[mobility++] = WATERS;
+            actions[mobility] = RETREAT;
+            moves[mobility++] = WATERS;
+            actions[mobility] = SKIP;
         }
         return moves::seed<uint8_t*,uint8_t>()
     }
