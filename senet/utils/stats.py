@@ -1,11 +1,11 @@
 import pandas as pd
-import webbrowser
 from tempfile import NamedTemporaryFile
 from .singleton import singleton
 from os import listdir
 from os.path import isfile, join
 
-
+pd.set_option('display.width', 1000)
+pd.set_option('display.max_columns', None)
 stats_header = "game cumulative statistics"
 
 class Stats(metaclass=singleton):
@@ -26,7 +26,10 @@ class Stats(metaclass=singleton):
         
     def update_src(self):
         for dr in self._src:
-            self._src[dr] = [join(f"logs/{dr}", f) for f in listdir(f"logs/{dr}") if isfile(join(f"logs/{dr}", f))]
+            try:
+                self._src[dr] = [join(f"logs/{dr}", f) for f in listdir(f"logs/{dr}") if isfile(join(f"logs/{dr}", f))]
+            except:
+                pass
 
     def update_brief(self):
         if type(self._src["brief"]) not in [list, tuple]:
@@ -46,19 +49,19 @@ class Stats(metaclass=singleton):
         #src = src[src["agent 1"] == "AI"]
         #src = src[src["agent 2"] == "AI"]
         trgattrs=[
-            "Pos",
-            "First Move",
-            "Timer",
-            "Rules",
-            "Depth",
-            "Eval",
-            "Coefs",
-            "Opponent's Depth",
-            "Opponent's Eval",
-            "Opponent's Coefs",
-            "Plays",
-            "Wins",
-            "Score"
+            "A",      # "Pos",
+            "F",        # "First",
+            "T",        # "Timer",
+            "R",        # "Rules",
+            "D",        # "Depth",
+            "E",     # "Eval",
+            "C",        # "Coefs",
+            "~D",       # "~Depth",
+            "~E",        # "~Eval",
+            "~C",       # "~Coefs",
+            "Plays",        # "Plays",
+            "Wins",     # "Wins",
+            "Score"     # "Score"
         ]
         summary = pd.DataFrame(columns=trgattrs)
         srcattrs = [
@@ -78,8 +81,8 @@ class Stats(metaclass=singleton):
             data = superset.get_group(group)
             if "human" in group:
                 continue
-            record1 = {"Pos": 1}
-            record2 = {"Pos": 2}
+            record1 = {"A": "V"}
+            record2 = {"A": "X"}
             for i in range(3):
                 record1.update({f"{trgattrs[i+1]}": group[i]})
                 record2.update({f"{trgattrs[i+1]}": group[i]})
@@ -107,11 +110,10 @@ class Stats(metaclass=singleton):
         
         return summary
     
-    def show_brief_in_browser(self):
+    def show_brief(self):
         self.update_src()
         self.update_brief()
         df = self.parse_brief()
-        f = NamedTemporaryFile(delete=True, suffix='.html')
-        df.to_html(f.name)
-        webbrowser.open(f.name)
+        df = df.sort_values(by='Wins',ascending=False)
+        print(df)
 STATS = Stats()
