@@ -88,6 +88,18 @@ static float * _user_coefs;
 static ui64 * _strat_seeds;
 static float * _strat_utils;
 static int _player;
+static int _maximizer;
+
+// static float (*_minimax)(float, float); 
+float min(float a, float b)
+{
+    return a < b ? a : b;
+}
+float max(float a, float b)
+{
+    return a > b ? a : b;
+}
+
 
 float _expectimax(ui64 seed, ui8 depth);
 void * _threadwork(void * param);
@@ -490,12 +502,15 @@ float _expectimax(ui64 seed, ui8 depth){
     }
     depth++;
     float cutil = 0;//chance util
-    util = 0;
-    xState chance_state;
+    
+    
+    xState chance_state = {._seed=seed};
+    int agent = chance_state._agent;
     xMoves chance_moves;
+    
     for (ui8 chance = 0; chance < 5; chance++){
         cutil = 0;
-        chance_state._seed = seed; 
+        // chance_state._seed = seed; 
         chance_state._steps=chance+1;
         chance_moves._seed=_get_moves(chance_state._seed);
         
@@ -503,13 +518,71 @@ float _expectimax(ui64 seed, ui8 depth){
             ui64 childstate = _increment(chance_state, chance_moves, MOVES_GET(chance_moves, move));            
             cutil += _expectimax(childstate, depth);
         }
-        _player ? (util = cutil > util ? cutil : util) : (util = cutil < util ? cutil : util);
+        if (chance == 0){
+            util = cutil;
+        }
+        else
+        {
+            if (agent) util = max(util, cutil);
+            else util = min(util, cutil);
+            // if(_maximizer)  
+            // {
+                // if (_player == agent) util = min(util, cutil);
+                // else util = max(util, cutil);
+// 
+            // }
+            // else 
+            // {
+                // if (_player == agent) util = max(util, cutil);
+                // else util = min(util, cutil);                
+            // }
         //wrong:
-        // _player ? (util = cutil < util ? cutil : util) : (util = cutil > util ? cutil : util);
+        // (_player == agent)  ? (util = (cutil < util ? cutil : util)) : (util = (cutil > util ? cutil : util));
         // util += chance_moves._len != 0 ? cutil * P[chance] / chance_moves._len : cutil * P[chance];
+        }
     }
     return util;
 }
+
+
+// float _expectimax(ui64 seed, ui8 depth){
+    // _node_counter += 1;
+    // float util = _eval(seed, _user_coefs);
+    // if (util  == 1 || util == 0 || depth >= _stopdepth || clock() > _stoptime){
+        // 
+        // return util;
+    // }
+    // depth++;
+    // float cutil = 0;//chance util
+    // 
+    // int agent = seed & 1;
+    // xState chance_state;
+    // xMoves chance_moves;
+    // 
+    // for (ui8 chance = 0; chance < 5; chance++){
+        // cutil = 0;
+        // chance_state._seed = seed; 
+        // chance_state._steps=chance+1;
+        // chance_moves._seed=_get_moves(chance_state._seed);
+        // 
+        // for (ui8 move = 0; move < chance_moves._len; move++){
+            // ui64 childstate = _increment(chance_state, chance_moves, MOVES_GET(chance_moves, move));            
+            // cutil += _expectimax(childstate, depth);
+        // }
+        // if (chance == 0){
+            // util = cutil;
+        // }
+        // else
+        // {
+            // if(_maximizer)  {(_player == agent)  ? (util = (cutil < util ? cutil : util)) : (util = (cutil > util ? cutil : util));}
+            // else { (_player == agent) ? (util = (cutil > util ? cutil : util)) : (util = (cutil < util ? cutil : util)); }
+        // //wrong:
+        // //(_player == agent)  ? (util = (cutil < util ? cutil : util)) : (util = (cutil > util ? cutil : util));
+        // //util += chance_moves._len != 0 ? cutil * P[chance] / chance_moves._len : cutil * P[chance];
+        // }
+    // }
+    // return util;
+// }
 
 void * _threadwork(void * param){
     ui8 id = (ui8) param;
@@ -543,7 +616,8 @@ emax_res get_strategy_emax_mt(ui64 seed, ui8 depth, ui8 sec, eval_e eval_id, rul
     _user_coefs = coefs;
 
     xState state = {._seed=seed};
-    _player = state._agent ? 1 : 0;
+    _player = state._agent;// ? 1 : 0;
+    _maximizer = _player;
     xMoves strat_moves = {._seed=_get_moves(seed)};
     _strat_seeds = malloc (sizeof(ui64) * strat_moves._len);
     _strat_utils = malloc (sizeof(float) * strat_moves._len);
