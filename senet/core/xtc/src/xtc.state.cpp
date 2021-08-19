@@ -93,7 +93,7 @@ State::moves (Rules rules) const
 }
 
 float
-State::evaluate () const
+State::expectation () const
 {
   uint64_t seed = _data._seed;
   uint8_t maxSum = 0;
@@ -114,6 +114,11 @@ State::evaluate () const
   else
     res = (float)(minSum) / (maxSum + minSum);
   return res;
+}
+
+uint64_t State::seed () const
+{
+  return _data._seed;
 }
 
 } // namespace xtc

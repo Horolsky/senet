@@ -47,4 +47,10 @@ Event::destination () const
 {
   return _data._destination;
 }
+
+uint16_t Event::seed () const
+{
+  return _data._seed;
+}
+
 }

@@ -35,7 +35,7 @@ Moves::seed (Unit _agent, Action _direction, int _mobility, int *_indici)
 int *
 Moves::indici (int *buffer) const
 {
-  bitf::solid::get_bulk<int *, uint64_t> (buffer, buffer + cnst::max_moves,
+  bitf::solid::get_bulk<int *, uint64_t> (buffer, buffer + _data._mobility,
                                           _data._indici, cnst::indici_offset);
   return buffer;
 }
@@ -44,7 +44,7 @@ int *
 Moves::actions (int *buffer) const
 {
   bitf::solid::get_bulk<int *, uint64_t> (
-      buffer, buffer + cnst::max_moves, _data._actions, cnst::actions_offset);
+      buffer, buffer + _data._mobility, _data._actions, cnst::actions_offset);
   return buffer;
 }
 
@@ -78,6 +78,11 @@ Moves::operator= (Moves &&other)
 {
   _data = other._data;
   return *this;
+}
+
+uint64_t Moves::seed () const
+{
+  return _data._seed;
 }
 
 }

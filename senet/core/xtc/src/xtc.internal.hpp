@@ -129,12 +129,10 @@ public:
   int* board (int* buffer) const;
   Moves moves (Rules) const;
   Event increment (Rules) const;
-
-  float evaluate () const;
-
-  uint64_t seed () const;
   Unit agent () const;
   int steps () const;
+  float expectation () const;
+  uint64_t seed () const;
 }; // class state
 
 class Moves
@@ -202,6 +200,7 @@ public:
   Unit agent () const;
   int mobility () const;
   Action direction () const;
+  uint64_t seed () const;
 }; // class moves
 
 class Event
@@ -255,6 +254,7 @@ public:
   Action action () const;
   int start () const;
   int destination () const;
+  uint16_t seed () const;
 }; // class event
 
 // functor class
