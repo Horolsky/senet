@@ -1,10 +1,9 @@
 """
 wrapper for builtin structures
 """
-from .xtc import State, Moves, Event, cnst, uint64_t #, Unit, RUles, Action, House
-# from .cnst import DEF_SEED
+from .xtc import State, Moves, Event
+from .constants import BOARD_SIZE
 from .enums import Action, Rules, Unit, House
-from ctypes import c_int, c_uint64, byref
 from array import array
 from typing import Union, Tuple
 
@@ -65,7 +64,7 @@ class Ply:
             return self.__event.destination()
 
     def __init__(self, state: Union[int, State] = State(), rules: Rules = Rules.MEUB, event: Event = Event()):
-        if type(state) not in (int, uint64_t, State):
+        if type(state) not in (int, State.seed_type, State):
             raise TypeError("invalid state type") 
         if type(rules) != Rules:
             raise TypeError("invalid rules type") 
@@ -73,8 +72,8 @@ class Ply:
             raise TypeError("invalid event type") 
         
         
-        if type(state) in (int, uint64_t):
-            state = State(uint64_t(state))
+        if type(state) in (int, State.seed_type):
+            state = State(State.seed_type(state))
         self.__state = state
         self.__seed = state.seed()
         self.__board = None
@@ -98,7 +97,7 @@ class Ply:
     @property
     def board(self) -> Tuple[Unit]:
         if self.__board is None:
-            cont = array('i', [0 for _ in range(30)])
+            cont = array('i', [0 for _ in range(BOARD_SIZE)])
             self.__state.board(cont)
             self.__board = tuple(map(lambda x: Unit(x), cont))
             del cont
