@@ -2,12 +2,12 @@
 #include "xtc.common.hpp"
 
 _XTC_BULK_EXTERN(int*)
+_XTC_SCALAR_EXTERN(int)
 
 namespace xtc
 {
-//ENUMS
 
-// enum class House;
+// namespace House;
 // enum class Unit;
 // enum class Action;
 // enum class Rules;
@@ -45,15 +45,16 @@ const int max_branching{ 7 };
 
 } // namespace cnst
 
-enum class House
+namespace House
 {
-  REBIRTH = 14,
-  BEAUTY = 26,
-  WATERS = 26,
-  TRUTHS = 27,
-  ATOUM = 28,
-  SCARAB = 29
-};
+  const int REBIRTH = 14;
+  const int BEAUTY = 25;
+  const int WATERS = 26;
+  const int TRUTHS = 27;
+  const int ATOUM = 28;
+  const int SCARAB = 29;
+  const int NETHER = 30;
+}
 
 // board cell unit
 enum class Unit
@@ -137,6 +138,7 @@ public:
 
   
   int* board (int* buffer) const;
+  Unit board (int) const;
   
   Unit agent () const;
   int steps () const;
@@ -168,7 +170,7 @@ class Moves
     };
   } bitfield;
   bitfield _data{ ._seed = 0UL };
-
+  int add_move(int index, Action action);
 public:
   friend class State;
   friend class Emax;
