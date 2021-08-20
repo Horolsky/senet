@@ -23,7 +23,7 @@ class Emax;
 
 namespace cnst
 {
-const uint64_t def_state
+const uint64_t def_state_seed
 {
   0b1010101010101010101010101010101010101010010001000100010001000000
 };
@@ -38,7 +38,7 @@ const size_t board_size{ 30UL };
 const size_t max_moves{ 7UL };
 
 // chance steps probabilities
-const float P[6] {0, .25, .375, .25, .0625, .0625}; 
+const float chance_prob[6] {0, .25, .375, .25, .0625, .0625}; 
 // 0.5 Mb
 const int max_deque{ 524288 }; 
 const int max_branching{ 7 };
@@ -108,7 +108,7 @@ public:
   static
   uint64_t seed (Unit _agent, int _steps, int* _board);
 
-  State () { _data._seed = cnst::def_state; }
+  State () { _data._seed = cnst::def_state_seed; }
   State (uint64_t _seed) { _data._seed = _seed; }
   State (const State &other) : _data (other._data) {}
   State (State &&other) : _data (other._data) {}
