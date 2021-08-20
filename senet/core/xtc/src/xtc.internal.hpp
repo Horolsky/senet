@@ -209,7 +209,10 @@ public:
   Moves &operator= (Moves &&other);
 
   int* indici (int* buffer) const;
+  int indici (int index) const;
   int* actions (int* buffer) const;
+  Action actions (int index) const;
+  
   Unit agent () const;
   int mobility () const;
   Action direction () const;

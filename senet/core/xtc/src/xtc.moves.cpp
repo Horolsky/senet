@@ -40,12 +40,24 @@ Moves::indici (int *buffer) const
   return buffer;
 }
 
+int
+Moves::indici (int index) const
+{
+  return bitf::solid::get_scalar<int, uint64_t> (_data._indici,index, cnst::indici_offset);
+}
+
 int *
 Moves::actions (int *buffer) const
 {
   bitf::solid::get_bulk<int *, uint64_t> (
       buffer, buffer + _data._mobility, _data._actions, cnst::actions_offset);
   return buffer;
+}
+
+Action
+Moves::actions (int index) const
+{
+  return static_cast<Action>(bitf::solid::get_scalar<int, uint64_t> (_data._actions,index, cnst::actions_offset));
 }
 
 Unit
