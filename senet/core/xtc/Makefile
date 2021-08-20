@@ -8,7 +8,8 @@ PROJ_SO = $(PROJ_N)-$(PROJ_V)-$(MACHINE_NAME)-$(KERNEL_NAME).so
 
 CPPFLAGS += -isystem $(GTEST_DIR)/include
 # TODO: flag for clang -Wgnu-anonymous-struct to avoid -std=gnu++2a
-CXXFLAGS += -pthread -fPIC -g -std=gnu++14 -Wall -Wextra -pedantic 
+TESTFLAGS += -pthread -fPIC -g -std=gnu++14 -Wall -Wextra -pedantic 
+BUILDFLAGS += -pthread -fPIC -std=gnu++14 -O3
 #  -fsanitize=address,undefined
 LDFLAGS += -fsanitize=address,undefined
 
@@ -20,14 +21,20 @@ BLD_D := build
 #external dependencies
 DEPS = $(LIB_D)/bitf
 
-UNITS_H = $(SRC_D)/*.hpp
-UNITS_O := $(patsubst $(SRC_D)/%.cpp, $(BLD_D)/%.o, $(wildcard $(SRC_D)/*.cpp))
+HEADERS = $(SRC_D)/*.hpp
+BLD_O := $(patsubst $(SRC_D)/%.cpp, $(BLD_D)/%.o, $(wildcard $(SRC_D)/*.cpp))
+TST_O := $(patsubst $(SRC_D)/%.cpp, $(TST_D)/%.o, $(wildcard $(SRC_D)/*.cpp))
 source = $(patsubst $(BLD_D)/%.o, $(SRC_D)/%.cpp, $(1))
+testsource = $(patsubst $(TST_D)/%.o, $(SRC_D)/%.cpp, $(1))
 
 #build object file
-$(UNITS_O): $(UNITS_H) $(DEPS)
-	$(CXX) $(CPPFLAGS) -I$(SRC_D) $(CXXFLAGS) -c \
+$(BLD_O): $(HEADERS) $(DEPS)
+	$(CXX) $(CPPFLAGS) -I$(SRC_D) $(BUILDFLAGS) -c \
             $(call source, $@) -o $@
+
+$(TST_O): $(HEADERS) $(DEPS)
+	$(CXX) $(CPPFLAGS) -I$(SRC_D) $(TESTFLAGS) -c \
+            $(call testsource, $@) -o $@
 
 print:
 	@echo $(PROJ_SO)
@@ -37,8 +44,11 @@ $(DEPS): update_libs
 update_libs:
 	make -C $(LIB_D) update
 
-build: $(UNITS_O)
-	$(CXX) $(CPPFLAGS) $(UNITS_O) -shared -o $(BLD_D)/$(PROJ_SO)
+$(BLD_D):
+	mkdir -p $(BLD_D)
+
+setup: $(BLD_D) clean $(BLD_O)
+	$(CXX) $(BUILDFLAGS) $(BLD_O) -shared -o $(BLD_D)/$(PROJ_SO)
 
 all : test
 
@@ -57,7 +67,7 @@ clean_test:
 	rm -fr test/*.o test/*.a test/gtest_entry
 
 clean: clean_test
-	rm -fr build/*
+	rm -fr $(BLD_D)/*
 
 # GOOGLE_TESTS: PREPARATION
 
@@ -72,7 +82,7 @@ GTEST_O = $(addprefix $(TST_D)/, gtest-all.o gtest_main.o)
 gtsrc = $(patsubst $(TST_D)/%.o, $(GTEST_DIR)/src/%.cc, $(1))
 
 $(GTEST_O): $(GTEST_SRCS_)
-	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
+	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(TESTFLAGS) -c \
             $(call gtsrc, $@) -o $@
 
 $(GTEST_MAIN) : $(GTEST_O)
@@ -82,11 +92,11 @@ $(GTEST_MAIN) : $(GTEST_O)
 TEST_ENTRY = $(TST_D)/gtest_entry.cpp
 
 $(TST_D)/gtest_entry.o : $(TEST_ENTRY) $(TST_D)/*.hpp $(SRC_D)/*.hpp $(GTEST_HEADERS) $(DEPS)
-	$(CXX) $(CPPFLAGS) -I$(SRC_D) $(CXXFLAGS) -c $(TEST_ENTRY) -o $@
+	$(CXX) $(CPPFLAGS) -I$(SRC_D) $(TESTFLAGS) -c $(TEST_ENTRY) -o $@
 
-$(TST_D)/gtest_entry : $(TST_D)/gtest_entry.o $(GTEST_MAIN) $(UNITS_O)
+$(TST_D)/gtest_entry : $(TST_D)/gtest_entry.o $(GTEST_MAIN) $(TST_O)
 	@echo "Building $@ for $(KERNEL_NAME) $(MACHINE_NAME)"
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ 
+	$(CXX) $(CPPFLAGS) $(TESTFLAGS) -lpthread $^ -o $@ 
 
 test: $(TST_D)/gtest_entry
 	$(TST_D)/gtest_entry
