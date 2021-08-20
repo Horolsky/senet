@@ -30,6 +30,11 @@ State::board (int *buffer) const
   return buffer;
 }
 
+Unit State::board (int index) const
+{
+  return static_cast<Unit>(bitf::solid::get_scalar<int, uint64_t>(_data._board, index, cnst::board_offset));
+}
+
 Unit
 State::agent () const
 {
