@@ -7,14 +7,14 @@ namespace xtc
 using namespace cnst;
 
 uint64_t
-State::build_seed (Unit _agent, int _steps, int *_board)
+State::build_seed (Unit agent, int steps, int *board)
 {
-  bitfield data{ ._seed = 0UL };
-  data._agent = static_cast<uint64_t> (_agent);
-  data._steps = _steps;
-  data._board = bitf::solid::set_bulk<int *, uint64_t> (
-      _board, _board + cnst::board_size, 0UL, cnst::board_offset);
-  return data._seed;
+  bitfield data{ .seed = 0UL };
+  data.agent = static_cast<uint64_t> (agent);
+  data.steps = steps;
+  data.board = bitf::solid::set_bulk<int *, uint64_t> (
+      board, board + cnst::board_size, 0UL, cnst::board_offset);
+  return data.seed;
 }
 
 /**
@@ -26,7 +26,7 @@ int *
 State::board (int *buffer) const
 {
   bitf::solid::get_bulk<int *, uint64_t> (buffer, buffer + cnst::board_size,
-                                          _data._board, cnst::board_offset);
+                                          _data.board, cnst::board_offset);
   return buffer;
 }
 
@@ -34,18 +34,18 @@ Unit
 State::board (int index) const
 {
   return static_cast<Unit> (bitf::solid::get_scalar<int, uint64_t> (
-      _data._board, index, cnst::board_offset));
+      _data.board, index, cnst::board_offset));
 }
 
 Unit
 State::agent () const
 {
-  return static_cast<Unit> (_data._agent);
+  return static_cast<Unit> (_data.agent);
 }
 int
 State::steps () const
 {
-  return (int)_data._steps;
+  return (int)_data.steps;
 }
 
 State &
@@ -63,29 +63,29 @@ State::operator= (State &&other)
 void
 State::set_agent (Unit agent)
 {
-  _data._agent = static_cast<uint64_t> (agent);
+  _data.agent = static_cast<uint64_t> (agent);
 }
 void
 State::set_steps (int steps)
 {
-  _data._steps = steps;
+  _data.steps = steps;
 }
 void
 State::update_board (int index, Unit unit)
 {
-  _data._board = bitf::solid::set_scalar (
-      _data._board, index, cnst::board_offset, static_cast<int> (unit));
+  _data.board = bitf::solid::set_scalar (
+      _data.board, index, cnst::board_offset, static_cast<int> (unit));
 }
 uint64_t
 State::seed () const
 {
-  return _data._seed;
+  return _data.seed;
 }
 
 float
 State::expectation () const
 {
-  uint64_t seed = _data._seed;
+  uint64_t seed = _data.seed;
   uint8_t maxSum = 0;
   uint8_t minSum = 0;
   for (uint8_t i = 4; i < 64; i += 2)
@@ -110,33 +110,33 @@ Moves
 State::moves_kendall () const
 {
   Moves moves (0);
-  Unit agent = static_cast<Unit> (_data._agent);
-  Unit enemy = static_cast<Unit> (_data._agent ^ 1);
+  Unit agent = static_cast<Unit> (_data.agent);
+  Unit enemy = static_cast<Unit> (_data.agent ^ 1);
 
   /* HOUSE OF WATER PENALTY */
   if (board (House::WATERS) == agent)
     {
-      if (_data._steps == 4)
+      if (_data.steps == 4)
         {
           moves.add_move (House::WATERS, Action::ESCAPE);
-          moves._data._direction = 1;
+          moves._data.direction = 1;
         }
       else if (board (House::REBIRTH) == Unit::NONE)
         {
           moves.add_move (House::REBIRTH, Action::DROW);  // reborning
           moves.add_move (House::SKIPTURN, Action::SKIP); // skipping
-          moves._data._direction = 2;                     // keep this not 0
+          moves._data.direction = 2;                      // keep this not 0
         }
       return moves;
     }
   /* DIRECT MOVE */
-  moves._data._direction = 1;
+  moves._data.direction = 1;
   for (int i = 0; i < cnst::board_size; i++)
     {
       Unit cell_occupation = board (i);
       if (cell_occupation != agent)
         continue;
-      int dest = i + _data._steps;
+      int dest = i + _data.steps;
       Unit trgt = board (dest);
       if (i == House::SCARAB)
         moves.add_move (i, Action::ESCAPE); // always escaping
@@ -163,11 +163,11 @@ State::moves_kendall () const
         }
     }
   /* REVERSE MOVE */
-  if (moves._data._mobility == 0)
+  if (moves._data.mobility == 0)
     {
-      moves._data._direction = 2;
+      moves._data.direction = 2;
 
-      Unit trgt = board (0); // state._board % 4;
+      Unit trgt = board (0); // state.board % 4;
       for (int i = 1; i < cnst::board_size; i++)
         {
           Unit cell = board (i);
@@ -189,8 +189,8 @@ State::moves_kendall () const
         }
     }
   /* SKIP MOVE */
-  if (moves._data._mobility == 0)
-    moves._data._direction = 0;
+  if (moves._data.mobility == 0)
+    moves._data.direction = 0;
   return moves;
 }
 
@@ -198,16 +198,16 @@ Moves
 State::moves_meub () const
 {
   Moves moves (0);
-  Unit agent = static_cast<Unit> (_data._agent);
-  Unit enemy = static_cast<Unit> (_data._agent ^ 1);
+  Unit agent = static_cast<Unit> (_data.agent);
+  Unit enemy = static_cast<Unit> (_data.agent ^ 1);
   /* DIRECT MOVE */
-  moves._data._direction = 1;
+  moves._data.direction = 1;
   for (int i = 0; i < cnst::board_size; i++)
     {
       Unit cell_occupation = board (i);
       if (cell_occupation != agent)
         continue;
-      int dest = i + _data._steps;
+      int dest = i + _data.steps;
       Unit trgt = board (dest);
       if (i == House::SCARAB)
         moves.add_move (i, Action::ESCAPE); // always escaping
@@ -229,9 +229,9 @@ State::moves_meub () const
         }
     }
   /* REVERSE MOVE */
-  if (moves._data._mobility == 0)
+  if (moves._data.mobility == 0)
     {
-      moves._data._direction = 2;
+      moves._data.direction = 2;
       Unit trgt = board (0);
       for (int i = 1; i < House::NETHER; i++)
         {
@@ -242,8 +242,8 @@ State::moves_meub () const
         }
     }
   /* SKIP MOVE */
-  if (moves._data._mobility == 0)
-    moves._data._direction = 0;
+  if (moves._data.mobility == 0)
+    moves._data.direction = 0;
   return moves;
 }
 
@@ -263,25 +263,25 @@ State::get_moves_f (Rules rules)
 }
 
 State
-State::increment_kendall (int index,
-                          Moves moves = Moves(0UL)) const
+State::increment_kendall (int index, Moves moves = Moves (0UL)) const
 {
-  if (moves._data._mobility > 0 && !moves.contains (index))
+  if (moves._data.mobility > 0 && !moves.contains (index))
     throw "illegal move";
-  if (moves._data._seed == 0UL) moves = this->moves_kendall ();
+  if (moves._data.seed == 0UL)
+    moves = this->moves_kendall ();
 
-  Unit agent = static_cast<Unit> (_data._agent);
-  Unit enemy = static_cast<Unit> (_data._agent ^ 1);
-  int steps = _data._steps;
+  Unit agent = static_cast<Unit> (_data.agent);
+  Unit enemy = static_cast<Unit> (_data.agent ^ 1);
+  int steps = _data.steps;
 
   /* next step preparation */
-  State new_state (_data._seed);
-  new_state._data._steps = 0;
-  //next agent rule
+  State new_state (_data.seed);
+  new_state._data.steps = 0;
+  // next agent rule
   if (steps == 1 || steps == 4 || steps == 5)
-    new_state._data._agent = _data._agent; // bonus move
+    new_state._data.agent = _data.agent; // bonus move
   else
-    new_state._data._agent = (_data._agent ^ 1); // normal move
+    new_state._data.agent = (_data.agent ^ 1); // normal move
 
   Action action = moves.actions (index);
 
@@ -329,7 +329,7 @@ State::increment_kendall (int index,
         }
       break;
     default:
-      new_state._data._seed = 0UL; // corrupted logic
+      new_state._data.seed = 0UL; // corrupted logic
       break;
     }
 

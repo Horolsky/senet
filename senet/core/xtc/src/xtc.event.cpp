@@ -4,14 +4,14 @@
 namespace xtc
 {
 uint64_t
-Event::build_seed (Unit _agent, Action _action, int _start, int _destination)
+Event::build_seed (Unit agent, Action action, int start, int destination)
 {
-  bitfield data{ ._seed = 0 };
-  data._agent = static_cast<uint64_t>(_agent);
-  data._action = static_cast<uint64_t>(_action);
-  data._start = _start;
-  data._destination = _destination;
-  return data._seed;
+  bitfield data{ .seed = 0 };
+  data.agent = static_cast<uint64_t>(agent);
+  data.action = static_cast<uint64_t>(action);
+  data.start = start;
+  data.destination = destination;
+  return data.seed;
 }
 
 Event &
@@ -30,27 +30,27 @@ Event::operator= (Event &&other)
 Unit
 Event::agent () const
 {
-  return static_cast<Unit>(_data._agent);
+  return static_cast<Unit>(_data.agent);
 }
 Action
 Event::action () const
 {
-  return static_cast<Action>(_data._action);
+  return static_cast<Action>(_data.action);
 }
 int
 Event::start () const
 {
-  return _data._start;
+  return _data.start;
 }
 int
 Event::destination () const
 {
-  return _data._destination;
+  return _data.destination;
 }
 
 uint16_t Event::seed () const
 {
-  return _data._seed;
+  return _data.seed;
 }
 
 }
