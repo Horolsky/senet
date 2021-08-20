@@ -15,7 +15,7 @@ namespace xtc
 // GAME OBJECTS
 
 class State;
-class Moves;
+class Strategies;
 class Emax;
 
 namespace cnst
@@ -31,7 +31,7 @@ const size_t indici_offset{ 5UL };
 const size_t actions_offset{ 5UL };
 
 const size_t board_size{ 30UL };
-const size_t max_moves{ 7UL };
+const size_t max_strategies{ 7UL };
 
 // chance steps probabilities
 const float chance_prob[6]{ 0, .25, .375, .25, .0625, .0625 };
@@ -105,19 +105,19 @@ class State
   } bitfield;
   bitfield _data{ .seed = 0UL };
 
-  Moves moves_kendall () const;
-  Moves moves_meub () const;
-  State increment_kendall (int, Moves) const;
-  State increment_meub (int, Moves) const;
+  Strategies strategies_kendall () const;
+  Strategies strategies_meub () const;
+  State increment_kendall (int, Strategies) const;
+  State increment_meub (int, Strategies) const;
   void update_board (int index, Unit unit);
 
 public:
   friend class Emax;
   using seed_type = uint64_t;
-  using increment_f = State (State::*) (int, Moves) const;
-  using moves_f = Moves (State::*) () const;
+  using increment_f = State (State::*) (int, Strategies) const;
+  using strategies_f = Strategies (State::*) () const;
   static uint64_t build_seed (Unit agent, int steps, int *board);
-  static moves_f get_moves_f (Rules);
+  static strategies_f get_strategies_f (Rules);
   static increment_f get_increment_f (Rules);
 
   State () { _data.seed = cnst::def_state_seed; }
@@ -146,7 +146,7 @@ public:
   uint64_t seed () const;
 }; // class state
 
-class Moves
+class Strategies
 {
   /**
    * 1 bit: agent
@@ -170,7 +170,7 @@ class Moves
     };
   } bitfield;
   bitfield _data{ .seed = 0UL };
-  int add_move (int index, Action action);
+  int push (int index, Action action);
 
 public:
   friend class State;
@@ -181,31 +181,31 @@ public:
   static uint64_t build_seed (Unit agent, Action direction, int mobility,
                               int *indici);
 
-  Moves () = default;
-  Moves (uint64_t seed) { _data.seed = seed; }
-  Moves (const Moves &other) : _data (other._data) {}
-  Moves (Moves &&other) : _data (other._data) {}
+  Strategies () = default;
+  Strategies (uint64_t seed) { _data.seed = seed; }
+  Strategies (const Strategies &other) : _data (other._data) {}
+  Strategies (Strategies &&other) : _data (other._data) {}
 
-  Moves (Unit agent, Action direction, int mobility, int *indici, int *actions)
+  Strategies (Unit agent, Action direction, int mobility, int *indici, int *actions)
   {
     _data.seed = build_seed (agent, direction, mobility, indici, actions);
   }
 
-  Moves (Unit agent, Action direction, int mobility, int *indici)
+  Strategies (Unit agent, Action direction, int mobility, int *indici)
   {
     _data.seed = build_seed (agent, direction, mobility, indici);
   }
 
-  Moves (const State &state, Rules rules)
+  Strategies (const State &state, Rules rules)
   {
-    State::moves_f f = State::get_moves_f (rules);
+    State::strategies_f f = State::get_strategies_f (rules);
     _data = (state.*f) ()._data;
   }
 
-  ~Moves () = default;
+  ~Strategies () = default;
 
-  Moves &operator= (const Moves &other);
-  Moves &operator= (Moves &&other);
+  Strategies &operator= (const Strategies &other);
+  Strategies &operator= (Strategies &&other);
 
   int *indici (int *buffer) const;
   int indici (int index) const;
@@ -217,7 +217,7 @@ public:
   Action direction () const;
   bool contains (int) const;
   uint64_t seed () const;
-}; // class moves
+}; // class strategies
 
 // functor class
 class Emax

@@ -3,7 +3,7 @@
 #include "../src/xtc.internal.hpp"
 #include "gtest/gtest.h"
 
-TEST (xMoves, init)
+TEST (Strategies, init)
 {
-    EXPECT_NO_THROW(xtc::Moves());
+    EXPECT_NO_THROW(xtc::Strategies());
 }

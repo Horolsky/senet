@@ -1,7 +1,7 @@
 """
 wrapper for builtin structures
 """
-from .xtc import State, Moves
+from .xtc import State, Strategies
 from .constants import BOARD_SIZE
 from .enums import Action, Rules, Unit, House
 from array import array
@@ -11,15 +11,15 @@ class Ply:
     """
     senet game ply
     """
-    class MovesView:
-        def __init__(self, moves: Moves):
-            self.__moves = moves
+    class StrategiesView:
+        def __init__(self, strategies: Strategies):
+            self.__strategies = strategies
             self.__indici = None
             self.__actions = None
         
         @property
         def mobility(self) -> int:
-            return self.__moves.mobility()
+            return self.__strategies.mobility()
         @property
         def indici(self) -> Tuple[int]:
             if self.__indici is None:
@@ -27,7 +27,7 @@ class Ply:
                     self.__indici = ()
                 else:
                     cont = array('i', [0 for _ in range(self.mobility)])
-                    self.__moves.indici(cont)
+                    self.__strategies.indici(cont)
                     self.__indici = tuple(cont)
                     del cont
             return self.__indici
@@ -38,7 +38,7 @@ class Ply:
                     self.__actions = ()
                 else:
                     cont = array('i', [0 for _ in range(self.mobility)])
-                    self.__moves.actions(cont)
+                    self.__strategies.actions(cont)
                     self.__actions = tuple(map(lambda x: Action(x), cont))
                     del cont
             return self.__actions
@@ -79,7 +79,7 @@ class Ply:
         
         self.__rules = rules.value
         self.__event = event
-        self.__moves = Ply.MovesView(Moves(state, rules.value))
+        self.__strategies = Ply.StrategiesView(Strategies(state, rules.value))
 
     @property
     def seed(self) -> int:
@@ -108,6 +108,6 @@ class Ply:
     def event(self) -> Event:
         return self.__event
     @property
-    def moves(self) -> MovesView:
-        return self.__moves
+    def strategies(self) -> StrategiesView:
+        return self.__strategies
     
