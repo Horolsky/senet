@@ -111,6 +111,8 @@ class State
 public:
   friend class Emax;
   using seed_type = uint64_t;
+  using increment_f = State (State::*)() const;
+  using moves_f = Moves (State::*)() const;
   static
   uint64_t seed (Unit _agent, int _steps, int* _board);
 
@@ -133,8 +135,8 @@ public:
 
   
   int* board (int* buffer) const;
-  Moves moves (Rules) const;
-  State increment (Rules) const;
+  moves_f moves (Rules) const;
+  increment_f increment (Rules) const;
   Unit agent () const;
   int steps () const;
   float expectation () const;
@@ -194,7 +196,8 @@ public:
 
   Moves (const State &state, Rules rules)
   {
-    _data = state.moves (rules)._data;
+    State::moves_f f = state.moves (rules);
+    _data = (state.*f)()._data;
   }
 
   ~Moves () = default;

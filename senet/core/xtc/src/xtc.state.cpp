@@ -106,16 +106,16 @@ State::moves_meub () const
   return Moves ();
 }
 
-Moves
+State::moves_f
 State::moves (Rules rules) const
 {
   if (rules == Rules::KENDALL)
     {
-      return moves_kendall ();
+      return &State::moves_kendall;
     }
   else if (rules == Rules::MEUB)
     {
-      return moves_meub ();
+      return &State::moves_meub;
     }
   else
     throw "invalid rules";
@@ -133,16 +133,16 @@ State::increment_meub () const
   return State ();
 }
 
-State
+State::increment_f
 State::increment (Rules rules) const
 {
   if (rules == Rules::KENDALL)
     {
-      return increment_kendall ();
+      return &State::increment_kendall;
     }
   else if (rules == Rules::MEUB)
     {
-      return increment_meub ();
+      return &State::increment_meub;
     }
   else
     throw "invalid rules";
