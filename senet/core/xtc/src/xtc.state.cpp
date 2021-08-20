@@ -10,7 +10,7 @@ uint64_t
 State::seed (Unit _agent, int _steps, int *_board)
 {
   bitfield data{ ._seed = 0UL };
-  data._agent = static_cast<uint64_t>(_agent);
+  data._agent = static_cast<uint64_t> (_agent);
   data._steps = _steps;
   data._board = bitf::solid::set_bulk<int *, uint64_t> (
       _board, _board + cnst::board_size, 0UL, cnst::board_offset);
@@ -25,16 +25,15 @@ State::seed (Unit _agent, int _steps, int *_board)
 int *
 State::board (int *buffer) const
 {
-  bitf::solid::get_bulk<int *, uint64_t> (
-      buffer, buffer + cnst::board_size, _data._board,
-      cnst::board_offset);
+  bitf::solid::get_bulk<int *, uint64_t> (buffer, buffer + cnst::board_size,
+                                          _data._board, cnst::board_offset);
   return buffer;
 }
 
 Unit
 State::agent () const
 {
-  return static_cast<Unit>(_data._agent);
+  return static_cast<Unit> (_data._agent);
 }
 int
 State::steps () const
@@ -57,7 +56,7 @@ State::operator= (State &&other)
 void
 State::set_agent (Unit agent)
 {
-  _data._agent = static_cast<uint64_t>(agent);
+  _data._agent = static_cast<uint64_t> (agent);
 }
 void
 State::set_steps (int steps)
@@ -65,31 +64,10 @@ State::set_steps (int steps)
   _data._steps = steps;
 }
 
-Moves
-moves_kendall (State state)
+uint64_t
+State::seed () const
 {
-  return Moves ();
-}
-
-Moves
-moves_meub (State state)
-{
-  return Moves ();
-}
-
-Moves
-State::moves (Rules rules) const
-{
-  if (rules == Rules::KENDALL)
-    {
-      return Moves (); // moves_kendall (this);
-    }
-  else if (rules == Rules::MEUB)
-    {
-      return Moves (); // moves_meub (this);
-    }
-  else
-    throw "invalid rules";
+  return _data._seed;
 }
 
 float
@@ -116,9 +94,58 @@ State::expectation () const
   return res;
 }
 
-uint64_t State::seed () const
+Moves
+State::moves_kendall () const
 {
-  return _data._seed;
+  return Moves ();
+}
+
+Moves
+State::moves_meub () const
+{
+  return Moves ();
+}
+
+Moves
+State::moves (Rules rules) const
+{
+  if (rules == Rules::KENDALL)
+    {
+      return moves_kendall ();
+    }
+  else if (rules == Rules::MEUB)
+    {
+      return moves_meub ();
+    }
+  else
+    throw "invalid rules";
+}
+
+State
+State::increment_kendall () const
+{
+  return State ();
+}
+
+State
+State::increment_meub () const
+{
+  return State ();
+}
+
+State
+State::increment (Rules rules) const
+{
+  if (rules == Rules::KENDALL)
+    {
+      return increment_kendall ();
+    }
+  else if (rules == Rules::MEUB)
+    {
+      return increment_meub ();
+    }
+  else
+    throw "invalid rules";
 }
 
 } // namespace xtc

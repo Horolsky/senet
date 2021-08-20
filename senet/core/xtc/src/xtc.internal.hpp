@@ -103,7 +103,13 @@ class State
   } bitfield;
   bitfield _data{ ._seed = 0UL };
 
+  Moves moves_kendall () const;
+  Moves moves_meub () const;
+  State increment_kendall () const;
+  State increment_meub () const;
+
 public:
+  friend class Emax;
   using seed_type = uint64_t;
   static
   uint64_t seed (Unit _agent, int _steps, int* _board);
@@ -128,7 +134,7 @@ public:
   
   int* board (int* buffer) const;
   Moves moves (Rules) const;
-  Event increment (Rules) const;
+  State increment (Rules) const;
   Unit agent () const;
   int steps () const;
   float expectation () const;
@@ -162,6 +168,7 @@ class Moves
 
 public:
   friend class State;
+  friend class Emax;
   using seed_type = uint64_t;
   static uint64_t seed (Unit _agent, Action _direction, int _mobility, int* _indici, int* _actions);
   static uint64_t seed (Unit _agent, Action _direction, int _mobility, int* _indici);
@@ -229,6 +236,7 @@ class Event
 
 public:
   friend class State;
+  friend class Emax;
   using seed_type = uint16_t;
   static uint64_t
   seed (Unit _agent, Action _action, int _start,
