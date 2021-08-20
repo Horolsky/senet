@@ -168,7 +168,40 @@ State::moves_kendall () const
 Moves
 State::moves_meub () const
 {
-  return Moves ();
+  Moves moves(0);
+  Unit agent = static_cast<Unit>(_data._agent);
+  Unit enemy = static_cast<Unit>(_data._agent ^ 1);
+    /* DIRECT MOVE */
+    moves._data._direction = 1;
+    for (int i = 0; i < cnst::board_size; i++){
+        Unit cell_occupation = board(i);
+        if (cell_occupation != agent) continue;
+        int dest = i + _data._steps;
+        Unit trgt = board(dest);
+        if (i == House::SCARAB) moves.add_move(i,Action::ESCAPE); // always escaping
+        else if (i >= House::BEAUTY && dest == House::NETHER) moves.add_move(i, Action::ESCAPE);     // correct escaping
+        else if (i != House::BEAUTY && dest > House::BEAUTY) continue;                        // forbidden house arriving
+        else if (dest > House::SCARAB) continue;                                   // forbidden escaping
+        else if (trgt == Unit::NONE) moves.add_move(i, Action::MOVE);                // normal movement
+        else if (trgt == enemy) {                                       // attack
+            Unit prev = dest > 0 ? board(dest-1) : Unit::NONE;
+            Unit nxt = dest < House::SCARAB ? board(dest+1) : Unit::NONE;
+            if (prev != enemy && nxt != enemy) moves.add_move(i, Action::ATTACK);
+        }
+    }
+    /* REVERSE MOVE */
+    if (moves._data._mobility == 0){   
+        moves._data._direction = 2;                      
+        Unit trgt = board(0);
+        for (int i = 1; i < House::NETHER; i++) {
+            Unit cell = board(i);
+            if (cell == agent && trgt == Unit::NONE) moves.add_move(i, Action::RETREAT);
+            trgt = cell;
+        }
+    }
+    /* SKIP MOVE */
+    if (moves._data._mobility == 0) moves._data._direction = 0;
+    return moves;
 }
 
 State::moves_f
