@@ -80,7 +80,7 @@ class Ply:
         
         self.__rules = rules.value
         self.__event = Ply.EventView(event)
-        self.__moves = Ply.MovesView(state.moves(rules.value))
+        self.__moves = Ply.MovesView(Moves(state, rules.value))
 
     @property
     def seed(self) -> int:
