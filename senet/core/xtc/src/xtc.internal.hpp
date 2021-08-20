@@ -114,7 +114,9 @@ public:
   using increment_f = State (State::*)() const;
   using moves_f = Moves (State::*)() const;
   static
-  uint64_t seed (Unit _agent, int _steps, int* _board);
+  uint64_t build_seed (Unit _agent, int _steps, int* _board);
+  static moves_f get_moves_f (Rules);
+  static increment_f get_increment_f (Rules);
 
   State () { _data._seed = cnst::def_state_seed; }
   State (uint64_t _seed) { _data._seed = _seed; }
@@ -123,7 +125,7 @@ public:
 
   State (Unit _agent, int _steps, int *_board)
   {
-    _data._seed = seed (_agent, _steps, _board);
+    _data._seed = build_seed (_agent, _steps, _board);
   }
 
   ~State () = default;
@@ -135,8 +137,7 @@ public:
 
   
   int* board (int* buffer) const;
-  moves_f moves (Rules) const;
-  increment_f increment (Rules) const;
+  
   Unit agent () const;
   int steps () const;
   float expectation () const;
@@ -172,8 +173,8 @@ public:
   friend class State;
   friend class Emax;
   using seed_type = uint64_t;
-  static uint64_t seed (Unit _agent, Action _direction, int _mobility, int* _indici, int* _actions);
-  static uint64_t seed (Unit _agent, Action _direction, int _mobility, int* _indici);
+  static uint64_t build_seed (Unit _agent, Action _direction, int _mobility, int* _indici, int* _actions);
+  static uint64_t build_seed (Unit _agent, Action _direction, int _mobility, int* _indici);
 
   Moves () = default;
   Moves (uint64_t _seed) { _data._seed = _seed; }
@@ -184,19 +185,19 @@ public:
          int _mobility, int *_indici, int *_actions)
   {
     _data._seed
-        = seed (_agent, _direction, _mobility, _indici, _actions);
+        = build_seed (_agent, _direction, _mobility, _indici, _actions);
   }
 
   Moves (Unit _agent, Action _direction,
          int _mobility, int *_indici)
   {
-    _data._seed = seed (_agent, _direction, _mobility, _indici);
+    _data._seed = build_seed (_agent, _direction, _mobility, _indici);
   }
   
 
   Moves (const State &state, Rules rules)
   {
-    State::moves_f f = state.moves (rules);
+    State::moves_f f = State::get_moves_f (rules);
     _data = (state.*f)()._data;
   }
 
@@ -242,7 +243,7 @@ public:
   friend class Emax;
   using seed_type = uint16_t;
   static uint64_t
-  seed (Unit _agent, Action _action, int _start,
+  build_seed (Unit _agent, Action _action, int _start,
         int _destination);
 
   Event () = default;
@@ -253,7 +254,7 @@ public:
   Event (Unit _agent, Action _action, int _start,
          int _destination)
   {
-    _data._seed = seed (_agent, _action, _start, _destination);
+    _data._seed = build_seed (_agent, _action, _start, _destination);
   }
 
   ~Event () = default;

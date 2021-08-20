@@ -7,7 +7,7 @@ namespace xtc
 using namespace cnst;
 
 uint64_t
-State::seed (Unit _agent, int _steps, int *_board)
+State::build_seed (Unit _agent, int _steps, int *_board)
 {
   bitfield data{ ._seed = 0UL };
   data._agent = static_cast<uint64_t> (_agent);
@@ -107,7 +107,7 @@ State::moves_meub () const
 }
 
 State::moves_f
-State::moves (Rules rules) const
+State::get_moves_f (Rules rules)
 {
   if (rules == Rules::KENDALL)
     {
@@ -134,7 +134,7 @@ State::increment_meub () const
 }
 
 State::increment_f
-State::increment (Rules rules) const
+State::get_increment_f (Rules rules)
 {
   if (rules == Rules::KENDALL)
     {

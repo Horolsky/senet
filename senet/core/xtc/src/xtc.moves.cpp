@@ -6,7 +6,7 @@ namespace xtc
 {
 
 uint64_t
-Moves::seed (Unit _agent, Action _direction, int _mobility, int *_indici,
+Moves::build_seed (Unit _agent, Action _direction, int _mobility, int *_indici,
              int *_actions)
 {
   bitfield data{ ._seed = 0UL };
@@ -21,7 +21,7 @@ Moves::seed (Unit _agent, Action _direction, int _mobility, int *_indici,
 }
 
 uint64_t
-Moves::seed (Unit _agent, Action _direction, int _mobility, int *_indici)
+Moves::build_seed (Unit _agent, Action _direction, int _mobility, int *_indici)
 {
   bitfield data{ ._seed = 0UL };
   data._agent = static_cast<uint64_t>(_agent);

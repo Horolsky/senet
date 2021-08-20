@@ -4,7 +4,7 @@
 namespace xtc
 {
 uint64_t
-Event::seed (Unit _agent, Action _action, int _start, int _destination)
+Event::build_seed (Unit _agent, Action _action, int _start, int _destination)
 {
   bitfield data{ ._seed = 0 };
   data._agent = static_cast<uint64_t>(_agent);
