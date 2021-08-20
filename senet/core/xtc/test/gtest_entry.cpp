@@ -3,7 +3,6 @@
 
 #include "gtest_state.hpp"
 #include "gtest_moves.hpp"
-#include "gtest_event.hpp"
 #include "gtest_eval.hpp"
 
 int

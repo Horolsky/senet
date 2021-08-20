@@ -6,7 +6,7 @@ from os import path
 PATH = path.dirname(path.realpath(__file__))
 
 __HDR = [f"{PATH}/src/xtc.common.hpp", f"{PATH}/src/xtc.internal.hpp"]
-__SMBS = ["cnst", "House", "Unit", "Action", "Rules", "Moves", "Event", "Emax", "State"]
+__SMBS = ["cnst", "House", "Unit", "Action", "Rules", "Moves", "Emax", "State"]
 
 __STD_T = [
     (["uint8_t","uint16_t","uint32_t","uint64_t",], "cstdint"),

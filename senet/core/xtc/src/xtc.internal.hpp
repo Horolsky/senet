@@ -16,7 +16,6 @@ namespace xtc
 
 class State;
 class Moves;
-class Event;
 class Emax;
 
 namespace cnst
@@ -72,7 +71,9 @@ enum class Action
   DROW,
   ATTACK,
   ATTACK_HOUSE,
-  ESCAPE
+  ESCAPE,
+  NONE, //for game start
+  ERROR
 };
 
 // game rules
@@ -217,59 +218,6 @@ public:
   bool contains (int) const;
   uint64_t seed () const;
 }; // class moves
-
-class Event
-{
-  /**
-   * 1 bit: agent
-   * 3 bits: mobility
-   * 7x5bits: indici
-   * 7x3bits: actions
-   */
-  typedef struct
-  {
-    union
-    {
-      uint16_t seed;
-      struct
-      {
-        uint16_t agent : 1;
-        uint16_t action : 5;
-        uint16_t start : 5;
-        uint16_t destination : 5;
-      };
-    };
-  } bitfield;
-  bitfield _data{ .seed = 0UL };
-
-public:
-  friend class State;
-  friend class Emax;
-  using seed_type = uint16_t;
-  static uint64_t build_seed (Unit agent, Action action, int start,
-                              int destination);
-
-  Event () = default;
-  Event (uint16_t seed) { _data.seed = seed; }
-  Event (const Event &other) : _data (other._data) {}
-  Event (Event &&other) : _data (other._data) {}
-
-  Event (Unit agent, Action action, int start, int destination)
-  {
-    _data.seed = build_seed (agent, action, start, destination);
-  }
-
-  ~Event () = default;
-
-  Event &operator= (const Event &other);
-  Event &operator= (Event &&other);
-
-  Unit agent () const;
-  Action action () const;
-  int start () const;
-  int destination () const;
-  uint16_t seed () const;
-}; // class event
 
 // functor class
 class Emax
