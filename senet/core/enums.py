@@ -11,6 +11,8 @@ class House(Enum):
     TRUTHS = _House.TRUTHS
     ATOUM = _House.ATOUM
     SCARAB = _House.SCARAB
+    NETHER = _House.NETHER
+    SKIPTURN = _House.SKIPTURN
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}.{self.name}"
 
@@ -28,11 +30,17 @@ class Unit(Enum):
         return f"{self.__class__.__name__}.{self.name}"
 
 class Action(Enum):
+    
     SKIP = _Action.SKIP
     MOVE = _Action.MOVE
     RETREAT = _Action.RETREAT
-    ATTACK = _Action.ATTACK
-    ESCAPE = _Action.ESCAPE
+    SWAPBACK = _Action.SWAPBACK
     DROW = _Action.DROW
+    ATTACK = _Action.ATTACK
+    ATTACK_HOUSE = _Action.ATTACK_HOUSE
+    ESCAPE = _Action.ESCAPE
+    NONE = _Action.NONE
+    ERROR = _Action.ERROR
+
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}.{self.name}"
