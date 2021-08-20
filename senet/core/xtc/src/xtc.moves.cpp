@@ -7,12 +7,12 @@ namespace xtc
 
 uint64_t
 Moves::build_seed (Unit _agent, Action _direction, int _mobility, int *_indici,
-             int *_actions)
+                   int *_actions)
 {
   bitfield data{ ._seed = 0UL };
-  data._agent = static_cast<uint64_t>(_agent);
+  data._agent = static_cast<uint64_t> (_agent);
   data._mobility = _mobility;
-  data._direction = static_cast<uint64_t>(_direction);
+  data._direction = static_cast<uint64_t> (_direction);
   data._indici = bitf::solid::set_bulk<int *, uint64_t> (
       _indici, _indici + cnst::max_moves, 0UL, cnst::indici_offset);
   data._actions = bitf::solid::set_bulk<int *, uint64_t> (
@@ -24,9 +24,9 @@ uint64_t
 Moves::build_seed (Unit _agent, Action _direction, int _mobility, int *_indici)
 {
   bitfield data{ ._seed = 0UL };
-  data._agent = static_cast<uint64_t>(_agent);
+  data._agent = static_cast<uint64_t> (_agent);
   data._mobility = _mobility;
-  data._direction = static_cast<uint64_t>(_direction);
+  data._direction = static_cast<uint64_t> (_direction);
   data._indici = bitf::solid::set_bulk<int *, uint64_t> (
       _indici, _indici + cnst::max_moves, 0UL, cnst::indici_offset);
   return data._seed;
@@ -43,7 +43,8 @@ Moves::indici (int *buffer) const
 int
 Moves::indici (int index) const
 {
-  return bitf::solid::get_scalar<int, uint64_t> (_data._indici,index, cnst::indici_offset);
+  return bitf::solid::get_scalar<int, uint64_t> (_data._indici, index,
+                                                 cnst::indici_offset);
 }
 
 int *
@@ -57,13 +58,14 @@ Moves::actions (int *buffer) const
 Action
 Moves::actions (int index) const
 {
-  return static_cast<Action>(bitf::solid::get_scalar<int, uint64_t> (_data._actions,index, cnst::actions_offset));
+  return static_cast<Action> (bitf::solid::get_scalar<int, uint64_t> (
+      _data._actions, index, cnst::actions_offset));
 }
 
 Unit
 Moves::agent () const
 {
-  return static_cast<Unit>(_data._agent);
+  return static_cast<Unit> (_data._agent);
 }
 
 int
@@ -75,7 +77,7 @@ Moves::mobility () const
 Action
 Moves::direction () const
 {
-  return static_cast<Action>(_data._direction);
+  return static_cast<Action> (_data._direction);
 }
 
 Moves &
@@ -92,17 +94,33 @@ Moves::operator= (Moves &&other)
   return *this;
 }
 
-uint64_t Moves::seed () const
+bool
+Moves::contains (int index) const
+{
+  uint64_t indici = _data._indici;
+  for (int i = 0; i < _data._mobility; i++)
+    if ((indici >> (i * cnst::indici_offset)) & 0b11111UL == index)
+      return true;
+  return false;
+}
+
+uint64_t
+Moves::seed () const
 {
   return _data._seed;
 }
 
-int Moves::add_move(int index, Action action)
+int
+Moves::add_move (int index, Action action)
 {
-  if (_data._mobility == cnst::max_moves) return cnst::max_moves;
-  
-  _data._indici = bitf::solid::set_scalar(_data._indici, _data._mobility, cnst::indici_offset, index);
-  _data._actions = bitf::solid::set_scalar(_data._actions, _data._mobility, cnst::actions_offset, static_cast<int>(action));
+  if (_data._mobility == cnst::max_moves)
+    return cnst::max_moves;
+
+  _data._indici = bitf::solid::set_scalar (_data._indici, _data._mobility,
+                                           cnst::indici_offset, index);
+  _data._actions = bitf::solid::set_scalar (_data._actions, _data._mobility,
+                                            cnst::actions_offset,
+                                            static_cast<int> (action));
   return ++_data._mobility;
 }
 

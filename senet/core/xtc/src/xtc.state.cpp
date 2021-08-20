@@ -70,7 +70,12 @@ State::set_steps (int steps)
 {
   _data._steps = steps;
 }
-
+void
+State::update_board (int index, Unit unit)
+{
+  _data._board = bitf::solid::set_scalar (
+      _data._board, index, cnst::board_offset, static_cast<int> (unit));
+}
 uint64_t
 State::seed () const
 {
@@ -118,9 +123,9 @@ State::moves_kendall () const
         }
       else if (board (House::REBIRTH) == Unit::NONE)
         {
-          moves.add_move (House::REBIRTH, Action::DROW);   // reborning
-          moves.add_move (House::REBIRTH, Action::ESCAPE); // skipping
-          moves._data._direction = 2;                      // keep this not 0
+          moves.add_move (House::REBIRTH, Action::DROW);  // reborning
+          moves.add_move (House::SKIPTURN, Action::SKIP); // skipping
+          moves._data._direction = 2;                     // keep this not 0
         }
       return moves;
     }
@@ -142,15 +147,19 @@ State::moves_kendall () const
       else if (dest > House::SCARAB)
         continue; // corrupted logic
       else if (trgt == Unit::NONE)
-        moves.add_move (i, Action::MOVE); // normal movement
+        moves.add_move (i, Action::MOVE);
       else if (trgt == enemy)
         { // attack
-          Unit prev = dest > 0 ? board (dest - 1) : Unit::NONE;
-          Unit nxt = dest < House::SCARAB ? board (dest + 1) : Unit::NONE;
-          if (prev != enemy && nxt != enemy)
-            moves.add_move (i, Action::ATTACK); // not defended trgt
-          else if (dest == House::WATERS)
+          if (dest == House::WATERS)
             moves.add_move (i, Action::ATTACK); // drowed trgt
+          else
+            {
+              Unit prev = dest > 0 ? board (dest - 1) : Unit::NONE;
+              Unit nxt = dest < House::SCARAB ? board (dest + 1) : Unit::NONE;
+              if (prev != enemy && nxt != enemy)
+                moves.add_move (i, dest > House::WATERS ? Action::ATTACK_HOUSE
+                                                        : Action::ATTACK);
+            }
         }
     }
   /* REVERSE MOVE */
@@ -166,12 +175,15 @@ State::moves_kendall () const
           if (cell == agent && trgt == Unit::NONE)
             moves.add_move (i, Action::RETREAT);
           else if (cell == agent && trgt == enemy)
-            { // attack backward
-              Unit prev = i > 1 ? board (i - 2) : Unit::NONE;
-              if (prev != enemy)
-                moves.add_move (i, Action::RETREAT); // retreat with attack
-              else if (i == House::TRUTHS)
-                moves.add_move (i, Action::RETREAT); // drowed trgt
+            {
+              if (i == House::TRUTHS)
+                moves.add_move (i, Action::SWAPBACK); // drowed trgt
+              else
+                {
+                  Unit prev = i > 1 ? board (i - 2) : Unit::NONE;
+                  if (prev != enemy)
+                    moves.add_move (i, Action::SWAPBACK);
+                }
             }
           trgt = cell;
         }
@@ -212,7 +224,8 @@ State::moves_meub () const
           Unit prev = dest > 0 ? board (dest - 1) : Unit::NONE;
           Unit nxt = dest < House::SCARAB ? board (dest + 1) : Unit::NONE;
           if (prev != enemy && nxt != enemy)
-            moves.add_move (i, Action::ATTACK);
+            moves.add_move (i, dest > House::WATERS ? Action::ATTACK_HOUSE
+                                                    : Action::ATTACK);
         }
     }
   /* REVERSE MOVE */
@@ -250,13 +263,81 @@ State::get_moves_f (Rules rules)
 }
 
 State
-State::increment_kendall () const
+State::increment_kendall (int index,
+                          Moves moves = Moves(0UL)) const
 {
-  return State ();
+  if (moves._data._mobility > 0 && !moves.contains (index))
+    throw "illegal move";
+  if (moves._data._seed == 0UL) moves = this->moves_kendall ();
+
+  Unit agent = static_cast<Unit> (_data._agent);
+  Unit enemy = static_cast<Unit> (_data._agent ^ 1);
+  int steps = _data._steps;
+
+  /* next step preparation */
+  State new_state (_data._seed);
+  new_state._data._steps = 0;
+  //next agent rule
+  if (steps == 1 || steps == 4 || steps == 5)
+    new_state._data._agent = _data._agent; // bonus move
+  else
+    new_state._data._agent = (_data._agent ^ 1); // normal move
+
+  Action action = moves.actions (index);
+
+  /* STATE UPD */
+  switch (action)
+    {
+    case Action::SKIP:
+      break;
+    case Action::MOVE:
+      new_state.update_board (index + steps, agent);
+      new_state.update_board (index, Unit::NONE);
+      break;
+    case Action::ESCAPE:
+      new_state.update_board (index, Unit::NONE);
+      break;
+    case Action::DROW:
+      new_state.update_board (index, Unit::NONE);
+      for (int i = House::REBIRTH; i >= 0; i--)
+        {
+          if (board (i) == Unit::NONE)
+            {
+              new_state.update_board (House::WATERS, agent);
+              break;
+            }
+        }
+      break;
+    case Action::SWAPBACK:
+      new_state.update_board (index - 1, agent);
+      new_state.update_board (index, enemy);
+      break;
+    case Action::ATTACK:
+      new_state.update_board (index + steps, agent);
+      new_state.update_board (index, enemy);
+      break;
+    case Action::ATTACK_HOUSE:
+      new_state.update_board (index + steps, agent);
+      new_state.update_board (index, Unit::NONE);
+      for (int i = House::WATERS; i >= 0; i--)
+        {
+          if (board (i) == Unit::NONE)
+            {
+              new_state.update_board (House::WATERS, enemy);
+              break;
+            }
+        }
+      break;
+    default:
+      new_state._data._seed = 0UL; // corrupted logic
+      break;
+    }
+
+  return new_state;
 }
 
 State
-State::increment_meub () const
+State::increment_meub (int index, Moves moves) const
 {
   return State ();
 }

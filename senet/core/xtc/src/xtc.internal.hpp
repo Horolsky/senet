@@ -54,6 +54,7 @@ namespace House
   const int ATOUM = 28;
   const int SCARAB = 29;
   const int NETHER = 30;
+  const int SKIPTURN = 0b11111;
 }
 
 // board cell unit
@@ -70,9 +71,11 @@ enum class Action
   SKIP,
   MOVE,
   RETREAT,
+  SWAPBACK,
+  DROW,
   ATTACK,
-  ESCAPE,
-  DROW
+  ATTACK_HOUSE,
+  ESCAPE
 };
 
 // game rules
@@ -106,13 +109,13 @@ class State
 
   Moves moves_kendall () const;
   Moves moves_meub () const;
-  State increment_kendall () const;
-  State increment_meub () const;
-
+  State increment_kendall (int, Moves) const;
+  State increment_meub (int, Moves) const;
+  void update_board(int index, Unit unit);
 public:
   friend class Emax;
   using seed_type = uint64_t;
-  using increment_f = State (State::*)() const;
+  using increment_f = State (State::*)(int, Moves) const;
   using moves_f = Moves (State::*)() const;
   static
   uint64_t build_seed (Unit _agent, int _steps, int* _board);
@@ -212,10 +215,11 @@ public:
   int indici (int index) const;
   int* actions (int* buffer) const;
   Action actions (int index) const;
-  
+
   Unit agent () const;
   int mobility () const;
   Action direction () const;
+  bool contains (int) const;
   uint64_t seed () const;
 }; // class moves
 
