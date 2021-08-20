@@ -85,4 +85,13 @@ uint64_t Moves::seed () const
   return _data._seed;
 }
 
+int Moves::add_move(int index, Action action)
+{
+  if (_data._mobility == cnst::max_moves) return cnst::max_moves;
+  
+  _data._indici = bitf::solid::set_scalar(_data._indici, _data._mobility, cnst::indici_offset, index);
+  _data._actions = bitf::solid::set_scalar(_data._actions, _data._mobility, cnst::actions_offset, static_cast<int>(action));
+  return ++_data._mobility;
+}
+
 }
