@@ -123,14 +123,12 @@ State::moves_kendall () const
         }
       else if (board (House::REBIRTH) == Unit::NONE)
         {
-          moves.add_move (House::REBIRTH, Action::DROW);  // reborning
-          moves.add_move (House::SKIPTURN, Action::SKIP); // skipping
-          moves._data.direction = 2;                      // keep this not 0
+          moves.add_move (House::REBIRTH, Action::DROW); // reborning
+          moves.add_move (House::SKIPTURN, Action::SKIP);
         }
       return moves;
     }
   /* DIRECT MOVE */
-  moves._data.direction = 1;
   for (int i = 0; i < cnst::board_size; i++)
     {
       Unit cell_occupation = board (i);
@@ -165,8 +163,6 @@ State::moves_kendall () const
   /* REVERSE MOVE */
   if (moves._data.mobility == 0)
     {
-      moves._data.direction = 2;
-
       Unit trgt = board (0); // state.board % 4;
       for (int i = 1; i < cnst::board_size; i++)
         {
@@ -188,9 +184,11 @@ State::moves_kendall () const
           trgt = cell;
         }
     }
-  /* SKIP MOVE */
+
   if (moves._data.mobility == 0)
-    moves._data.direction = 0;
+    {
+      moves.add_move (House::SKIPTURN, Action::SKIP);
+    }
   return moves;
 }
 
@@ -201,7 +199,7 @@ State::moves_meub () const
   Unit agent = static_cast<Unit> (_data.agent);
   Unit enemy = static_cast<Unit> (_data.agent ^ 1);
   /* DIRECT MOVE */
-  moves._data.direction = 1;
+
   for (int i = 0; i < cnst::board_size; i++)
     {
       Unit cell_occupation = board (i);
@@ -217,6 +215,8 @@ State::moves_meub () const
         continue; // forbidden house arriving
       else if (dest > House::SCARAB)
         continue; // forbidden escaping
+      else if (dest == House::WATERS)
+        moves.add_move (i, Action::DROW); //
       else if (trgt == Unit::NONE)
         moves.add_move (i, Action::MOVE); // normal movement
       else if (trgt == enemy)
@@ -231,7 +231,6 @@ State::moves_meub () const
   /* REVERSE MOVE */
   if (moves._data.mobility == 0)
     {
-      moves._data.direction = 2;
       Unit trgt = board (0);
       for (int i = 1; i < House::NETHER; i++)
         {
@@ -241,9 +240,10 @@ State::moves_meub () const
           trgt = cell;
         }
     }
-  /* SKIP MOVE */
   if (moves._data.mobility == 0)
-    moves._data.direction = 0;
+    {
+      moves.add_move (House::SKIPTURN, Action::SKIP);
+    }
   return moves;
 }
 
@@ -299,14 +299,8 @@ State::increment_kendall (int index, Moves moves = Moves (0UL)) const
       break;
     case Action::DROW:
       new_state.update_board (index, Unit::NONE);
-      for (int i = House::REBIRTH; i >= 0; i--)
-        {
-          if (board (i) == Unit::NONE)
-            {
-              new_state.update_board (House::WATERS, agent);
-              break;
-            }
-        }
+      new_state.update_board (House::REBIRTH,
+                              agent); // space is guaranteed by moves func
       break;
     case Action::SWAPBACK:
       new_state.update_board (index - 1, agent);
@@ -337,9 +331,73 @@ State::increment_kendall (int index, Moves moves = Moves (0UL)) const
 }
 
 State
-State::increment_meub (int index, Moves moves) const
+State::increment_meub (int index, Moves moves = Moves (0UL)) const
 {
-  return State ();
+  if (moves._data.mobility > 0 && !moves.contains (index))
+    throw "illegal move";
+  if (moves._data.seed == 0UL)
+    moves = this->moves_meub ();
+
+  Unit agent = static_cast<Unit> (_data.agent);
+  Unit enemy = static_cast<Unit> (_data.agent ^ 1);
+  int steps = _data.steps;
+
+  /* next step preparation */
+  State new_state (_data.seed);
+  new_state._data.steps = 0;
+  // next agent rule
+  if (steps == 1 || steps == 4 || steps == 5)
+    new_state._data.agent = _data.agent; // bonus move
+  else
+    new_state._data.agent = (_data.agent ^ 1); // normal move
+
+  Action action = moves.actions (index);
+
+  /* STATE UPD */
+  switch (action)
+    {
+    case Action::SKIP:
+      break;
+    case Action::MOVE:
+      new_state.update_board (index + steps, agent);
+      new_state.update_board (index, Unit::NONE);
+      break;
+    case Action::ESCAPE:
+      new_state.update_board (index, Unit::NONE);
+      break;
+    case Action::DROW:
+      new_state.update_board (index, Unit::NONE);
+      for (int i = House::REBIRTH; i >= 0; i--)
+        {
+          if (board (i) == Unit::NONE)
+            {
+              new_state.update_board (i, agent);
+              break;
+            }
+        }
+      break;
+    case Action::ATTACK:
+      new_state.update_board (index + steps, agent);
+      new_state.update_board (index, enemy);
+      break;
+    case Action::ATTACK_HOUSE:
+      new_state.update_board (index + steps, agent);
+      new_state.update_board (index, Unit::NONE);
+      for (int i = House::REBIRTH; i >= 0; i--)
+        {
+          if (board (i) == Unit::NONE)
+            {
+              new_state.update_board (i, enemy);
+              break;
+            }
+        }
+      break;
+    default:
+      new_state._data.seed = 0UL; // corrupted logic
+      break;
+    }
+
+  return new_state;
 }
 
 State::increment_f
