@@ -102,8 +102,68 @@ State::expectation () const
 Moves
 State::moves_kendall () const
 {
-  return Moves ();
+    Moves moves(0);
+    Unit agent = static_cast<Unit>(_data._agent);
+    Unit enemy = static_cast<Unit>(_data._agent ^ 1);
+    
+    /* HOUSE OF WATER PENALTY */                            
+    if (board(House::WATERS) == agent)
+    {
+        if (_data._steps == 4)
+        {
+            moves.add_move(House::WATERS, Action::ESCAPE);
+            moves._data._direction = 1;
+        }
+        else if (board(House::REBIRTH) == Unit::NONE)
+        {
+            moves.add_move(House::REBIRTH, Action::DROW);   //reborning    
+            moves.add_move(House::REBIRTH, Action::ESCAPE); //skipping
+            moves._data._direction = 2;                     //keep this not 0
+        }
+        return moves;
+    }
+    /* DIRECT MOVE */
+    moves._data._direction = 1;
+    for (int i = 0; i < cnst::board_size; i++)
+    {
+        Unit cell_occupation = board(i);
+        if (cell_occupation != agent) continue;
+        int dest = i + _data._steps;
+        Unit trgt = board(dest);
+        if (i == House::SCARAB) moves.add_move(i, Action::ESCAPE);  // always escaping
+        else if (i >= House::BEAUTY && dest == House::NETHER) moves.add_move(i, Action::ESCAPE);         // correct escaping
+        else if (i != House::BEAUTY && dest > House::BEAUTY) continue;                            // forbidden house arriving
+        else if (dest > House::SCARAB) continue;                                       // corrupted logic
+        else if (trgt == Unit::NONE) moves.add_move(i, Action::MOVE); // normal movement
+        else if (trgt == enemy) {                                           // attack
+            Unit prev = dest > 0 ? board(dest-1) : Unit::NONE;
+            Unit nxt = dest < House::SCARAB ? board(dest+1) : Unit::NONE;
+            if (prev != enemy && nxt != enemy) moves.add_move(i, Action::ATTACK);//not defended trgt
+            else if (dest == House::WATERS) moves.add_move(i, Action::ATTACK);//drowed trgt
+        }
+    }
+    /* REVERSE MOVE */
+    if (moves._data._mobility == 0) {   
+        moves._data._direction = 2;                      
+        
+        Unit trgt = board(0);// state._board % 4;                                       
+        for (int i = 1; i < cnst::board_size; i++) {
+            Unit cell = board(i);
+            
+            if (cell == agent && trgt == Unit::NONE) moves.add_move(i, Action::RETREAT);
+            else if (cell == agent && trgt == enemy) {                                                   // attack backward
+                Unit prev = i > 1 ? board(i-2) : Unit::NONE;
+                if (prev != enemy) moves.add_move(i, Action::RETREAT); //retreat with attack
+                else if (i == House::TRUTHS) moves.add_move(i, Action::RETREAT);   //drowed trgt
+            }
+            trgt = cell;
+        }
+    }
+    /* SKIP MOVE */
+    if (moves._data._mobility == 0) moves._data._direction = 0;                                              
+    return moves;
 }
+
 
 Moves
 State::moves_meub () const
