@@ -39,7 +39,7 @@ $(TST_O): $(HEADERS) $(DEPS)
 print:
 	@echo $(PROJ_SO)
 
-$(DEPS): update_libs
+# $(DEPS): update_libs
 
 update_libs:
 	make -C $(LIB_D) update
