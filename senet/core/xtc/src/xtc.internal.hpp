@@ -30,8 +30,8 @@ const size_t board_offset{ 2UL };
 const size_t indici_offset{ 5UL };
 const size_t actions_offset{ 5UL };
 
-const size_t board_size{ 30UL };
-const size_t max_strategies{ 7UL };
+const int board_size{ 30 };
+const int max_strategies{ 7 };
 
 // chance steps probabilities
 const float chance_prob[6]{ 0, .25, .375, .25, .0625, .0625 };
