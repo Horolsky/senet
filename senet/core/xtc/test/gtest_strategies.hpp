@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../src/xtc.internal.hpp"
+#include "../src/xtc.objects.hpp"
 #include "gtest/gtest.h"
 
 TEST (Strategies, init)

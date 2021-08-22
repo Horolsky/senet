@@ -5,7 +5,6 @@
  * */
 
 #include "xtc.common.hpp"
-#include "xtc.internal.hpp"
 
 _XTC_BULK_EXPLICIT(int*)
 _XTC_SCALAR_EXPLICIT(int)

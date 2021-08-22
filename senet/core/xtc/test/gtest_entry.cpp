@@ -4,6 +4,7 @@
 #include "gtest_state.hpp"
 #include "gtest_strategies.hpp"
 #include "gtest_eval.hpp"
+#include "gtest_emax.hpp"
 
 int
 main (int argc, char **argv)

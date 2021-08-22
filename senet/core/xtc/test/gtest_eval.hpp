@@ -1,10 +1,11 @@
 #pragma once
 
-#include "../src/xtc.internal.hpp"
+#include "../src/xtc.eval.hpp"
 #include "gtest/gtest.h"
+
+
 
 TEST (State_expect, init)
 {
-    auto x = xtc::State();
-    EXPECT_NO_THROW(x.expectation());
+    EXPECT_NO_THROW(xtc::Eval::expectation(xtc::State()));
 }

@@ -1,104 +1,35 @@
-#pragma once
-// #include "util.deque.hpp"
-#include "xtc.common.hpp"
-#include "xtc.internal.hpp"
+#include "xtc.emax.hpp"
 namespace xtc
 {
-
-  int Emax::operator()(State state)
+  int zerodepth_brute(const State& state, double* coefs, Rules rules, bool max)
   {
-    return 0;
+    const FuncStrategies get_strategies = FuncStrategies(rules);
+    const FuncIncrement increment = FuncIncrement(rules);
+    
+    Strategies strategies = get_strategies(state);
+    double util = max ? 0 : 1;
+    int res = 0;
+    for (int i = 0; i < strategies.mobility(); i++)
+    {
+      double sutil = Eval::expectation(increment(state, strategies.indici(i), strategies));
+      if (max)
+      {
+        util = sutil > util ? sutil : util;
+        res = i;
+      }
+      else
+      {
+        util = sutil < util ? sutil : util;
+        res = i;
+      }
+      return res;
+    }
+  }
+
+
+  int Emax::operator()(const State &state) const
+  {
+    bool max = static_cast<bool>(state.agent());
+    return zerodepth_brute(state, nullptr, Rules::KENDALL, max);
   }
 }
-/*
-
-iterativePreorder(node)
-if (node == null)
-return
-stack ← empty stack
-stack.push(node)
-while (not stack.isEmpty())
-node ← stack.pop()
-visit(node)
-//right child is pushed first so that left is processed first
-if node.right ≠ null
-  stack.push(node.right)
-if node.left ≠ null
-  stack.push(node.left)
-  */
-
-
-// float eval (uint64_t);
-// uint64_t increment (uint64_t);
-// int get_strategies(uint64_t state, unsigned int* buff, int steps);
-// static cloc_t stoptime;
-// static int stopdepth;
-
-
-// double
-// __expectimax (xtc::state::type origin, int depth)
-// {
-    // if (depth < 1) throw std::logic_error("non-positive  expectimax depth");
-//   
-//   origin = set_depth(origin, 0);
-//   deque<uint64_t, MAX_DEQUE> deque;
-//   deque.push_front (origin);
-//   
-//   while (!deque.empty () &&)
-    // {
-    //   auto node = deque.pop_back ();
-// 
-    //   for (int i = 0; i < MAX_STEPS; i++)
-        // {
-        //   float p = P[i];
-        //   unsigned int strategies[MAX_BRANCHING];
-        //   int mobility = get_strategies(node, strategies, i+1); // change content of strategies
-// 
-        //   for (int i = 0; i < mobility; i++)
-            // {
-            //   auto subnode = increment (node, i);
-            // }
-        // }
-    // }
-// }
-
-// single branch
-/*
-float
-_expectimax (state::type state, uint8_t depth, const uint8_t stopdepth, const clock_t stoptime)
-{
-
-  float util = eval (state);
-
-  if (util == 1 || util == 0 || depth >= stopdepth || clock () > stoptime)
-    {
-      return util;
-    }
-
-  depth++;
-  util = 0;
-  
-  for (uint16_t chance = 0; chance < 5; chance++)
-    {
-        float cur_util = 0; // chance util
-        state::type cur_state = 
-        moves::type cur_moves;
-      cur_util = 0;
-      cur_state._seed = seed;
-      cur_state._steps = chance + 1;
-      cur_moves._seed = _get_moves (cur_state._seed);
-
-      for (ui8 move = 0; move < cur_moves._len; move++)
-        {
-          ui64 childstate = _increment (cur_state, cur_moves,
-                                        MOVES_GET (cur_moves, move));
-          cur_util += _expectimax (childstate, depth);
-        }
-      util += cur_moves._len != 0 ? cur_util * P[chance] / cur_moves._len
-                                     : cur_util * P[chance];
-    }
-  return util;
-}
-} // namespace algo
-} // namespace xtc
-*/
