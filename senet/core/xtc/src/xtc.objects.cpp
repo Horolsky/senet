@@ -94,9 +94,9 @@ Strategies::build_seed (Unit agent, int mobility,
   data.agent = static_cast<uint64_t> (agent);
   data.mobility = mobility;
   data.indici = bitf::solid::set_bulk<int *, uint64_t> (
-      indici, indici + max_strategies, 0UL, indici_offset);
+      indici, indici + mobility, 0UL, indici_offset);
   data.actions = bitf::solid::set_bulk<int *, uint64_t> (
-      actions, actions + max_strategies, 0UL, actions_offset);
+      actions, actions + mobility, 0UL, actions_offset);
   return data.seed;
 }
 
