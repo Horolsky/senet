@@ -27,7 +27,7 @@ Unit
 State::board (int index) const
 {
   return static_cast<Unit> (bitf::solid::get_scalar<int, uint64_t> (
-      _data.board, index, board_offset));
+      _data.board, index*board_offset, board_offset));
 }
 
 Unit
@@ -68,7 +68,7 @@ State::set_steps (int steps)
 void
 State::update_board (int index, Unit unit)
 {
-  _data.board = bitf::solid::set_scalar (_data.board, index, board_offset,
+  _data.board = bitf::solid::set_scalar (_data.board, index*board_offset, board_offset,
                                          static_cast<int> (unit));
 }
 uint64_t
@@ -111,7 +111,7 @@ Strategies::indici (int *buffer) const
 int
 Strategies::indici (int index) const
 {
-  return bitf::solid::get_scalar<int, uint64_t> (_data.indici, index,
+  return bitf::solid::get_scalar<int, uint64_t> (_data.indici, index*indici_offset,
                                                  indici_offset);
 }
 
@@ -127,7 +127,7 @@ Action
 Strategies::actions (int index) const
 {
   return static_cast<Action> (bitf::solid::get_scalar<int, uint64_t> (
-      _data.actions, index, actions_offset));
+      _data.actions, index*actions_offset, actions_offset));
 }
 
 Unit
@@ -178,10 +178,10 @@ Strategies::push (int index, Action action)
   if (_data.mobility == max_strategies)
     return max_strategies;
 
-  _data.indici = bitf::solid::set_scalar (_data.indici, _data.mobility,
+  _data.indici = bitf::solid::set_scalar (_data.indici, _data.mobility*indici_offset,
                                           indici_offset, index);
   _data.actions
-      = bitf::solid::set_scalar (_data.actions, _data.mobility, actions_offset,
+      = bitf::solid::set_scalar (_data.actions, _data.mobility*actions_offset, actions_offset,
                                  static_cast<int> (action));
   return ++_data.mobility;
 }

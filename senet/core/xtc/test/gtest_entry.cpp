@@ -3,6 +3,7 @@
 
 #include "gtest_state.hpp"
 #include "gtest_strategies.hpp"
+#include "gtest_logic.hpp"
 #include "gtest_eval.hpp"
 #include "gtest_emax.hpp"
 
