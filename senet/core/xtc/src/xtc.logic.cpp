@@ -204,7 +204,7 @@ FuncIncrement::kendall (const State state, const int choice, Strategies strategi
   int steps = state.steps();
 
   /* next step preparation */
-  State new_state (steps);
+  State new_state (state);
   new_state._data.steps = 0;
   // next agent rule
   if (steps == 1 || steps == 4 || steps == 5)
@@ -272,7 +272,7 @@ FuncIncrement::meub (const State state, const int choice, Strategies strategies)
   int steps = state.steps();
 
   /* next step preparation */
-  State new_state (state._data.seed);
+  State new_state (state);
   new_state._data.steps = 0;
   // next agent rule
   if (steps == 1 || steps == 4 || steps == 5)
