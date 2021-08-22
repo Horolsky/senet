@@ -1,5 +1,5 @@
 #include "xtc.objects.hpp"
-//Dice class members dedined in separate .cpp
+//Dice class members defined in separate .cpp
 
 namespace xtc
 {
