@@ -84,6 +84,12 @@ bool State::is_strategy_node () const
 {
   return _data.steps > 0;
 }
+bool State::is_terminal_node () const
+{
+  int x = bitf::solid::index_of<int, uint64_t>(static_cast<int>(Unit::X), _data.board, board_offset);
+  int y = bitf::solid::index_of<int, uint64_t>(static_cast<int>(Unit::Y), _data.board, board_offset);
+  return ( y < 0 ) || ( x < 0 );
+}
 
 uint64_t
 Strategies::build_seed (Unit agent, int mobility,

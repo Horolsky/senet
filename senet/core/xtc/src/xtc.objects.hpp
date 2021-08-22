@@ -111,6 +111,7 @@ public:
 
   bool is_chance_node () const;
   bool is_strategy_node () const;
+  bool is_terminal_node () const;
 
 private:
   void update_board (int index, Unit unit);

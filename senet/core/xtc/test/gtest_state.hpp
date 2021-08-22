@@ -47,5 +47,13 @@ TEST (xState, board_get)
         xtc::Unit expected = static_cast<xtc::Unit>(board[i]);
         EXPECT_EQ(s.board(i), expected);
     }
-    
+}
+
+TEST (xState, terminal)
+{
+    xtc::Unit agent = xtc::Unit::X;
+    int steps = 1;
+    int board[30] {0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2};
+    auto s = xtc::State(agent, steps, board);
+    EXPECT_TRUE(s.is_terminal_node());
 }
