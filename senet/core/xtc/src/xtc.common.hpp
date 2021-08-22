@@ -25,14 +25,14 @@ using uint64_t = std::uint64_t;
                                                         size_t, int);
 
 #define _XTC_SCALAR_EXTERN(T)                                                 \
-  extern template T bitf::solid::get_scalar<T, uint64_t> (uint64_t, int,      \
-                                                          size_t);            \
+  extern template T bitf::solid::get_scalar<T, uint64_t> (uint64_t, size_t,   \
+                                                          int);               \
   \        
   extern template uint64_t                                                    \
-  bitf::solid::set_scalar<T, uint64_t> (uint64_t, int, size_t, T);
+  bitf::solid::set_scalar<T, uint64_t> (T, uint64_t, size_t, int);
 
 #define _XTC_SCALAR_EXPLICIT(T)                                               \
-  template T bitf::solid::get_scalar<T, uint64_t> (uint64_t, int, size_t);    \
+  template T bitf::solid::get_scalar<T, uint64_t> (uint64_t, size_t, int);    \
   \        
   template uint64_t                                                           \
-  bitf::solid::set_scalar<T, uint64_t> (uint64_t, int, size_t, T);
+  bitf::solid::set_scalar<T, uint64_t> (T, uint64_t, size_t, int);
