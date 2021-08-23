@@ -38,7 +38,7 @@ Eval::poly_eval (const State &state, const std::array<double, coef_n> &coefs)
   return .5;
 }
 
-Eval::Eval (Eval::Func func_id, std::array<int, coef_n> coefs)
+Eval::Eval (Eval::FuncID func_id, std::array<int, coef_n> coefs)
 {
   std::array<double, coef_n> norm_coefs;
   int sum = 0;
@@ -59,13 +59,13 @@ Eval::operator() (const State &state) const
 {
   switch (_func_id)
     {
-    case Func::BASIC:
+    case FuncID::BASIC:
       return expectation (state);
       break;
-    case Func::LINEAR:
+    case FuncID::LINEAR:
       return lin_eval (state, _coefs);
       break;
-    case Func::POLYNOMIAL:
+    case FuncID::POLYNOMIAL:
       return poly_eval (state, _coefs);
       break;
     default:
@@ -73,8 +73,8 @@ Eval::operator() (const State &state) const
     }
 }
 double
-Eval::coef (int i) const
+Eval::coef (CoefID coef) const
 {
-  return _coefs[i];
+  return _coefs[static_cast<int>(coef)];
 }
 } // namespace xtc
