@@ -38,8 +38,8 @@ public:
   double coef (CoefID) const;
 
 private:
-  Eval::FuncID _func_id;
   std::array<double, coef_n> _coefs;
+  Eval::FuncID _func_id;
 };
 
 } // namespace xtc
