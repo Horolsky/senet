@@ -27,4 +27,13 @@ Eval::expectation (const State& state)
     res = (float)(minSum) / (maxSum + minSum);
   return res;
 }
+
+double Eval::lin_eval(const State &state, const std::array<double,coef_n> coefs)
+{
+  return .5;
+}
+double Eval::poly_eval(const State &state, const std::array<double,coef_n> coefs)
+{
+  return .5;
+}
 } //namespace xtc
