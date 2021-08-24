@@ -2,6 +2,7 @@
 #include <random>
 namespace xtc
 {
+const std::array<double,6> Dice::P = { 0, .25, .375, .25, .0625, .0625 };
 int
 Dice::roll ()
 {
