@@ -53,17 +53,6 @@ State::operator= (State &&other)
   _data = other._data;
   return *this;
 }
-void
-State::set_agent (Unit agent)
-{
-  _data.agent = static_cast<uint64_t> (agent);
-}
-
-void
-State::set_steps (int steps)
-{
-  _data.steps = steps;
-}
 
 void
 State::update_board (int index, Unit unit)

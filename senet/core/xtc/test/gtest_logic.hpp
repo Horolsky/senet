@@ -5,9 +5,7 @@
 
 xtc::State get_start_state(xtc::Unit agent, int steps)
 {
-    auto state = xtc::State();
-    state.set_agent(agent);
-    state.set_steps(steps);
+    auto state = xtc::State(xtc::State(), agent, steps);
     return state;
 }
 const int start_board[30] {0,1,0,1,0,1,0,1,0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2};

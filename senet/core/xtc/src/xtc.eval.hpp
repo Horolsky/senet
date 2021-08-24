@@ -34,6 +34,17 @@ public:
   Eval (const Eval &other) : _func_id(other._func_id), _coefs(other._coefs) {};
   Eval (Eval &&other) : _func_id(other._func_id), _coefs(std::move(other._coefs)) {};
   
+  Eval &operator= (const Eval &other) {
+    _func_id =other._func_id;
+    _coefs = other._coefs;
+    return *this;
+  }
+  Eval &operator= (Eval &&other) {
+    _func_id =other._func_id;
+    _coefs = std::move(other._coefs);
+    return *this;
+  }
+
   double operator() (const State &state) const;
   double coef (CoefID) const;
 

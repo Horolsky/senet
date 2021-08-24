@@ -54,8 +54,19 @@ public:
 
   State () { _data.seed = def_state_seed; }
   State (uint64_t seed) { _data.seed = seed; }
+
   State (const State &other) : _data (other._data) {}
   State (State &&other) : _data (other._data) {}
+
+  State (const State &other, int steps) : _data(other._data) { _data.steps = steps; }
+  State (State &&other, int steps) : _data(other._data) { _data.steps = steps; }
+
+  State (const State &other, Unit agent) : _data(other._data) { _data.agent = static_cast<int>(agent); }
+  State (State &&other, Unit agent) : _data(other._data) { _data.agent = static_cast<int>(agent); }
+
+  State (const State &other, Unit agent, int steps) : _data(other._data) { _data.agent = static_cast<int>(agent); _data.steps = steps; }
+  State (State &&other, Unit agent, int steps) : _data(other._data) { _data.agent = static_cast<int>(agent); _data.steps = steps; }
+  
 
   State (Unit agent, int steps, int *board)
   {
@@ -66,8 +77,6 @@ public:
 
   State &operator= (const State &other);
   State &operator= (State &&other);
-  void set_agent (Unit agent);
-  void set_steps (int steps);
 
   /**
    * loads game state to an array buffer of size 30
@@ -129,7 +138,7 @@ public:
   static const int mobility_offset{ 3 };
   static const int indici_offset{ 5 };
   static const int actions_offset{ 5 };
-  static const int max_strategies{ 7 };
+  static const int max_strategies{ 5 };
 
   static uint64_t build_seed (Unit agent, int mobility, int *indici,
                               int *actions);

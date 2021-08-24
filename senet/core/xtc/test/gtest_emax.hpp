@@ -13,10 +13,6 @@ TEST (Emax, init)
 
 TEST (Emax, call)
 {
-    xtc::Unit agent = xtc::Unit::Y;
-    int steps = 5;
-    int board[30] {0,1,0,1,0,1,0,1,0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2};
-    auto s = xtc::State(agent, steps, board);
-
+    auto s = xtc::State(xtc::State(),5);
     EXPECT_NO_THROW(xtc::Emax()(s));
 }

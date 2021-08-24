@@ -5,8 +5,7 @@
 
 xtc::State get_start_state()
 {
-    auto state = xtc::State();
-    state.set_steps(1);
+    auto state = xtc::State(xtc::State(),1);
     return state;
 }
 
