@@ -5,8 +5,15 @@ import cppyy
 from os import path
 PATH = path.dirname(path.realpath(__file__))
 
-__HDR = [f"{PATH}/src/xtc.common.hpp", f"{PATH}/src/xtc.internal.hpp"]
-__SMBS = ["cnst", "House", "Unit", "Action", "Rules", "Strategies", "Emax", "State"]
+__HDR = [
+    f"{PATH}/src/xtc.common.hpp",
+    f"{PATH}/src/xtc.fwd.hpp",
+    f"{PATH}/src/xtc.objects.hpp",
+    f"{PATH}/src/xtc.logic.hpp",
+    f"{PATH}/src/xtc.eval.hpp",
+    f"{PATH}/src/xtc.emax.hpp"
+    ]
+__SMBS = ["Dice", "House", "Unit", "Action", "Rules", "Strategies", "State",  "FuncStrategies", "FuncIncrement", "Eval", "Expectimax"]
 
 __STD_T = [
     (["uint8_t","uint16_t","uint32_t","uint64_t",], "cstdint"),

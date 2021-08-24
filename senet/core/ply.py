@@ -1,8 +1,7 @@
 """
 wrapper for builtin structures
 """
-from .xtc import State, Strategies
-from .constants import BOARD_SIZE
+from .xtc import State, Strategies, FuncStrategies, FuncIncrement, Eval
 from .enums import Action, Rules, Unit, House
 from array import array
 from typing import Union, Tuple
@@ -79,7 +78,8 @@ class Ply:
         
         self.__rules = rules.value
         self.__event = event
-        self.__strategies = Ply.StrategiesView(Strategies(state, rules.value))
+        self.__getstrat = FuncStrategies(rules.value)
+        self.__strategies = Ply.StrategiesView(self.__getstrat(state))
 
     @property
     def seed(self) -> int:
@@ -92,14 +92,14 @@ class Ply:
         return Unit(self.__state.agent())
     @property
     def steps(self) -> Unit:
-        return Unit(self.__state.steps())
+        return self.__state.steps()
     @property
     def expectation(self) -> float:
         return Unit(self.__state.expectation())
     @property
     def board(self) -> Tuple[Unit]:
         if self.__board is None:
-            cont = array('i', [0 for _ in range(BOARD_SIZE)])
+            cont = array('i', [0 for _ in range(State.board_size)])
             self.__state.board(cont)
             self.__board = tuple(map(lambda x: Unit(x), cont))
             del cont
