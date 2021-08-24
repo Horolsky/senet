@@ -3,6 +3,9 @@
 #include "xtc.objects.hpp"
 #include "xtc.logic.hpp"
 #include "xtc.eval.hpp"
+#include <array>
+#include <thread>
+
 
 namespace xtc
 {
@@ -18,13 +21,7 @@ public:
     iterative_opt
   };
   static const int coefs_num {4};
-  enum class CoefsID
-  {
-    stepsum,
-    mobility,
-    priority,
-    attack
-  };
+  
   static const int max_buffer{ 524288 }; // 0.5 Mb
 
   Emax () = default;
@@ -32,7 +29,11 @@ public:
   Emax (Emax &&other) = default;
   ~Emax () = default;
 
-  int operator() (const State &state) const;
+  int operator() (const State &state, int depth=4, int time=100) const;
+private:
+Eval _eval;
+AlgoID _algo;
+std::array<std::thread, Strategies::max_strategies> _threads;
 };
 
 } // namespace xtc
