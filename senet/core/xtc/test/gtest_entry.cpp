@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-
+#include "gtest_dice.hpp"
 #include "gtest_state.hpp"
 #include "gtest_strategies.hpp"
 #include "gtest_logic.hpp"
