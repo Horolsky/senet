@@ -12,35 +12,38 @@ class Ply:
     """
     class StrategiesView:
         def __init__(self, strategies: Strategies):
-            self.__strategies = strategies
-            self.__indici = None
-            self.__actions = None
+            self._strategies = strategies
+            self._indici = None
+            self._actions = None
         
         @property
         def mobility(self) -> int:
-            return self.__strategies.mobility()
+            return self._strategies.mobility()
         @property
         def indici(self) -> Tuple[int]:
-            if self.__indici is None:
+            if self._indici is None:
                 if self.mobility == 0:
-                    self.__indici = ()
+                    self._indici = ()
                 else:
                     cont = array('i', [0 for _ in range(self.mobility)])
-                    self.__strategies.indici(cont)
-                    self.__indici = tuple(cont)
+                    self._strategies.indici(cont)
+                    self._indici = tuple(cont)
                     del cont
-            return self.__indici
+            return self._indici
         @property
         def actions(self) -> Tuple[Action]:
-            if self.__actions is None:
+            if self._actions is None:
                 if self.mobility == 0:
-                    self.__actions = ()
+                    self._actions = ()
                 else:
                     cont = array('i', [0 for _ in range(self.mobility)])
-                    self.__strategies.actions(cont)
-                    self.__actions = tuple(map(lambda x: Action(x), cont))
+                    self._strategies.actions(cont)
+                    self._actions = tuple(map(lambda x: Action(x), cont))
                     del cont
-            return self.__actions
+            return self._actions
+
+        def __repr__(self) -> str:
+            return f"Strategies[{self.mobility}]"
 
     class Event:
         def __init__(self, **kwargs):
@@ -61,6 +64,8 @@ class Ply:
         @property
         def destination(self) -> int:
             return self.__destination
+        def __repr__(self) -> str:
+            return f"Event({self.agent}, {self.action}, {self.start}, {self.destination})"
 
     def __init__(self, state: Union[int, State] = State(), rules: Rules = Rules.MEUB, event: Event = Event()):
         if type(state) not in (int, State.seed_type, State):
@@ -79,7 +84,8 @@ class Ply:
         self.__rules = rules.value
         self.__event = event
         self.__getstrat = FuncStrategies(rules.value)
-        self.__strategies = Ply.StrategiesView(self.__getstrat(state))
+        self.__increment = FuncIncrement(rules.value)
+        self.__stratview = Ply.StrategiesView(self.__getstrat(state))
 
     @property
     def seed(self) -> int:
@@ -109,5 +115,25 @@ class Ply:
         return self.__event
     @property
     def strategies(self) -> StrategiesView:
-        return self.__strategies
+        return self.__stratview
+    def __repr__(self) -> str:
+            return f"Ply({self.agent}, s: {self.steps}, {str(self.board)})"
+
+    def increment(self, choice:int):
+        if choice not in self.strategies.indici:
+            raise RuntimeError("invalid strategy")
+        state = self.__increment(
+            self.__state,
+            choice,
+            self.__stratview._strategies
+            )
+        index = self.strategies.indici.index(choice)
+        event = Ply.Event(
+            agent=self.agent, 
+            action=self.strategies.actions[index], 
+            start=choice, 
+            destination=choice+self.steps
+            )
+        return Ply(state, self.rules, event)
+    
     
