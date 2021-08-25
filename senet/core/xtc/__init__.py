@@ -10,11 +10,10 @@ __HDR = [
     f"{PATH}/src/xtc.fwd.hpp",
     f"{PATH}/src/xtc.state.hpp",
     f"{PATH}/src/xtc.strategies.hpp",
-    f"{PATH}/src/xtc.logic.hpp",
     f"{PATH}/src/xtc.eval.hpp",
     f"{PATH}/src/xtc.emax.hpp"
     ]
-__SMBS = ["Dice", "House", "Unit", "Action", "Rules", "Strategies", "State",  "FuncStrategies", "FuncIncrement", "Eval", "Expectimax"]
+__SMBS = ["Dice", "House", "Unit", "Action", "Strategies", "State",  "StrategyNode", "ChanceNode", "Eval", "Expectimax"]
 
 __STD_T = [
     (["uint8_t","uint16_t","uint32_t","uint64_t",], "cstdint"),

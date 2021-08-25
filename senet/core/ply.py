@@ -1,8 +1,8 @@
 """
 wrapper for builtin structures
 """
-from .xtc import State, Strategies, FuncStrategies, FuncIncrement, Eval
-from .enums import Action, Rules, Unit, House
+from .xtc import uint64_t, State, Strategies, Eval, StrategyNode, ChanceNode
+from .enums import Action, Unit, House
 from array import array
 from typing import Union, Tuple
 
@@ -43,7 +43,7 @@ class Ply:
             return self._actions
 
         def __repr__(self) -> str:
-            return f"Strategies[{self.mobility}]"
+            return "("+ ", ".join([f"{self.indici[i]}: {self.actions[i]}" for i in range(self.mobility) ]) + ")"
 
     class Event:
         def __init__(self, **kwargs):
@@ -65,34 +65,52 @@ class Ply:
         def destination(self) -> int:
             return self.__destination
         def __repr__(self) -> str:
-            return f"Event({self.agent}, {self.action}, {self.start}, {self.destination})"
+            return f"({repr(self.agent)} did {repr(self.action)} from {self.start} to {self.destination})"
 
-    def __init__(self, state: Union[int, State] = State(), rules: Rules = Rules.MEUB, event: Event = Event()):
-        if type(state) not in (int, State.seed_type, State):
-            raise TypeError("invalid state type") 
-        if type(rules) != Rules:
-            raise TypeError("invalid rules type") 
-        if type(event) != Ply.Event:
-            raise TypeError("invalid event type") 
-        
-        if type(state) in (int, State.seed_type):
-            state = State(State.seed_type(state))
+    def __init__(self, **kwargs):
+        state, seed, event = None, None, None
+
+        # fast cinit
+        if "seed" in kwargs:
+            seed = kwargs["seed"]
+            if type(seed) not in (int, uint64_t):
+                raise TypeError("invalid seed type")
+            state = StrategyNode(uint64_t(seed))
+        # manual init
+        elif "state" in kwargs:
+            state = kwargs["state"]
+            if type(state) != StrategyNode:
+                raise TypeError("invalid StrategyNode type")
+            seed = state.seed()
+        elif "chance" in kwargs:
+            chance = kwargs["chance"]
+            agent = Unit(kwargs.get("agent", Unit.X))
+            if type(chance) != int:
+                raise TypeError("invalid chance type")
+            if type(agent) != Unit:
+                raise TypeError("invalid agent type")
+            state = StrategyNode(State(), agent.value, chance)
+            seed = state.seed()
+
+        if "event" in kwargs:
+            event = kwargs["event"]
+            if type(event) != Ply.Event:
+                raise TypeError("invalid event type")
+        else:
+            event = Ply.Event()
+
+        if None in (state, seed, event):
+            raise AttributeError("not enough data to build Ply")
         self.__state = state
-        self.__seed = state.seed()
-        self.__board = None
-        
-        self.__rules = rules.value
+        self.__seed = seed
         self.__event = event
-        self.__getstrat = FuncStrategies(rules.value)
-        self.__increment = FuncIncrement(rules.value)
-        self.__stratview = Ply.StrategiesView(self.__getstrat(state))
+
+        self.__board = None
+        self.__stratview = None
 
     @property
     def seed(self) -> int:
         return self.__seed
-    @property
-    def rules(self) -> Rules:
-        return Rules(self.__rules)
     @property
     def agent(self) -> Unit:
         return Unit(self.__state.agent())
@@ -115,18 +133,17 @@ class Ply:
         return self.__event
     @property
     def strategies(self) -> StrategiesView:
+        if self.__stratview is None:
+            self.__stratview = Ply.StrategiesView(self.__state.strategies())
         return self.__stratview
     def __repr__(self) -> str:
             return f"Ply({self.agent}, s: {self.steps}, {str(self.board)})"
 
-    def increment(self, choice:int):
-        if choice not in self.strategies.indici:
-            raise RuntimeError("invalid strategy")
-        state = self.__increment(
-            self.__state,
-            choice,
-            self.__stratview._strategies
-            )
+    def increment(self, choice:int, chance:int):
+        # if choice not in self.strategies.indici:
+        #     raise RuntimeError("invalid strategy")
+        strategies = self.strategies._strategies
+        state = self.__state.child(choice,strategies).child(chance)
         index = self.strategies.indici.index(choice)
         event = Ply.Event(
             agent=self.agent, 
@@ -134,6 +151,6 @@ class Ply:
             start=choice, 
             destination=choice+self.steps
             )
-        return Ply(state, self.rules, event)
+        return Ply(state=state, event=event)
     
     

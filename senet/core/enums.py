@@ -1,7 +1,7 @@
 """
 builtin enums wrapping
 """
-from .xtc import Rules as _Rules, Unit as _Unit, House as _House, Action as _Action
+from .xtc import Unit as _Unit, House as _House, Action as _Action
 from enum import Enum
 
 class House(Enum):
@@ -16,18 +16,13 @@ class House(Enum):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}.{self.name}"
 
-class Rules(Enum):
-    MEUB = _Rules.MEUB
-    KENDALL = _Rules.KENDALL
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}.{self.name}"
-
 class Unit(Enum):
     X = _Unit.X
     Y = _Unit.Y
     NONE = _Unit.NONE
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}.{self.name}"
+        return self.name
+        # return f"{self.__class__.__name__}.{self.name}"
 
 class Action(Enum):
     
@@ -43,4 +38,5 @@ class Action(Enum):
     ERROR = _Action.ERROR
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}.{self.name}"
+        return self.name
+        # return f"{self.__class__.__name__}.{self.name}"
