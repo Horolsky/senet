@@ -27,6 +27,8 @@ void expectations_par (const StrategyNode &choicenode,
                        const Strategies &strats, double *expectations,
                        int depth);
 
+int get_best (const StrategyNode &state, int stopdepth, int time);
+
 static shared_param GLOBAL_STATE;
 static const int FRAME = 10;
 static const int THREADING_DEPTH = 2;
