@@ -43,7 +43,7 @@ class Ply:
             return self._actions
 
         def __repr__(self) -> str:
-            return "("+ ", ".join([f"{self.indici[i]}: {self.actions[i]}" for i in range(self.mobility) ]) + ")"
+            return "("+ ", ".join([f"{self.indici[i]}: {repr(self.actions[i])}" for i in range(self.mobility) ]) + ")"
 
     class Event:
         def __init__(self, **kwargs):
@@ -137,7 +137,7 @@ class Ply:
             self.__stratview = Ply.StrategiesView(self.__state.strategies())
         return self.__stratview
     def __repr__(self) -> str:
-            return f"Ply({self.agent}, s: {self.steps}, {str(self.board)})"
+            return f"Ply({repr(self.agent)}, s: {self.steps}, {str(self.board)})"
 
     def increment(self, choice:int, chance:int):
         # if choice not in self.strategies.indici:
