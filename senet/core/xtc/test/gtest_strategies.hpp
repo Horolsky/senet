@@ -8,7 +8,7 @@ TEST (Strategies, init)
     EXPECT_NO_THROW(xtc::Strategies());
 }
 
-TEST (Strategies, contains)
+TEST (Strategies, seed_contains)
 {
     xtc::Unit agent {xtc::Unit::Y};
     int mobility {5};

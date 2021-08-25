@@ -2,7 +2,6 @@
 #include "xtc.fwd.hpp"
 #include "xtc.state.hpp"
 #include "xtc.strategies.hpp"
-#include "xtc.logic.hpp"
 #include "xtc.eval.hpp"
 #include <array>
 #include <thread>
@@ -30,7 +29,7 @@ public:
   Emax (Emax &&other) = default;
   ~Emax () = default;
 
-  int operator() (const State &state, int depth=4, int time=100) const;
+  int operator() (const StrategyNode &state, int depth=4, int time=100) const;
 private:
 Eval _eval;
 AlgoID _algo;

@@ -36,9 +36,7 @@ class Strategies
   int push (int index, Action action);
 
 public:
-  friend class FuncStrategies;
-  friend class FuncIncrement;
-  friend class Expectimax;
+  friend StrategyNode;
 
   using seed_type = uint64_t;
   static const int agent_offset{ 1 };

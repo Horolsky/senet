@@ -9,13 +9,10 @@ namespace xtc
 /* GAME OBJECTS */
 
 class State;
+  class ChanceNode;
+  class StrategyNode;
 class Strategies;
 class Dice;
-
-/* GAME LOGIC FUNCTORS*/
-
-class FuncStrategies;
-class FuncIncrement;
 
 /* ALGO FUNCTORS*/
 
@@ -58,12 +55,5 @@ enum class Action
   ESCAPE,
   NONE, // for game start
   ERROR // reserved
-};
-
-// game rules
-enum class Rules
-{
-  MEUB,
-  KENDALL
 };
 }
