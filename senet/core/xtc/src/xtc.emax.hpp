@@ -1,6 +1,7 @@
 #pragma once
 #include "xtc.fwd.hpp"
-#include "xtc.objects.hpp"
+#include "xtc.state.hpp"
+#include "xtc.strategies.hpp"
 #include "xtc.logic.hpp"
 #include "xtc.eval.hpp"
 #include <array>

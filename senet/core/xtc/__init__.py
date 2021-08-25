@@ -8,7 +8,8 @@ PATH = path.dirname(path.realpath(__file__))
 __HDR = [
     f"{PATH}/src/xtc.common.hpp",
     f"{PATH}/src/xtc.fwd.hpp",
-    f"{PATH}/src/xtc.objects.hpp",
+    f"{PATH}/src/xtc.state.hpp",
+    f"{PATH}/src/xtc.strategies.hpp",
     f"{PATH}/src/xtc.logic.hpp",
     f"{PATH}/src/xtc.eval.hpp",
     f"{PATH}/src/xtc.emax.hpp"

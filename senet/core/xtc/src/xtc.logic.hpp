@@ -5,7 +5,8 @@
  */
 #pragma once
 #include "xtc.fwd.hpp"
-#include "xtc.objects.hpp"
+#include "xtc.state.hpp"
+#include "xtc.strategies.hpp"
 
 namespace xtc
 {
