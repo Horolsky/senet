@@ -187,8 +187,9 @@ ChanceNode StrategyNode::child(int choice, Strategies strategies) const
     new_state._data.agent = _data.agent; // bonus move
   else
     new_state._data.agent = (_data.agent ^ 1); // normal move
-
-  Action action = strategies.actions (choice);
+    
+  int index = bitf::solid::index_of(choice, strategies._data.indici, Strategies::indici_offset);
+  Action action = strategies.actions (index);
 
   /* STATE UPD */
   switch (action)

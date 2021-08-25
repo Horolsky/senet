@@ -141,6 +141,20 @@ public:
     _data = other._data;
     _data.agent = static_cast<int> (agent);
   }
+
+  ChanceNode &operator= (const State &other)
+  {
+    ChanceNode tmp {other};
+    std::swap(_data, tmp._data);
+    return *this;
+  }
+  ChanceNode &operator= (State &&other)
+  {
+    std::swap(_data, other._data);
+    return *this;
+  }
+
+
   StrategyNode child(int chance) const;
 };
 
