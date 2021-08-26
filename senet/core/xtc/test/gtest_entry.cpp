@@ -1,4 +1,5 @@
-#include "gtest/gtest.h"
+// #include "gtest/gtest.h"
+#include "gtest_helper.hpp"
 
 #include "gtest_dice.hpp"
 #include "gtest_state.hpp"

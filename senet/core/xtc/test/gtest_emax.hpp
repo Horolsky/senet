@@ -1,10 +1,5 @@
 #pragma once
-
-#include "../src/xtc.emax.hpp"
-#include "gtest/gtest.h"
-
-
-
+#include "gtest_helper.hpp"
 
 TEST (Emax, init)
 {

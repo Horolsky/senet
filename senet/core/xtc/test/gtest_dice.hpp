@@ -1,8 +1,5 @@
 #pragma once
-
-#include "../src/xtc.dice.hpp"
-#include "gtest/gtest.h"
-
+#include "gtest_helper.hpp"
 
 TEST (Dice, init)
 {

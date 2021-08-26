@@ -1,14 +1,12 @@
 #pragma once
+#include "gtest_helper.hpp"
 
-#include "../src/xtc.state.hpp"
-#include "gtest/gtest.h"
-
-TEST (xState, init)
+TEST (State, init)
 {
     EXPECT_NO_THROW(xtc::State());
 }
 
-TEST (xState, def_board)
+TEST (State, def_board)
 {
     auto s = xtc::State();
     int board[30];
@@ -18,7 +16,7 @@ TEST (xState, def_board)
     EXPECT_EQ(eq, true);
 }
 
-TEST (xState, build_seed)
+TEST (State, build_seed)
 {
     xtc::Unit agent = xtc::Unit::Y;
     int steps = 5;
@@ -27,7 +25,7 @@ TEST (xState, build_seed)
     EXPECT_EQ(s.seed(), 0b1010101010101010101010101010101010101010010001000100010001001011);
 }
 
-TEST (xState, build_seed_corrupted)
+TEST (State, build_seed_corrupted)
 {
     xtc::Unit agent = xtc::Unit::Y;
     int steps = 7;
@@ -36,7 +34,7 @@ TEST (xState, build_seed_corrupted)
     EXPECT_EQ(s.seed(), 0b1111111111111111111111111111111111111111111111111111111111111111);
 }
 
-TEST (xState, board_get)
+TEST (State, board_get)
 {
     xtc::Unit agent = xtc::Unit::Y;
     int steps = 1;
@@ -49,7 +47,7 @@ TEST (xState, board_get)
     }
 }
 
-TEST (xState, terminal)
+TEST (State, terminal)
 {
     xtc::Unit agent = xtc::Unit::X;
     int steps = 1;
@@ -57,3 +55,35 @@ TEST (xState, terminal)
     auto s = xtc::State(agent, steps, board);
     EXPECT_TRUE(s.is_terminal_node());
 }
+
+
+TEST (State, child)
+{
+    auto state = start_state(xtc::Unit::X, 1);
+    xtc::ChanceNode new_state = state.child(0);
+    int new_board[30] {1,0,0,1,0,1,0,1,0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2};
+    for (int i = 0; i < 30; i++)
+    {
+        EXPECT_EQ(new_state.board(i), static_cast<xtc::Unit>(new_board[i]));
+    }
+}
+
+TEST (State, assign)
+{
+    int board[30];
+    empty_board(board);
+    board[8] = 0;
+    auto state = xtc::StrategyNode(xtc::State::build_seed(xtc::Unit::X, 5, board));
+
+    EXPECT_EQ(state.agent(), xtc::Unit::X);
+    EXPECT_EQ(state.steps(), 5);
+    EXPECT_EQ(state.board(0), xtc::Unit::NONE);
+    EXPECT_TRUE(state.is_terminal_node()); 
+
+    state = start_state(xtc::Unit::Y, 1);
+    
+    EXPECT_EQ(state.agent(), xtc::Unit::Y);
+    EXPECT_EQ(state.steps(), 1);
+    EXPECT_EQ(state.board(0), xtc::Unit::X);
+}
+
