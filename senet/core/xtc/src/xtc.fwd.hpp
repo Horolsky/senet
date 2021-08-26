@@ -31,6 +31,7 @@ const int TRUTHS = 27;
 const int ATOUM = 28;
 const int SCARAB = 29;
 const int NETHER = 30;
+const int ERROR = 30; //sic, for use in Strategies::indici
 const int SKIPTURN = 31;
 }
 

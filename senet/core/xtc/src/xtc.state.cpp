@@ -27,7 +27,7 @@ Unit
 State::board (int index) const
 {
   return static_cast<Unit> (bitf::solid::get_scalar<int, uint64_t> (
-      _data.board, board_offset, index*board_offset));
+      _data.board, board_offset, index * board_offset));
 }
 
 Unit
@@ -57,7 +57,8 @@ State::operator= (State &&other)
 void
 State::update_board (int index, Unit unit)
 {
-  _data.board = bitf::solid::set_scalar (static_cast<int> (unit), _data.board, board_offset, index*board_offset);
+  _data.board = bitf::solid::set_scalar (static_cast<int> (unit), _data.board,
+                                         board_offset, index * board_offset);
 }
 uint64_t
 State::seed () const
@@ -65,31 +66,38 @@ State::seed () const
   return _data.seed;
 }
 
-bool State::is_chance_node () const
+bool
+State::is_chance_node () const
 {
   return _data.steps == 0;
 }
-bool State::is_strategy_node () const
+bool
+State::is_strategy_node () const
 {
   return _data.steps > 0;
 }
-bool State::is_terminal_node () const
+bool
+State::is_terminal_node () const
 {
-  int x = bitf::solid::index_of<int, uint64_t>(static_cast<int>(Unit::X), _data.board, board_offset);
-  int y = bitf::solid::index_of<int, uint64_t>(static_cast<int>(Unit::Y), _data.board, board_offset);
-  return ( y < 0 ) || ( x < 0 );
+  int x = bitf::solid::index_of<int, uint64_t> (static_cast<int> (Unit::X),
+                                                _data.board, board_offset);
+  int y = bitf::solid::index_of<int, uint64_t> (static_cast<int> (Unit::Y),
+                                                _data.board, board_offset);
+  return (y < 0) || (x < 0);
 }
 
-StrategyNode ChanceNode::child(int chance) const
+StrategyNode
+ChanceNode::child (int chance) const
 {
-  return StrategyNode(*this, chance);
+  return StrategyNode (*this, chance);
 }
 
-Strategies StrategyNode::strategies() const
+Strategies
+StrategyNode::strategies () const
 {
   Strategies strategies (0UL);
-  int steps = this->steps();
-  Unit agent = this->agent();
+  int steps = this->steps ();
+  Unit agent = this->agent ();
   Unit enemy = static_cast<Unit> (_data.agent ^ 1);
 
   /* HOUSE OF WATER PENALTY */
@@ -107,11 +115,14 @@ Strategies StrategyNode::strategies() const
       return strategies;
     }
   /* DIRECT MOVE */
+  int team_size = 0;
   for (int i = 0; i < State::board_size; i++)
     {
       Unit cell_occupation = this->board (i);
       if (cell_occupation != agent)
         continue;
+      else
+        ++team_size;
       int dest = i + steps;
       Unit trgt = this->board (dest);
       if (i == House::SCARAB)
@@ -121,7 +132,11 @@ Strategies StrategyNode::strategies() const
       else if (i != House::BEAUTY && dest > House::BEAUTY)
         continue; // forbidden house arriving
       else if (dest > House::SCARAB)
-        continue; // corrupted logic
+      {
+        strategies._data.seed = 0;
+        strategies.push (House::ERROR, Action::ERROR);
+        break;
+      }
       else if (trgt == Unit::NONE)
         strategies.push (i, Action::MOVE);
       else if (trgt == enemy)
@@ -164,17 +179,26 @@ Strategies StrategyNode::strategies() const
         }
     }
 
-  if (strategies.mobility () == 0)
+  if (strategies.mobility () == 0 || team_size == 1)
     {
       strategies.push (House::SKIPTURN, Action::SKIP);
     }
+
+  if (team_size == 0)
+    {
+      strategies._data.seed = 0;
+      strategies.push (House::ERROR, Action::ERROR);
+      // throw std::logic_error("corrupted game logic");
+    }
   return strategies;
 }
-ChanceNode StrategyNode::child(int choice, Strategies strategies) const
+ChanceNode
+StrategyNode::child (int choice, Strategies strategies) const
 {
-  if (strategies.seed() == 0UL) strategies = this->strategies();
-  if (strategies.mobility() > 0 && !strategies.contains (choice))
-    throw std::logic_error("illegal move");
+  if (strategies.seed () == 0UL)
+    strategies = this->strategies ();
+  if (strategies.mobility () > 0 && !strategies.contains (choice))
+    throw std::logic_error ("illegal move");
 
   Unit agent = static_cast<Unit> (_data.agent);
   Unit enemy = static_cast<Unit> (_data.agent ^ 1);
@@ -187,8 +211,9 @@ ChanceNode StrategyNode::child(int choice, Strategies strategies) const
     new_state._data.agent = _data.agent; // bonus move
   else
     new_state._data.agent = (_data.agent ^ 1); // normal move
-    
-  int index = bitf::solid::index_of(choice, strategies._data.indici, Strategies::indici_offset);
+
+  int index = bitf::solid::index_of (choice, strategies._data.indici,
+                                     Strategies::indici_offset);
   Action action = strategies.actions (index);
 
   /* STATE UPD */
@@ -219,17 +244,19 @@ ChanceNode StrategyNode::child(int choice, Strategies strategies) const
     case Action::ATTACK_HOUSE:
       new_state.update_board (choice + steps, agent);
       new_state.update_board (choice, Unit::NONE);
+      /* this case is not well defined by Kendall's rules, need review */
       for (int i = House::WATERS; i >= 0; i--)
         {
           if (new_state.board (i) == Unit::NONE)
             {
-              new_state.update_board (House::WATERS, enemy);
+              new_state.update_board (i, enemy);
               break;
             }
         }
       break;
     default:
-      new_state._data.seed = 0UL; // corrupted logic
+      throw std::logic_error ("corrupted game logic");
+      // new_state._data.seed = 0UL; // corrupted logic
       break;
     }
   return new_state;
