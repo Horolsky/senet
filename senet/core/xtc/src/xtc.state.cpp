@@ -109,7 +109,7 @@ StrategyNode::strategies () const
         }
       else if (this->board (House::REBIRTH) == Unit::NONE)
         {
-          strategies.push (House::REBIRTH, Action::DROW); // reborning
+          strategies.push (House::WATERS, Action::DROW); // reborning
           strategies.push (House::SKIPTURN, Action::SKIP);
         }
       return strategies;
