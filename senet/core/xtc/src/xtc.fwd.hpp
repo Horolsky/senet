@@ -1,8 +1,11 @@
 #pragma once
-#include "xtc.common.hpp"
+#include "../lib/bitf/src/bitf_solid.hpp"
+#include <cstdint>
 
-_XTC_BULK_EXTERN (int *)
-_XTC_SCALAR_EXTERN (int)
+using uint8_t = std::uint8_t;
+using uint16_t = std::uint16_t;
+using uint32_t = std::uint32_t;
+using uint64_t = std::uint64_t;
 
 namespace xtc
 {
@@ -54,6 +57,7 @@ enum class Action
   ATTACK,
   ATTACK_HOUSE,
   ESCAPE,
+  PANIC,
   NONE, // for game start
   ERROR // reserved
 };

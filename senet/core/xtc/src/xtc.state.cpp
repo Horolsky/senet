@@ -83,7 +83,7 @@ State::is_terminal_node () const
                                                 _data.board, board_offset);
   int y = bitf::solid::index_of<int, uint64_t> (static_cast<int> (Unit::Y),
                                                 _data.board, board_offset);
-  return (y < 0) || (x < 0);
+  return y < 0 || y >= board_size || x < 0 || x >= board_size;
 }
 
 StrategyNode
@@ -116,13 +116,17 @@ StrategyNode::strategies () const
     }
   /* DIRECT MOVE */
   int team_size = 0;
+  int last_paw = -1;
   for (int i = 0; i < State::board_size; i++)
     {
       Unit cell_occupation = this->board (i);
       if (cell_occupation != agent)
         continue;
       else
+      {
         ++team_size;
+        last_paw = i;
+      }
       int dest = i + steps;
       Unit trgt = this->board (dest);
       if (i == House::SCARAB)
@@ -179,10 +183,14 @@ StrategyNode::strategies () const
         }
     }
 
-  if (strategies.mobility () == 0 || team_size == 1)
+  if (strategies.mobility () == 0)
     {
       strategies.push (House::SKIPTURN, Action::SKIP);
     }
+  if (team_size == 1 && last_paw > House::WATERS)
+  {
+    strategies.push(last_paw, Action::PANIC);
+  }
 
   if (team_size == 0)
     {
@@ -212,7 +220,7 @@ StrategyNode::child (int choice, Strategies strategies) const
   else
     new_state._data.agent = (_data.agent ^ 1); // normal move
 
-  int index = bitf::solid::index_of (choice, strategies._data.indici,
+  int index = bitf::solid::index_of<int>(choice, strategies._data.indici,
                                      Strategies::indici_offset);
   Action action = strategies.actions (index);
 
@@ -237,6 +245,10 @@ StrategyNode::child (int choice, Strategies strategies) const
       new_state.update_board (choice - 1, agent);
       new_state.update_board (choice, enemy);
       break;
+    case Action::RETREAT:
+      new_state.update_board (choice - 1, agent);
+      new_state.update_board (choice, Unit::NONE);
+      break;
     case Action::ATTACK:
       new_state.update_board (choice + steps, agent);
       new_state.update_board (choice, enemy);
@@ -253,6 +265,10 @@ StrategyNode::child (int choice, Strategies strategies) const
               break;
             }
         }
+      break;
+    case Action::PANIC:
+      new_state.update_board (choice, new_state.board(House::BEAUTY));
+      new_state.update_board (House::BEAUTY, agent);
       break;
     default:
       throw std::logic_error ("corrupted game logic");

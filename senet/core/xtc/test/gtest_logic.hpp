@@ -71,10 +71,13 @@ TEST (Logic, MOVE)
     auto state = xtc::StrategyNode(xtc::State::build_seed(xtc::Unit::X, chance, board));
     
     int moves[6] {8,13,18,23,24,25};
-    int steps[6] {5, 5, 5, 1, 1, 5};
+    int steps[6] {5, 5, 1, 1, 5, 5};
     for (int i = 0; i < 6; i++)
     {
-        state = state.child(moves[i]).child(steps[i]);
+        auto strat = state.child(moves[i]);
+        strat.board(board);
+        state = strat.child(steps[i]);
+        
     }
     EXPECT_TRUE(state.is_terminal_node());   
     EXPECT_EQ(xtc::Eval::expectation(state), 0);   
