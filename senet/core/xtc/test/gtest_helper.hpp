@@ -22,3 +22,10 @@ void empty_board(int* board)
     for (int i = 0; i < 30; i++)
     board[i] = 2;
 }
+
+bool check_board(int* board, const State& state)
+{
+    for (int i = 0; i < 30; i++)
+    if (board[i] != static_cast<int>(state.board(i))) return false;
+    return true;
+}

@@ -15,6 +15,10 @@ TEST (Logic, SKIP)
     EXPECT_EQ(strats.mobility(), 1);
     EXPECT_EQ(strats.indici(0), House::SKIPTURN);
     EXPECT_EQ(strats.actions(0), Action::SKIP);
+
+    state = state.child(House::SKIPTURN).child(1);
+    EXPECT_EQ(state.agent(), Unit::X);//repeat
+    EXPECT_TRUE(check_board(board, state));
 }
 
 TEST (Logic, MOVE)
@@ -23,13 +27,19 @@ TEST (Logic, MOVE)
     empty_board(board);
     board[0] = 0;
     board[6] = 1;
-    int chance = 5;
+    int chance = 3;
     auto state = StrategyNode(State::build_seed(Unit::X, chance, board));
     
     auto strats = state.strategies();
     EXPECT_EQ(strats.mobility(), 1);
     EXPECT_EQ(strats.indici(0), 0);
     EXPECT_EQ(strats.actions(0), Action::MOVE);   
+
+    state = state.child(0).child(1);
+    EXPECT_EQ(state.agent(), Unit::Y);
+    board[0] = 2;
+    board[3] = 0;
+    EXPECT_TRUE(check_board(board, state));
 }
 
 TEST (Logic, RETREAT)
@@ -46,6 +56,12 @@ TEST (Logic, RETREAT)
     EXPECT_EQ(strats.mobility(), 1);
     EXPECT_EQ(strats.indici(0), 5);
     EXPECT_EQ(strats.actions(0), Action::RETREAT);   
+
+    state = state.child(5).child(1);
+    EXPECT_EQ(state.agent(), Unit::X);
+    board[5] = 2;
+    board[4] = 0;
+    EXPECT_TRUE(check_board(board, state));
 }
 
 TEST (Logic, SWAPBACK)
@@ -63,6 +79,12 @@ TEST (Logic, SWAPBACK)
     EXPECT_EQ(strats.mobility(), 1);
     EXPECT_EQ(strats.indici(0), 5);
     EXPECT_EQ(strats.actions(0), Action::SWAPBACK);   
+
+    state = state.child(5).child(1);
+    EXPECT_EQ(state.agent(), Unit::X);
+    board[5] = 1;
+    board[4] = 0;
+    EXPECT_TRUE(check_board(board, state));
 }
 
 TEST (Logic, DROW)
