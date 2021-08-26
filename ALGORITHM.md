@@ -24,6 +24,19 @@ def expectiminimax(node, depth)
     return α
 ```
 
+### recursive version 2
+```python
+def emax(node, depth):
+    if terminal(node) or depth is 0:
+        return eval(node)
+    if agent(node) is minimizer:
+        return min([emax(child, depth-1) for child in children(node)])
+    if agent(node) is maximizer:
+        return max([emax(child, depth-1) for child in children(node)])
+    if chance(node): 
+        return sum([P[child] * emax(child, depth-1) for child in children(node)])
+```
+
 ### DFS version
 one iteration includes both decision and chance  
 TURNS = finite set of possible turns  
