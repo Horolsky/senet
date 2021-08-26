@@ -7,11 +7,13 @@
 #include "../src/xtc.emax.hpp"
 #include "gtest/gtest.h"
 
+using namespace xtc;
+
 const int start_board[30] {0,1,0,1,0,1,0,1,0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2};
 
-xtc::StrategyNode start_state(xtc::Unit agent, int steps)
+StrategyNode start_state(Unit agent, int steps)
 {
-    auto state = xtc::StrategyNode(xtc::State(), agent, steps);
+    auto state = StrategyNode(State(), agent, steps);
     return state;
 }
 

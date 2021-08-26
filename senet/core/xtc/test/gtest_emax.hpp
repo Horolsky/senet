@@ -3,11 +3,11 @@
 
 TEST (Emax, init)
 {
-    EXPECT_NO_THROW(xtc::Emax());
+    EXPECT_NO_THROW(Emax());
 }
 
 TEST (Emax, call)
 {
-    auto s = xtc::StrategyNode(xtc::State(),5);
-    EXPECT_NO_THROW(xtc::Emax()(s));
+    auto s = StrategyNode(State(),5);
+    EXPECT_NO_THROW(Emax()(s));
 }

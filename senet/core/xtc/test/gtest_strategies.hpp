@@ -3,16 +3,16 @@
 
 TEST (Strategies, init)
 {
-    EXPECT_NO_THROW(xtc::Strategies());
+    EXPECT_NO_THROW(Strategies());
 }
 
 TEST (Strategies, seed_contains)
 {
-    xtc::Unit agent {xtc::Unit::Y};
+    Unit agent {Unit::Y};
     int mobility {5};
     int indici[5] {1,3,5,7,9};
     int actions[5] {0,0,0,0,0};
-    auto s = xtc::Strategies(agent, mobility, indici, actions); 
+    auto s = Strategies(agent, mobility, indici, actions); 
 
     EXPECT_TRUE(s.contains(1));
     EXPECT_TRUE(s.contains(3));
@@ -23,8 +23,8 @@ TEST (Strategies, seed_contains)
 
 TEST (Strategies, y_starts)
 {
-    auto state = start_state(xtc::Unit::Y, 1);
-    xtc::Strategies s = state.strategies();
+    auto state = start_state(Unit::Y, 1);
+    Strategies s = state.strategies();
 
     EXPECT_TRUE(s.contains(1));
     EXPECT_TRUE(s.contains(3));
