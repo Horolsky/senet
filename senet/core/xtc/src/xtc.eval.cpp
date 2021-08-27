@@ -69,6 +69,7 @@ Eval::operator() (const State &state) const
       return poly_eval (state, _coefs);
       break;
     default:
+      throw std::logic_error("invalid _func_id");
       break;
     }
 }

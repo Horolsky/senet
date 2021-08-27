@@ -8,6 +8,13 @@ TEST (Emax, init)
 
 TEST (Emax, call)
 {
-    auto s = StrategyNode(State(),5);
+    auto s = StrategyNode(State(),1);
     EXPECT_NO_THROW(Emax()(s));
+}
+
+TEST (Emax, choice)
+{
+    auto s = StrategyNode(State(),1);
+    int choice = Emax()(s);
+    EXPECT_LE(choice, s.strategies().mobility());
 }

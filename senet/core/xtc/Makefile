@@ -4,19 +4,20 @@ PROJ_V = 0.0.1
 PROJ_N = senet_xtc
 PROJ_SO = $(PROJ_N)-$(PROJ_V)-$(MACHINE_NAME)-$(KERNEL_NAME).so
 
-.PHONY: all clean clean_test build test format tidy check check_dep update_libs
+.PHONY: all clean clean_test build test format tidy check check_dep update_libs manual
 
 CPPFLAGS += -isystem $(GTEST_DIR)/include
 # TODO: flag for clang -Wgnu-anonymous-struct to avoid -std=gnu++2a
-TESTFLAGS += -pthread -fPIC -g -std=gnu++14 -Wall -Wextra -pedantic 
+TESTFLAGS += -pthread -fPIC -g -O3 -std=gnu++14 -Wall -Wextra -pedantic 
 BUILDFLAGS += -pthread -fPIC -std=gnu++14 -O3
-#  -fsanitize=address,undefined
+# -fsanitize=address,undefined
 LDFLAGS += -fsanitize=address,undefined
 
 SRC_D := src
 LIB_D := lib
 TST_D := test
 BLD_D := build
+MAN_D := manual
 
 #external dependencies
 DEPS = $(LIB_D)/bitf
@@ -24,8 +25,13 @@ DEPS = $(LIB_D)/bitf
 HEADERS = $(SRC_D)/*.hpp
 BLD_O := $(patsubst $(SRC_D)/%.cpp, $(BLD_D)/%.o, $(wildcard $(SRC_D)/*.cpp))
 TST_O := $(patsubst $(SRC_D)/%.cpp, $(TST_D)/%.o, $(wildcard $(SRC_D)/*.cpp))
+
+MAN_OUT := $(patsubst $(MAN_D)/%.cpp, $(MAN_D)/%, $(wildcard $(MAN_D)/*.cpp))
+MAN_O := $(patsubst %, %.o, $(MAN_OUT))
+
 source = $(patsubst $(BLD_D)/%.o, $(SRC_D)/%.cpp, $(1))
 testsource = $(patsubst $(TST_D)/%.o, $(SRC_D)/%.cpp, $(1))
+mansource = $(patsubst $(MAN_D)/%.o, $(MAN_D)/%.cpp, $(1))
 
 #build object file
 $(BLD_O): $(HEADERS) $(DEPS)
@@ -36,8 +42,15 @@ $(TST_O): $(HEADERS) $(DEPS)
 	$(CXX) $(CPPFLAGS) -I$(SRC_D) $(TESTFLAGS) -c \
             $(call testsource, $@) -o $@
 
+$(MAN_O): $(HEADERS) $(DEPS)
+	$(CXX) $(CPPFLAGS) -I$(SRC_D) $(TESTFLAGS) -c \
+            $(call mansource, $@) -o $@
+
+$(MAN_OUT): $(MAN_O) $(BLD_D)/$(PROJ_SO)
+	$(CXX) $@.o  $(BLD_D)/$(PROJ_SO) -o $@
+
 print:
-	@echo $(PROJ_SO)
+	@echo $(MAN_OUT)
 
 # $(DEPS): update_libs
 
@@ -65,6 +78,9 @@ tidy: .clang-tidy
 
 clean_test:
 	rm -fr test/*.o test/*.a test/gtest_entry
+
+clean_manual:
+	rm -fr manual/*.o
 
 clean: clean_test
 	rm -fr $(BLD_D)/*

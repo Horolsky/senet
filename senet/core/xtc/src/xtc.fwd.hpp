@@ -20,7 +20,7 @@ class Dice;
 /* ALGO FUNCTORS*/
 
 class Eval;
-class Expectimax;
+class Emax;
 
 /* CONSTANTS & ENUMS */
 
