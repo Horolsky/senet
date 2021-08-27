@@ -150,7 +150,7 @@ class Ply:
         # if choice not in self.strategies.indici:
         #     raise RuntimeError("invalid strategy")
         strategies = self.strategies._strategies
-        state = self.__state.child(choice,strategies).child(chance)
+        state = self.__state.choice(choice,strategies).chance(chance)
         index = self.strategies.indici.index(choice)
         event = Ply.Event(
             agent=self.agent, 

@@ -16,7 +16,7 @@ TEST (Logic, SKIP)
     EXPECT_EQ(strats.indici(0), House::SKIPTURN);
     EXPECT_EQ(strats.actions(0), Action::SKIP);
 
-    state = state.child(House::SKIPTURN).child(1);
+    state = state.choice(House::SKIPTURN).chance(1);
     EXPECT_EQ(state.agent(), Unit::X);//repeat
     EXPECT_TRUE(check_board(board, state));
 }
@@ -35,7 +35,7 @@ TEST (Logic, MOVE)
     EXPECT_EQ(strats.indici(0), 0);
     EXPECT_EQ(strats.actions(0), Action::MOVE);   
 
-    state = state.child(0).child(1);
+    state = state.choice(0).chance(1);
     EXPECT_EQ(state.agent(), Unit::Y);
     board[0] = 2;
     board[3] = 0;
@@ -57,7 +57,7 @@ TEST (Logic, RETREAT)
     EXPECT_EQ(strats.indici(0), 5);
     EXPECT_EQ(strats.actions(0), Action::RETREAT);   
 
-    state = state.child(5).child(1);
+    state = state.choice(5).chance(1);
     EXPECT_EQ(state.agent(), Unit::X);
     board[5] = 2;
     board[4] = 0;
@@ -80,7 +80,7 @@ TEST (Logic, SWAPBACK)
     EXPECT_EQ(strats.indici(0), 5);
     EXPECT_EQ(strats.actions(0), Action::SWAPBACK);   
 
-    state = state.child(5).child(1);
+    state = state.choice(5).chance(1);
     EXPECT_EQ(state.agent(), Unit::X);
     board[5] = 1;
     board[4] = 0;
@@ -113,7 +113,7 @@ TEST (Logic, ATTACK)
     int chance = 1;
     auto state = StrategyNode(State::build_seed(Unit::X, chance, board));
     
-    state = state.child(8).child(2);
+    state = state.choice(8).chance(2);
     EXPECT_EQ(state.board(8), Unit::Y);
     EXPECT_EQ(state.board(9), Unit::X);
 }
@@ -129,7 +129,7 @@ TEST (Logic, ATTACK_HOUSE)
     
     EXPECT_EQ(state.strategies().actions(0), Action::ATTACK_HOUSE);
     
-    state = state.child(25).child(3);
+    state = state.choice(25).chance(3);
     EXPECT_EQ(state.board(29), Unit::X);
     EXPECT_EQ(state.board(26), Unit::Y); // DROWED    
 }
@@ -180,9 +180,9 @@ TEST (Logic, _complex_1)
     int steps[6] {5, 5, 1, 1, 5, 5};
     for (int i = 0; i < 6; i++)
     {
-        auto strat = state.child(moves[i]);
+        auto strat = state.choice(moves[i]);
         strat.board(board);
-        state = strat.child(steps[i]);
+        state = strat.chance(steps[i]);
         
     }
     EXPECT_TRUE(state.is_terminal_node());   

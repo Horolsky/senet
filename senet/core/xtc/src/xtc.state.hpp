@@ -116,7 +116,7 @@ private:
 /**
  * ChanceNode with chance (steps) = 0.
  * cannot be incremented
- * child(int chance) returns StrategyNode
+ * chance(int chance) returns StrategyNode
  */ 
 class ChanceNode : public State
 {
@@ -155,14 +155,14 @@ public:
   }
 
 
-  StrategyNode child(int chance) const;
+  StrategyNode chance(int chance) const;
 };
 
 /**
  * StrategyNode with non-zero steps parameter.
  * if no steps passed to a constructor, 
  * this parameter derived from given seed or state
- * child(int chance) returns incremented state as ChanceNode
+ * choice(int choice) returns incremented state as ChanceNode
  */ 
 class StrategyNode : public State
 {
@@ -207,7 +207,7 @@ public:
       throw std::logic_error ("zero steps in StrategyNode");
   }
   Strategies strategies() const;
-  ChanceNode child(int i, Strategies strategies = Strategies(0UL)) const;
+  ChanceNode choice(int i, Strategies strategies = Strategies(0UL)) const;
 };
 
 } // namespace xtc

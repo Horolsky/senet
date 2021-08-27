@@ -87,7 +87,7 @@ State::is_terminal_node () const
 }
 
 StrategyNode
-ChanceNode::child (int chance) const
+ChanceNode::chance (int chance) const
 {
   return StrategyNode (*this, chance);
 }
@@ -201,7 +201,7 @@ StrategyNode::strategies () const
   return strategies;
 }
 ChanceNode
-StrategyNode::child (int choice, Strategies strategies) const
+StrategyNode::choice (int choice, Strategies strategies) const
 {
   if (strategies.seed () == 0UL)
     strategies = this->strategies ();

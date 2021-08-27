@@ -60,7 +60,7 @@ TEST (State, terminal)
 TEST (State, child)
 {
     auto state = start_state(Unit::X, 1);
-    ChanceNode new_state = state.child(0);
+    ChanceNode new_state = state.choice(0);
     int new_board[30] {1,0,0,1,0,1,0,1,0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2};
     for (int i = 0; i < 30; i++)
     {

@@ -88,7 +88,7 @@ expectations_par (const StrategyNode &choicenode, const Strategies &strats,
 
   for (int i = 0; i < strats.mobility (); i++)
     {
-      auto chancenode = choicenode.child (strats.indici (i), strats);
+      auto chancenode = choicenode.choice (strats.indici (i), strats);
       threads[i]
           = std::thread (threadwork, chancenode, expectations + i, depth + 1);
       GLOBAL_STATE.threads_created++;
@@ -133,7 +133,7 @@ expectation_rec (const ChanceNode &chancenode, int depth)
   for (int steps = 1; steps < Dice::P.size (); steps++)
     {
       // taking minimax for this choice node
-      auto choicenode = chancenode.child (steps);
+      auto choicenode = chancenode.chance (steps);
       auto strats = choicenode.strategies ();
       double *expectations = new double[strats.mobility ()];
       if (expectations == nullptr)
@@ -150,7 +150,7 @@ expectation_rec (const ChanceNode &chancenode, int depth)
           for (int i = 0; i < strats.mobility (); i++)
             {
               auto chance_subnode
-                  = choicenode.child (strats.indici (i), strats);
+                  = choicenode.choice (strats.indici (i), strats);
               expectations[i] = expectation_rec (chance_subnode, depth + 1);
             }
         }
