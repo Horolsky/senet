@@ -31,6 +31,7 @@ public:
 
   Eval () = default;
   Eval (Eval::FuncID func_id, std::array<int, coef_n> coefs = { 1, 0, 0, 0 });
+  Eval (Eval::FuncID func_id, int* coefs);
   Eval (const Eval &other) : _func_id(other._func_id), _coefs(other._coefs) {};
   Eval (Eval &&other) : _func_id(other._func_id), _coefs(std::move(other._coefs)) {};
   

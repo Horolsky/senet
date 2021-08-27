@@ -188,3 +188,11 @@ TEST (Logic, _complex_1)
     EXPECT_TRUE(state.is_terminal_node());   
     EXPECT_EQ(Eval::expectation(state), 0);   
 }
+
+TEST(Logic, REBIRTH_OCCUPIED)
+{
+    uint64_t seed = 12143157482611190434;
+    auto node = StrategyNode(seed);
+    auto strats = node.strategies();
+    EXPECT_GT(strats.mobility(), 0);
+}

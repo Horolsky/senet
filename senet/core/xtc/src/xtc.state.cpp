@@ -10,8 +10,12 @@ State::build_seed (Unit agent, int steps, int *board)
   State::bitfield data{ .seed = 0UL };
   data.agent = static_cast<uint64_t> (agent);
   data.steps = steps;
-  data.board = bitf::solid::set_bulk<int *, uint64_t> (
-      board, board + board_size, 0UL, board_offset);
+  if (board != nullptr)
+    data.board = bitf::solid::set_bulk<int *, uint64_t> (
+        board, board + board_size, 0UL, board_offset);
+  else
+    data.board
+        = 0b101010101010101010101010101010101010101001000100010001000100;
   return data.seed;
 }
 
@@ -34,6 +38,11 @@ Unit
 State::agent () const
 {
   return static_cast<Unit> (_data.agent);
+}
+Unit
+State::enemy () const
+{
+  return static_cast<Unit> (_data.agent ^ 1);
 }
 int
 State::steps () const
@@ -112,6 +121,10 @@ StrategyNode::strategies () const
           strategies.push (House::WATERS, Action::DROW); // reborning
           strategies.push (House::SKIPTURN, Action::SKIP);
         }
+      else
+        {
+          strategies.push (House::SKIPTURN, Action::SKIP);
+        }
       return strategies;
     }
   /* DIRECT MOVE */
@@ -123,10 +136,10 @@ StrategyNode::strategies () const
       if (cell_occupation != agent)
         continue;
       else
-      {
-        ++team_size;
-        last_paw = i;
-      }
+        {
+          ++team_size;
+          last_paw = i;
+        }
       int dest = i + steps;
       Unit trgt = this->board (dest);
       if (i == House::SCARAB)
@@ -136,11 +149,11 @@ StrategyNode::strategies () const
       else if (i != House::BEAUTY && dest > House::BEAUTY)
         continue; // forbidden house arriving
       else if (dest > House::SCARAB)
-      {
-        strategies._data.seed = 0;
-        strategies.push (House::ERROR, Action::ERROR);
-        break;
-      }
+        {
+          strategies._data.seed = 0;
+          strategies.push (House::ERROR, Action::ERROR);
+          break;
+        }
       else if (trgt == Unit::NONE)
         strategies.push (i, Action::MOVE);
       else if (trgt == enemy)
@@ -188,9 +201,9 @@ StrategyNode::strategies () const
       strategies.push (House::SKIPTURN, Action::SKIP);
     }
   if (team_size == 1 && last_paw > House::WATERS)
-  {
-    strategies.push(last_paw, Action::PANIC);
-  }
+    {
+      strategies.push (last_paw, Action::PANIC);
+    }
 
   if (team_size == 0)
     {
@@ -220,8 +233,8 @@ StrategyNode::choice (int choice, Strategies strategies) const
   else
     new_state._data.agent = (_data.agent ^ 1); // normal move
 
-  int index = bitf::solid::index_of<int>(choice, strategies._data.indici,
-                                     Strategies::indici_offset);
+  int index = bitf::solid::index_of<int> (choice, strategies._data.indici,
+                                          Strategies::indici_offset);
   Action action = strategies.actions (index);
 
   /* STATE UPD */
@@ -267,7 +280,7 @@ StrategyNode::choice (int choice, Strategies strategies) const
         }
       break;
     case Action::PANIC:
-      new_state.update_board (choice, new_state.board(House::BEAUTY));
+      new_state.update_board (choice, new_state.board (House::BEAUTY));
       new_state.update_board (House::BEAUTY, agent);
       break;
     default:

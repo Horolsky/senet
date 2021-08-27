@@ -22,13 +22,9 @@ public:
   static const int chance_number{ 5 };
   static const int stick_number{ 4 };
   int roll ();
-  int
-  operator[] (size_t i) const
-  {
-    if (i >= stick_number)
-      throw std::overflow_error ("only 4 sticks in dice");
-    return _sticks[i];
-  }
+  int operator[] (size_t i) const;
+  int* sticks (int* it) const;
+  int sticks (size_t i) const;
 
 private:
   std::array<int,4> _sticks { 0, 0, 0, 0 };

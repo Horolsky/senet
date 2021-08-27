@@ -53,6 +53,26 @@ Eval::Eval (Eval::FuncID func_id, std::array<int, coef_n> coefs)
   _func_id = func_id;
   _coefs = norm_coefs;
 }
+Eval::Eval (Eval::FuncID func_id, int* coefs)
+{
+  int def_coefs[4] {1,0,0,0};
+  if (coefs == nullptr)
+  {
+    coefs = def_coefs;
+  }
+  std::array<double, coef_n> norm_coefs;
+  int sum = 0;
+  for (int i = 0; i < coef_n; i++)
+    {
+      sum += coefs[i];
+    }
+  for (int i = 0; i < coef_n; i++)
+    {
+      norm_coefs[i] = ((double)coefs[i]) / sum;
+    }
+  _func_id = func_id;
+  _coefs = norm_coefs;
+}
 
 double
 Eval::operator() (const State &state) const

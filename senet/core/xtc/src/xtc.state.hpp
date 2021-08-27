@@ -45,7 +45,7 @@ public:
   static const int steps_offset{ 3 };
   static const int board_offset{ 2 };
   static const int board_size{ 30 };
-  static uint64_t build_seed (Unit agent, int steps, int *board);
+  static uint64_t build_seed (Unit agent, int steps, int *board = nullptr);
 
   State () { _data.seed = def_state_seed; }
   State (uint64_t seed) { _data.seed = seed; }
@@ -102,6 +102,7 @@ public:
   Unit board (int) const;
 
   Unit agent () const;
+  Unit enemy () const;
   int steps () const;
   uint64_t seed () const;
 

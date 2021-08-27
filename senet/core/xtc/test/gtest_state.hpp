@@ -87,3 +87,16 @@ TEST (State, assign)
     EXPECT_EQ(state.board(0), Unit::X);
 }
 
+TEST(StrategyNode, init)
+{
+    
+    EXPECT_NO_THROW(StrategyNode(State(),1));
+    EXPECT_NO_THROW(StrategyNode(State(), Unit::X,1));
+    EXPECT_NO_THROW(StrategyNode(State(), Unit::Y,1));
+    
+    // int st = ;
+    // EXPECT_GT(StrategyNode(State()).steps(), 0);
+    EXPECT_THROW(StrategyNode(State()).steps(), std::logic_error);
+    EXPECT_THROW(StrategyNode(State(), Unit::Y,0), std::logic_error);
+    EXPECT_THROW(StrategyNode(State(), Unit::Y), std::logic_error);
+}
