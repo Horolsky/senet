@@ -6,14 +6,14 @@ from os import path
 PATH = path.dirname(path.realpath(__file__))
 
 __HDR = [
-    f"{PATH}/src/xtc.common.hpp",
     f"{PATH}/src/xtc.fwd.hpp",
+    f"{PATH}/src/xtc.dice.hpp",
     f"{PATH}/src/xtc.state.hpp",
     f"{PATH}/src/xtc.strategies.hpp",
     f"{PATH}/src/xtc.eval.hpp",
     f"{PATH}/src/xtc.emax.hpp"
     ]
-__SMBS = ["Dice", "House", "Unit", "Action", "Strategies", "State",  "StrategyNode", "ChanceNode", "Eval", "Expectimax"]
+__SMBS = ["Dice", "House", "Unit", "Action", "Strategies", "State",  "StrategyNode", "ChanceNode", "Eval", "Emax"]
 
 __STD_T = [
     (["uint8_t","uint16_t","uint32_t","uint64_t",], "cstdint"),
@@ -40,6 +40,7 @@ def __load_std():
             raise ImportError(f"unable to load {header}")
         for smb in symbols:
             _std[smb] = eval(f"cppyy.gbl.std.{smb}")
+
     globals().update(_std)
         
 __load_src()

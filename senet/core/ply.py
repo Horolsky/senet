@@ -75,7 +75,8 @@ class Ply:
             seed = kwargs["seed"]
             if type(seed) not in (int, uint64_t):
                 raise TypeError("invalid seed type")
-            state = StrategyNode(uint64_t(seed))
+            seed = uint64_t(seed)
+            state = StrategyNode(seed)
         # manual init
         elif "state" in kwargs:
             state = kwargs["state"]
@@ -107,9 +108,13 @@ class Ply:
 
         self.__board = None
         self.__stratview = None
+        self.__expectation = None
 
     @property
-    def seed(self) -> int:
+    def state(self) -> StrategyNode:
+        return self.__state
+    @property
+    def seed(self) -> uint64_t:
         return self.__seed
     @property
     def agent(self) -> Unit:
@@ -119,7 +124,9 @@ class Ply:
         return self.__state.steps()
     @property
     def expectation(self) -> float:
-        return Unit(self.__state.expectation())
+        if self.__expectation is None:
+            self.__expectation = Eval()(self.__state)
+        return self.__expectation
     @property
     def board(self) -> Tuple[Unit]:
         if self.__board is None:
