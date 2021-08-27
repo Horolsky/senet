@@ -17,11 +17,11 @@ int main(int argc, char* argv[])
     {
         time = stoi(argv[2]);
     }
-    auto e = Emax();
+    auto e = Emax(Eval(), Emax::AlgoID::RECURSIVE,depth,time);
     auto s = StrategyNode(State(),1);
     
     auto start = chrono::steady_clock::now();
-    int choice = e(s,depth,time);
+    int choice = e(s);
     auto wtime = (chrono::steady_clock::now() - start);
     
     cout << "seed: " << s.seed() << endl;

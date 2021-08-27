@@ -52,33 +52,6 @@
             ]
         }
     },
-    "agent-v": {
-        "depth": {
-            "value": 1,
-            "type": "number",
-            "options": [0,12],
-            "descr": [
-                "search depth of ai agents in autoplay"
-            ]
-        },
-        "eval": {
-            "value": "basic",
-            "type": "flag",
-            "options": [ "basic", "linear", "Meub" ],
-            "descr": [
-                "state evaluation function of 1st ai player"
-            ]
-        },
-        "coefs": {
-            "value": [1,0,0,0],
-            "type": "list",
-            "options": [0,100],
-            "descr": [
-                "coefficients for linear evaluation of 1st ai player"
-            ],
-            "lrange": [4,4]
-        }
-    },
     "agent-x": {
         "depth": {
             "value": 1,
@@ -91,9 +64,9 @@
         "eval": {
             "value": "basic",
             "type": "flag",
-            "options": [ "basic", "linear", "Meub" ],
+            "options": [ "basic", "linear", "polynomial" ],
             "descr": [
-                "state evaluation function of 1st ai player"
+                "state evaluation function of X ai player"
             ]
         },
         "coefs": {
@@ -101,20 +74,55 @@
             "type": "list",
             "options": [0,100],
             "descr": [
-                "coefficients for linear evaluation of 1st ai player"
+                "coefficients for linear evaluation of X ai player"
             ],
             "lrange": [4,4]
+        },
+        "emax": {
+            "value": "recursive",
+            "type": "flag",
+            "options": [ "recursive", "iterative" ],
+            "descr": [
+                "expectimax algorithm of X ai player"
+            ]
+        }
+    },
+    "agent-y": {
+        "depth": {
+            "value": 1,
+            "type": "number",
+            "options": [0,12],
+            "descr": [
+                "search depth of ai agents in autoplay"
+            ]
+        },
+        "eval": {
+            "value": "basic",
+            "type": "flag",
+            "options": [ "basic", "linear", "polynomial" ],
+            "descr": [
+                "state evaluation function of Y ai player"
+            ]
+        },
+        "coefs": {
+            "value": [1,0,0,0],
+            "type": "list",
+            "options": [0,100],
+            "descr": [
+                "coefficients for linear evaluation of Y ai player"
+            ],
+            "lrange": [4,4]
+        },
+        "emax": {
+            "value": "recursive",
+            "type": "flag",
+            "options": [ "recursive", "iterative" ],
+            "descr": [
+                "expectimax algorithm of Y ai player"
+            ]
         }
     },
     "game": {
-        "rules": {
-            "value": "Meub",
-            "type": "flag",
-            "options": [ "Meub", "Kendal" ],
-            "descr": [
-                "rules of game"
-            ]
-        },
         "pawns": {
             "value": 5,
             "type": "number",

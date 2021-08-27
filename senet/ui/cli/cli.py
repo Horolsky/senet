@@ -1,9 +1,10 @@
+from senet.core.enums import Unit
 from senet.core import Game, Agent
 from senet.ai import AIplayer
 from .msg_cli import msgout#messages as msg
-from senet.ui.rules import rules
 from senet.utils import singleton, STATS
 from senet.settings import SETTINGS
+from senet.ui.rules import rules
 
 
 class cli(metaclass=singleton):
@@ -30,7 +31,7 @@ class cli(metaclass=singleton):
         ai vs ai autoplayed game
         ai depth are taken from the settings 
         """
-        seed=10066320
+        seed=0
         repeats = 1
         if len(tokens) > 1:
             try:
@@ -41,23 +42,24 @@ class cli(metaclass=singleton):
                     repeats = int(tokens[2])
             except:
                 return False
-        depth1 = SETTINGS.get("agent-V/depth")
-        depth2 = SETTINGS.get("agent-X/depth")
+        depth1 = SETTINGS.get("agent-x/depth")
+        depth2 = SETTINGS.get("agent-y/depth")
         
-        eval1 = SETTINGS.get("agent-V/eval")
-        eval2 = SETTINGS.get("agent-X/eval")
-        coefs1 = SETTINGS.get("agent-V/coefs")
-        coefs2 = SETTINGS.get("agent-X/coefs")
+        eval1 = SETTINGS.get("agent-x/eval")
+        eval2 = SETTINGS.get("agent-y/eval")
+        emax1 = SETTINGS.get("agent-x/emax")
+        emax2 = SETTINGS.get("agent-y/emax")
+        coefs1 = SETTINGS.get("agent-x/coefs")
+        coefs2 = SETTINGS.get("agent-y/coefs")
 
-        rules = SETTINGS.get("game/rules")
         autofirst = SETTINGS.get("game/first")
 
-        agent1 = AIplayer(number=1, depth=depth1, rules=rules, eval_func=eval1, coefs=coefs1)
-        agent2 = AIplayer(number=2, depth=depth2, rules=rules, eval_func=eval2, coefs=coefs2)
+        agentX = AIplayer(agent=Unit.X, depth=depth1, eval_func=eval1, emax_algo=emax1, coefs=coefs1)
+        agentY = AIplayer(agent=Unit.Y, depth=depth2, eval_func=eval2, emax_algo=emax2, coefs=coefs2)
 
         self.msgout(f"launching {repeats} autogames")        
         for i in range(repeats):    
-            self.__autogame.start(agent1, agent2, rules, autofirst, seed)
+            self.__autogame.start(agentX, agentY, autofirst, seed)
             if (i+1) % 10 == 0:
                 self.msgout(f"{i+1} games over")  
         self.msgout(f"{repeats} autogames completed")        
@@ -75,28 +77,35 @@ class cli(metaclass=singleton):
         if type(tokens) is not list or len(tokens) < 3:
             return False
         #default first player pawns
-        first, seed = 1, 10066320 #def seed for game start
+        first = Unit.X
+        seed = 0 #def seed for game start
         if len(tokens) == 4:
-            option = int(tokens[3])
-            if option in [1,2]:
-                first = 1
-            elif Game.check_seed(option):
-                seed = option 
-            else:
+            try:
+                option = int(tokens[3])
+                if option in [1,2]:
+                    first = Unit(option-1)
+                elif Game.check_seed(option):
+                    seed = option 
+                else:
+                    return False
+            except:
                 return False
 
-        rules = SETTINGS.get("game/rules")
-        symb = ('V','X')
         agents = {
-            "human": lambda an: Agent(number=an+1, dfunc=self.ask_human, name="human"),
-            "ai": lambda an: AIplayer(number=an+1, depth=SETTINGS.get(f"agent-{symb[an]}/depth"), rules=rules, eval_func=SETTINGS.get(f"agent-{symb[an]}/eval"))
+            "human": lambda an: Agent(agent=an, dfunc=self.ask_human, name="human"),
+            "ai": lambda an: AIplayer(
+                agent=an,
+                depth=SETTINGS.get(f"agent-{repr(an)}/depth"),
+                eval_func=SETTINGS.get(f"agent-{repr(an)}/eval"),
+                emax_algo=SETTINGS.get(f"agent-{repr(an)}/emax")
+                )
             }
         if tokens[1] not in agents or tokens[2] not in agents:
             return False
-        agent1 = agents.get(tokens[1])(0)
-        agent2 = agents.get(tokens[2])(1)
+        agentX = agents.get(tokens[1])(Unit.X)
+        agentY = agents.get(tokens[2])(Unit.Y)
         self.msgout("\tGAME STARTED")
-        self.game.start(agent1, agent2, rules, first, seed)
+        self.game.start(agentX, agentY, first, seed)
         return True
     
     def ask_human(self, state=0):
@@ -139,7 +148,7 @@ class cli(metaclass=singleton):
                 continue
             if cmd == "stats":
                 msgout("GAME STATS")
-                msgout("A: Agent, F: first move, T: timer, R: rules, D: depth, E: eval func, C: coefs, ~: opponents params\n")
+                msgout("A: Agent, F: first move, T: timer, D: depth, E: eval func, C: coefs, ~: opponents params\n")
                 STATS.show_brief()
             #game actions
             if cmd == 'a':
@@ -165,7 +174,7 @@ class cli(metaclass=singleton):
                 #break
             if cmd[0] in "0123456789" and self.game.running:
                 m = self.get_index(tks)
-                if m in self.game.state.moves:
+                if m in self.game.ply.strategies.indici:
                     movement = m
                     break # return movement for in-game loop
                 else:
@@ -178,7 +187,7 @@ class cli(metaclass=singleton):
         callback for core.game victory event
         @param agent: int (1, 2)
         """
-        self.msgout(f"VICTORY! Player {('V', 'X')[agent-1]} won the game")
+        self.msgout(f"VICTORY! Player {repr(agent)} won the game")
         self.msgout("press S to start new game")
     
     def _on_move(self):
@@ -197,8 +206,8 @@ class cli(metaclass=singleton):
             "r": lambda: msgout(rules),
             "i": lambda: msgout("info"),
             "b": lambda: msgout(self.stringify_board()),
-            "m": lambda: msgout(self.game.state.moves),
-            "u": lambda: msgout("utility: " + str(self.game.state.utility))
+            "m": lambda: msgout(self.game.ply.strategies.indici),
+            "u": lambda: msgout("utility: " + str(self.game.ply.utility))
             }
         if msg in reqmsg:
             reqmsg[msg]()
@@ -244,14 +253,8 @@ class cli(metaclass=singleton):
         """
         return stringified representation of a current game board, event info and stats
         """
-        b = self.game.state.board
+        b = self.game.ply.board
         board = ""
-        def symb(n):
-            return {
-                0: "_",
-                1: "V",
-                2: "X"
-            }.get(n)
 
         brd = SETTINGS.get("cli/brd")
         if brd == "tbl":
@@ -259,39 +262,26 @@ class cli(metaclass=singleton):
             r2, r3 = r1.copy(), r1.copy()
             for i in range(10):
                 c1, c2, c3 = b[i], b[19-i], b[i+20]
-                r1[i], r2[i], r3[i] = symb(c1), symb(c2), symb(c3)
+                r1[i], r2[i], r3[i] = repr(c1), repr(c2), repr(c3)
             r1, r2, r3 = " ".join(r1), " ".join(r2), " ".join(r3)
             top = " ".join(str(i+1) for i in range(10))
             bottom = " ".join(" " for _ in range(5)) + " a b c d e"
             board = f"\t{top}\n\t{r1} 1\n\t{r2} 2\n\t{r3} 3\n\t{bottom}\n"
         elif brd == "lin":
-            board = " ".join(map(symb, b)) 
+            board = " ".join(map(repr, b)) 
         #EVENT MSG
-        agent =  ('V', 'X')[self.game.state.agent-1]
+        agent =  self.game.ply.agent
         event_msg = ""
         if self.game.turn == 0:
             event_msg = "game starts"
         else:
-            code = self.game.state.event[2]
-            previous = ('V', 'X')[self.game.state.event[1]-1]
-            start, destination = map(self.get_pos, self.game.state.event[3:])
-            event_msg = {
-                0: f"{previous} drawed in House of Waters",
-                1: f"{previous} reversed from {start}",
-                2: f"{previous} skipped the turn",
-                3: f"{previous} moved from {start} to {destination}",
-                4: f"{previous} from {start} attacked enemy on {destination}",
-                5: f"{previous} from {start} has successfully escaped the board",
-            }.get(code)
+            event_msg = repr(self.game.ply.event)
         #STATS MSG
-        stats = f"\tplayer {agent} is moving for {self.game.state.steps} steps\n"
-        stats += {
-            1: f"\tpossible moves: {', '.join(map(self.get_pos, self.game.state.moves))}\n",
-            -1: f"\tplayer cannot move forward, possible reverse moves: {', '.join(map(self.get_pos, self.game.state.moves))}\n",
-            0: "\tno avaliable moves, player skips the turn\n"
-            }.get(self.game.state.mobility)
+        stats = f"\tdice rollout gives for {repr(agent)} {self.game.ply.steps} steps\n"
+        strats = self.game.ply.strategies
+        stats += "\tpossible strategies:\n\t" + ", ".join([f"{self.get_pos(strats.indici[i])}: {repr(strats.actions[i])}" for i in range(strats.mobility) ])
         
-        stats += f"\tbench: V - {self.game.state.bench[0]}, X - {self.game.state.bench[1]}"
+        # stats += f"\tbench: V - {self.game.ply.bench[0]}, X - {self.game.ply.bench[1]}"
         head = f"turn {self.game.turn}, {event_msg}"
         emb = "=" * (80 - len(head))
         return f"{head} {emb}\n\n{board}\n{stats}"

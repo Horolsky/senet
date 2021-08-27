@@ -65,7 +65,7 @@ class Ply:
         def destination(self) -> int:
             return self.__destination
         def __repr__(self) -> str:
-            return f"({repr(self.agent)} did {repr(self.action)} from {self.start} to {self.destination})"
+            return f"({repr(self.agent)} made {repr(self.action)} from {self.start} to {self.destination})"
 
     def __init__(self, **kwargs):
         state, seed, event = None, None, None
@@ -79,9 +79,7 @@ class Ply:
             state = StrategyNode(seed)
         # manual init
         elif "state" in kwargs:
-            state = kwargs["state"]
-            if type(state) != StrategyNode:
-                raise TypeError("invalid StrategyNode type")
+            state = StrategyNode(kwargs["state"])
             seed = state.seed()
         elif "chance" in kwargs:
             chance = kwargs["chance"]
@@ -90,8 +88,11 @@ class Ply:
                 raise TypeError("invalid chance type")
             if type(agent) != Unit:
                 raise TypeError("invalid agent type")
-            state = StrategyNode(State(), agent.value, chance)
-            seed = state.seed()
+            # s = State()
+            a = agent.value
+            seed = uint64_t(State.build_seed(a, chance))
+            state = StrategyNode(State(seed))
+            # seed = state.seed()
 
         if "event" in kwargs:
             event = kwargs["event"]
@@ -119,6 +120,9 @@ class Ply:
     @property
     def agent(self) -> Unit:
         return Unit(self.__state.agent())
+    @property
+    def enemy(self) -> Unit:
+        return Unit(self.__state.enemy())
     @property
     def steps(self) -> Unit:
         return self.__state.steps()
