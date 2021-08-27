@@ -166,12 +166,14 @@ expectation_rec (const ChanceNode &chancenode, int depth)
 } // namespace bruteforce
 
 int
-Emax::operator() (const StrategyNode &state, int depth, int time) const
+Emax::operator() (const StrategyNode &node, int depth, int time) const
 {
-  if (depth < 6) bruteforce::get_best (state, depth, time);
+  int choice = 0;
+  if (depth < 6) choice = bruteforce::get_best (node, depth, time);
   else {
     throw std::runtime_error("deep algos not implemented yet");
   }
+  return choice;
 }
 
 } // namespace xtc
