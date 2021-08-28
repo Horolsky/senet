@@ -46,8 +46,7 @@ class Stats(metaclass=singleton):
             return False
         brief = self._df["brief"]
         src = brief[(brief["agent 1"] == "AI") & (brief["agent 2"] == "AI")]
-        #src = src[src["agent 1"] == "AI"]
-        #src = src[src["agent 2"] == "AI"]
+        
         trgattrs=[
             "A",      # "Pos",
             "F",        # "First",

@@ -275,13 +275,13 @@ class cli(metaclass=singleton):
         if self.game.turn == 0:
             event_msg = "game starts"
         else:
-            event_msg = repr(self.game.ply.event)
+            ev = self.game.ply.event
+            event_msg = f"{repr(ev.agent)} made {repr(ev.action)} from {self.get_pos(ev.start)} to {self.get_pos(ev.destination)}"
         #STATS MSG
-        stats = f"\tdice rollout gives for {repr(agent)} {self.game.ply.steps} steps\n"
+        stats = f"\t{repr(agent)} has {self.game.ply.steps} steps\n"
         strats = self.game.ply.strategies
-        stats += "\tpossible strategies:\n\t" + ", ".join([f"{self.get_pos(strats.indici[i])}: {repr(strats.actions[i])}" for i in range(strats.mobility) ])
+        stats += "\tavailable strategies:\n\t" + ", ".join([f"{self.get_pos(strats.indici[i])}: {repr(strats.actions[i])}" for i in range(strats.mobility) ])
         
-        # stats += f"\tbench: V - {self.game.ply.bench[0]}, X - {self.game.ply.bench[1]}"
         head = f"turn {self.game.turn}, {event_msg}"
         emb = "=" * (80 - len(head))
         return f"{head} {emb}\n\n{board}\n{stats}"
