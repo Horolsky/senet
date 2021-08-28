@@ -39,11 +39,13 @@ State::agent () const
 {
   return static_cast<Unit> (_data.agent);
 }
+
 Unit
 State::enemy () const
 {
   return static_cast<Unit> (_data.agent ^ 1);
 }
+
 int
 State::steps () const
 {
@@ -56,6 +58,7 @@ State::operator= (const State &other)
   _data = other._data;
   return *this;
 }
+
 State &
 State::operator= (State &&other)
 {
@@ -69,6 +72,7 @@ State::update_board (int index, Unit unit)
   _data.board = bitf::solid::set_scalar (static_cast<int> (unit), _data.board,
                                          board_offset, index * board_offset);
 }
+
 uint64_t
 State::seed () const
 {
@@ -80,11 +84,13 @@ State::is_chance_node () const
 {
   return _data.steps == 0;
 }
+
 bool
 State::is_strategy_node () const
 {
   return _data.steps > 0;
 }
+
 bool
 State::is_terminal_node () const
 {
@@ -213,6 +219,7 @@ StrategyNode::strategies () const
     }
   return strategies;
 }
+
 ChanceNode
 StrategyNode::choice (int choice, Strategies strategies) const
 {
@@ -290,4 +297,5 @@ StrategyNode::choice (int choice, Strategies strategies) const
     }
   return new_state;
 }
+
 } // namespace xtc

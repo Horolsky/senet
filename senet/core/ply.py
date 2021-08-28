@@ -76,10 +76,14 @@ class Ply:
             if type(seed) not in (int, uint64_t):
                 raise TypeError("invalid seed type")
             seed = uint64_t(seed)
-            state = StrategyNode(seed)
+            state = StrategyNode.create(seed)
         # manual init
         elif "state" in kwargs:
-            state = StrategyNode(kwargs["state"])
+            # state = StrategyNode(kwargs["state"])
+            # seed = state.seed()
+            state = kwargs["state"]
+            if type(state) not in (State, StrategyNode):
+                raise TypeError("invalid StrategyNode type")
             seed = state.seed()
         elif "chance" in kwargs:
             chance = kwargs["chance"]
@@ -88,10 +92,17 @@ class Ply:
                 raise TypeError("invalid chance type")
             if type(agent) != Unit:
                 raise TypeError("invalid agent type")
+
+            # state = StrategyNode(State(), agent.value, chance)
+            # seed = state.seed()
+            
             # s = State()
-            a = agent.value
-            seed = uint64_t(State.build_seed(a, chance))
-            state = StrategyNode(State(seed))
+
+            
+            state = StrategyNode.create(agent.value, chance)
+            seed = state.seed()
+            
+
             # seed = state.seed()
 
         if "event" in kwargs:

@@ -53,34 +53,34 @@ public:
   State (const State &other) : _data (other._data) {}
   State (State &&other) : _data (other._data) {}
 
-  State (const State &other, int steps) : _data (other._data)
-  {
-    _data.steps = steps;
-  }
-  State (State &&other, int steps) : _data (other._data)
-  {
-    _data.steps = steps;
-  }
+  // State (const State &other, int steps) : _data (other._data)
+  // {
+    // _data.steps = steps;
+  // }
+  // State (State &&other, int steps) : _data (other._data)
+  // {
+    // _data.steps = steps;
+  // }
 
-  State (const State &other, Unit agent) : _data (other._data)
-  {
-    _data.agent = static_cast<int> (agent);
-  }
-  State (State &&other, Unit agent) : _data (other._data)
-  {
-    _data.agent = static_cast<int> (agent);
-  }
-
-  State (const State &other, Unit agent, int steps) : _data (other._data)
-  {
-    _data.agent = static_cast<int> (agent);
-    _data.steps = steps;
-  }
-  State (State &&other, Unit agent, int steps) : _data (other._data)
-  {
-    _data.agent = static_cast<int> (agent);
-    _data.steps = steps;
-  }
+  // State (const State &other, Unit agent) : _data (other._data)
+  // {
+    // _data.agent = static_cast<int> (agent);
+  // }
+  // State (State &&other, Unit agent) : _data (other._data)
+  // {
+    // _data.agent = static_cast<int> (agent);
+  // }
+// 
+  // State (const State &other, Unit agent, int steps) : _data (other._data)
+  // {
+    // _data.agent = static_cast<int> (agent);
+    // _data.steps = steps;
+  // }
+  // State (State &&other, Unit agent, int steps) : _data (other._data)
+  // {
+    // _data.agent = static_cast<int> (agent);
+    // _data.steps = steps;
+  // }
 
   State (Unit agent, int steps, int *board)
   {
@@ -147,11 +147,13 @@ public:
   {
     ChanceNode tmp {other};
     std::swap(_data, tmp._data);
+    _data.steps = 0;
     return *this;
   }
   ChanceNode &operator= (State &&other)
   {
     std::swap(_data, other._data);
+    _data.steps = 0;
     return *this;
   }
 
@@ -168,6 +170,28 @@ public:
 class StrategyNode : public State
 {
 public:
+  static StrategyNode create (Unit agent, int steps, int *board)
+  {
+    if (steps == 0) {
+      throw std::logic_error("StrategyNode::create: zero steps in StrategyNode");
+    }
+    uint64_t seed = State::build_seed(agent, steps, board);
+    return StrategyNode(seed);
+  }
+  static StrategyNode create (Unit agent, int steps)
+  {
+    if (steps == 0) {
+      throw std::logic_error("StrategyNode::create: zero steps in StrategyNode");
+    }
+    bitfield data {.seed = State::def_state_seed };
+    data.agent = static_cast<int>(agent);
+    data.steps = steps;
+    return StrategyNode(data.seed);
+  }
+  static StrategyNode create (uint64_t seed)
+  {
+    return StrategyNode(seed);
+  }
   explicit StrategyNode (uint64_t seed)
   {
     _data.seed = seed;
@@ -175,36 +199,36 @@ public:
       throw std::logic_error ("zero steps in StrategyNode");
   }
   
-  StrategyNode (const State &other, int steps = 0)
+  explicit StrategyNode (const State &other, int steps = 0)
   {
     _data = other._data;
     if (steps) _data.steps = steps;
-    if (!_data.steps)
+    if (_data.steps == 0)
       throw std::logic_error ("zero steps in StrategyNode");
   }
 
-  StrategyNode (State &&other, int steps = 0) 
+  explicit StrategyNode (State &&other, int steps = 0) 
   {
     _data = other._data;
     if (steps) _data.steps = steps;
-    if (!_data.steps)
+    if (_data.steps == 0)
       throw std::logic_error ("zero steps in StrategyNode");
   }
 
-  StrategyNode (const State &other, Unit agent, int steps = 0)
+  explicit StrategyNode (const State &other, Unit agent, int steps = 0)
   {
     _data = other._data;
     _data.agent = static_cast<int> (agent);
     if (steps) _data.steps = steps;
-    if (!_data.steps)
+    if (_data.steps == 0)
       throw std::logic_error ("zero steps in StrategyNode");
   }
-  StrategyNode (State &&other, Unit agent, int steps = 0)
+  explicit StrategyNode (State &&other, Unit agent, int steps = 0)
   {
     _data = other._data;
     _data.agent = static_cast<int> (agent);
     if (steps) _data.steps = steps;
-    if (!_data.steps)
+    if (_data.steps == 0)
       throw std::logic_error ("zero steps in StrategyNode");
   }
   Strategies strategies() const;

@@ -102,8 +102,10 @@ class Game():
             chance = s.steps()
             if chance == 0:
                 chance = self.__dice.roll()
-                self.__sticks = tuple(self.__dice.sticks)   
-            self.__ply = Ply(state=s,chance=chance, agent=first)
+                self.__sticks = tuple(self.__dice.sticks)  
+                self.__ply = Ply(state=s,chance=chance, agent=first)
+            else:
+                self.__ply = Ply(seed=seed)
             
         if self.__logging_game:
             headers = f"N;{agentX._name} vs {agentY._name}: agent;steps;utility;seed\n"
