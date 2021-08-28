@@ -31,7 +31,7 @@ int get_best (const StrategyNode &state, int stopdepth, int time);
 
 static shared_param GLOBAL_STATE;
 static const int FRAME = 10;
-static const int THREADING_DEPTH = 2;
+static const int THREADING_DEPTH = 1;
 
 int
 get_best (const StrategyNode &state, int stopdepth, int time)
@@ -97,7 +97,7 @@ expectations_par (const StrategyNode &choicenode, const Strategies &strats,
   int frames = GLOBAL_STATE.timetowork / FRAME + 1;
   while (--frames > 0)
     {
-      if (GLOBAL_STATE.jobsdone >= strats.mobility ())
+      if (GLOBAL_STATE.jobsdone == GLOBAL_STATE.threads_created)//strats.mobility ())
         break;
       std::this_thread::sleep_for (std::chrono::milliseconds (FRAME));
     }
@@ -168,11 +168,21 @@ expectation_rec (const ChanceNode &chancenode, int depth)
 int
 Emax::operator() (const StrategyNode &node) const
 {
-  int choice = 0;
-  if (_depth < 6) choice = bruteforce::get_best (node, _depth, _time);
-  else {
-    throw std::runtime_error("deep algos not implemented yet");
-  }
+  int choice = bruteforce::get_best (node, _depth, _time);
+  // if (_depth < 6) choice =
+  // else {
+    // throw std::runtime_error("deep algos not implemented yet");
+  // }
+  return choice;
+}
+int
+Emax::operator() (const StrategyNode &node, int* nodes, int* leaves, int* threads, int* jobs) const
+{
+  int choice = bruteforce::get_best (node, _depth, _time);
+  *nodes = bruteforce::GLOBAL_STATE.nodes_visited;
+  *leaves = bruteforce::GLOBAL_STATE.leaves_visited;
+  *threads = bruteforce::GLOBAL_STATE.threads_created;
+  *jobs = bruteforce::GLOBAL_STATE.jobsdone;
   return choice;
 }
 

@@ -46,6 +46,7 @@ public:
   ~Emax () = default;
 
   int operator() (const StrategyNode &state) const;
+  int operator() (const StrategyNode &node, int* nodes, int* leaves, int* threads, int* jobs) const;
 private:
 Eval _eval {Eval()};
 std::array<std::thread, Strategies::max_strategies> _threads;
