@@ -27,13 +27,13 @@ def expectiminimax(node, depth)
 ### recursive version 2
 ```python
 def emax(node, depth):
-    if terminal(node) or depth is 0:
+    if is_terminal(node) or depth is 0:
         return eval(node)
-    if agent(node) is minimizer:
+    if is_choice(node) and agent(node) is minimizer:
         return min([emax(child, depth-1) for child in children(node)])
-    if agent(node) is maximizer:
+    if is_choice(node) and agent(node) is maximizer:
         return max([emax(child, depth-1) for child in children(node)])
-    if chance(node): 
+    if is_chance(node): 
         return sum([P[child] * emax(child, depth-1) for child in children(node)])
 ```
 
