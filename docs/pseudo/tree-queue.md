@@ -39,10 +39,10 @@ B-heap node position determining for tree with an arbitrary branching:
 
 ```python
 
-def parent(node: int):
+def parent_index(node: int):
     return (node-1) // B
 
-def child(node: int, i: int):
+def child_index(node: int, i: int):
     return B * node + 1 + i
 
 def depth(node: int):   #indexation from 0
@@ -71,5 +71,24 @@ def init_queue(node: Node):
             d_queue.push(d+1)
     return n_queue
 ```
-NB: dead branches not handled here.  
-Use random access to workaround it, skipping empty nodes in loop
+
+### Inplace leafs update
+```python
+def cut_dead_leafs(tree: Queue):
+    """
+    This subroutine updates inner head/size properties,
+    excluding unused brunches from previous iteration.
+    Working leafs group of size B**(D-1) would be used as source for new iteration.
+    Actual data in the container is not mutated
+    """
+
+def update_tree(n_queue: Queue):
+    cut_dead_leafs(tree)
+    for i in range(B**(D-1)):
+        for child in n_queue.pop(): 
+            n_queue.push(child) 
+    return n_queue
+```
+
+NB: dead subbranches/leafs are not handled in this pseudocode.  
+Use random access with B-heap indexation to workaround it.
