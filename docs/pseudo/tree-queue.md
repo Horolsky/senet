@@ -45,7 +45,7 @@ def parent(node: int):
 def child(node: int, i: int):
     return B * node + 1 + i
 
-def depth(node):   #indexation from 0
+def depth(node: int):   #indexation from 0
     d = 0
     li = 0      #index of first node in level
     while(li <= node):
@@ -59,13 +59,17 @@ def depth(node):   #indexation from 0
 
 ### Priority queue initialization
 ```python
-def init_queue(nodes_queue, node, D):
-    node.d = 0
-    queue.push(node)
-    while peek(queue).d < D:
-        node = queue.pop()
-        for child in node:
-            child.d = node.d + 1
-            queue.push(child) 
-    return queue
+def init_queue(node: Node):
+    d_queue = Queue(size=B**D) # depth bookkeeping
+    n_queue = Queue(size=B**D) # working nodes storage
+    d_queue.push(0)
+    n_queue.push(node)
+    while peek(d_queue) < D:
+        d = d_queue.pop()
+        for child in n_queue.pop(): 
+            n_queue.push(child) 
+            d_queue.push(d+1)
+    return n_queue
 ```
+NB: dead branches not handled here.  
+Use random access to workaround it, skipping empty nodes in loop
