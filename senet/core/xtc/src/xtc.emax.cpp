@@ -1,57 +1,125 @@
 #include "xtc.emax.hpp"
 #include "xtc.dice.hpp"
+#include <atomic>
 #include <chrono>
 namespace xtc
 {
 
 namespace bruteforce
 {
-typedef struct
-{
-  Eval eval;
-  int stopdepth;
-  int jobsdone;
-  int timetowork;
-  int threads_created;
-  int nodes_visited;
-  int leaves_visited;
-  bool stopflag;
 
-} shared_param;
-
-int get_minimax (double *expectations, int n, bool max);
-void threadwork (const ChanceNode &state, double *result, int depth);
-
-double expectation_rec (const ChanceNode &chancenode, int depth);
-void expectations_par (const StrategyNode &choicenode,
-                       const Strategies &strats, double *expectations,
-                       int depth);
-
-int get_best (const StrategyNode &state, int stopdepth, int time);
-
-static shared_param GLOBAL_STATE;
 static const int FRAME = 10;
-static const int THREADING_DEPTH = 1;
+static Eval g_eval;
+
+std::atomic<int> g_stopdepth;
+std::atomic<int> g_jobsdone;
+std::atomic<int> g_timetowork;
+std::atomic<int> g_threads_created;
+std::atomic<int> g_nodes_visited;
+std::atomic<int> g_leaves_visited;
+std::atomic<bool> g_stopflag;
+//
+int get_best_strategy (const StrategyNode &state, int stopdepth, int time);
+void threadwork (const ChanceNode &state, double *result, int depth);
+double expectation_recursive (const ChanceNode &chancenode, int depth);
+int get_minimax (double *expectations, int n, bool max);
 
 int
-get_best (const StrategyNode &state, int stopdepth, int time)
+get_best_strategy (const StrategyNode &state, int stopdepth, int time)
 {
-  GLOBAL_STATE.stopflag = false;
-  GLOBAL_STATE.stopdepth = stopdepth;
-  GLOBAL_STATE.timetowork = time;
-  GLOBAL_STATE.eval = Eval ();
+  g_eval = Eval ();
+  g_stopflag = false;
+  g_stopdepth = stopdepth;
+  g_timetowork = time;
 
-  GLOBAL_STATE.nodes_visited = 0;
-  GLOBAL_STATE.leaves_visited = 0;
-  GLOBAL_STATE.threads_created = 0;
+  g_nodes_visited = 0;
+  g_leaves_visited = 0;
+  g_threads_created = 0;
 
   bool max = state.agent () != Unit::X;
   auto strats = state.strategies ();
+  if (strats.seed () == 0)
+    throw std::logic_error ("corrupted node");
+  if (strats.mobility () < 2)
+    return 0;
+
   double *expectations = new double[strats.mobility ()];
-  expectations_par (state, strats, expectations, -1);
+  std::thread *threads = new std::thread[strats.mobility ()];
+
+  for (int i = 0; i < strats.mobility (); i++)
+    {
+      auto chancenode = state.choice (strats.indici (i), strats);
+      threads[i]
+          = std::thread (threadwork, chancenode, expectations + i, 0);
+      g_threads_created++;
+    }
+
+  int frames = g_timetowork / FRAME + 1;
+  while (--frames > 0)
+    {
+      if (g_jobsdone == g_threads_created)
+        break;
+      std::this_thread::sleep_for (std::chrono::milliseconds (FRAME));
+    }
+  g_stopflag = true;
+  for (int i = 0; i < strats.mobility (); i++)
+    {
+      threads[i].join ();
+    }
+
   int choice = get_minimax (expectations, strats.mobility (), max);
+  delete[] threads;
   delete[] expectations;
   return choice;
+}
+
+double
+expectation_recursive (const ChanceNode &chancenode, int depth)
+{
+  double expect = g_eval (chancenode);
+  if (g_stopflag || depth >= g_stopdepth || (expect - (long)expect) == 0)
+    {
+      g_leaves_visited++;
+      return expect;
+    }
+  g_nodes_visited++;
+  expect = 0;
+
+  for (int steps = 1; steps < Dice::P.size (); steps++)
+    {
+      // taking minimax for this choice node
+      auto choicenode = chancenode.chance (steps);
+      auto strats = choicenode.strategies ();
+      double *expectations = new double[strats.mobility ()];
+      if (expectations == nullptr)
+        {
+          throw std::logic_error ("unable to allocate expectations");
+        }
+      if (strats.seed () == 0)
+        {
+          throw std::logic_error ("corrupted node");
+        }
+      for (int i = 0; i < strats.mobility (); i++)
+        {
+          auto chance_subnode = choicenode.choice (strats.indici (i), strats);
+          expectations[i] = expectation_recursive (chance_subnode, depth + 1);
+        }
+
+      int minimax_index = get_minimax (expectations, strats.mobility (),
+                                       choicenode.agent () != Unit::X);
+      double choiceexpect = expectations[minimax_index];
+      expect += Dice::P[steps] * choiceexpect;
+      delete[] expectations;
+    }
+  return expect;
+}
+
+void
+threadwork (const ChanceNode &chancenode, double *result, int depth)
+{
+  *result = expectation_recursive (chancenode, depth);
+  if (depth == 0)
+    g_jobsdone++;
 }
 
 int
@@ -74,115 +142,30 @@ get_minimax (double *expectations, int n, bool max)
   return choice;
 }
 
-void
-expectations_par (const StrategyNode &choicenode, const Strategies &strats,
-                  double *expectations, int depth)
-{
-  if (strats.seed () == 0)
-    throw std::logic_error ("corrupted node");
-  if (expectations == nullptr)
-    throw std::logic_error ("nullptr expectations");
-  if (strats.mobility () < 2)
-    return;
-  std::thread *threads = new std::thread[strats.mobility ()];
-
-  for (int i = 0; i < strats.mobility (); i++)
-    {
-      auto chancenode = choicenode.choice (strats.indici (i), strats);
-      threads[i]
-          = std::thread (threadwork, chancenode, expectations + i, depth + 1);
-      GLOBAL_STATE.threads_created++;
-    }
-
-  int frames = GLOBAL_STATE.timetowork / FRAME + 1;
-  while (--frames > 0)
-    {
-      if (GLOBAL_STATE.jobsdone == GLOBAL_STATE.threads_created)//strats.mobility ())
-        break;
-      std::this_thread::sleep_for (std::chrono::milliseconds (FRAME));
-    }
-  GLOBAL_STATE.stopflag = true;
-  for (int i = 0; i < strats.mobility (); i++)
-    {
-      threads[i].join ();
-    }
-  delete[] threads;
-}
-
-void
-threadwork (const ChanceNode &chancenode, double *result, int depth)
-{
-  *result = expectation_rec (chancenode, depth);
-  if (depth == 0)
-    GLOBAL_STATE.jobsdone++;
-}
-
-double
-expectation_rec (const ChanceNode &chancenode, int depth)
-{
-  double expect = GLOBAL_STATE.eval (chancenode);
-  if (GLOBAL_STATE.stopflag || depth >= GLOBAL_STATE.stopdepth
-      || (expect - (long)expect) == 0)
-    {
-      GLOBAL_STATE.leaves_visited++;
-      return expect;
-    }
-  GLOBAL_STATE.nodes_visited++;
-  expect = 0;
-
-  for (int steps = 1; steps < Dice::P.size (); steps++)
-    {
-      // taking minimax for this choice node
-      auto choicenode = chancenode.chance (steps);
-      auto strats = choicenode.strategies ();
-      double *expectations = new double[strats.mobility ()];
-      if (expectations == nullptr)
-        throw std::logic_error ("unable to allocate expectations");
-
-      if (false) // depth < THREADING_DEPTH) //TODO: test this
-        {
-          expectations_par (choicenode, strats, expectations, depth + 1);
-        }
-      else
-        {
-          if (strats.seed () == 0)
-            throw std::logic_error ("corrupted node");
-          for (int i = 0; i < strats.mobility (); i++)
-            {
-              auto chance_subnode
-                  = choicenode.choice (strats.indici (i), strats);
-              expectations[i] = expectation_rec (chance_subnode, depth + 1);
-            }
-        }
-      int minimax_index = get_minimax (expectations, strats.mobility (),
-                                       choicenode.agent () != Unit::X);
-      double choiceexpect = expectations[minimax_index];
-      expect += Dice::P[steps] * choiceexpect;
-      delete[] expectations;
-    }
-  return expect;
-}
-
 } // namespace bruteforce
 
 int
 Emax::operator() (const StrategyNode &node) const
 {
-  int choice = bruteforce::get_best (node, _depth, _time);
-  // if (_depth < 6) choice =
-  // else {
-    // throw std::runtime_error("deep algos not implemented yet");
-  // }
+  int choice = 0;
+  if (_depth < 8)
+    choice = bruteforce::get_best_strategy (node, _depth, _time);
+  else
+    {
+      throw std::runtime_error ("max depth exceeded");
+    }
   return choice;
 }
+
 int
-Emax::operator() (const StrategyNode &node, int* nodes, int* leaves, int* threads, int* jobs) const
+Emax::test_call (const StrategyNode &node, int *nodes, int *leaves,
+                  int *threads, int *jobs) const
 {
-  int choice = bruteforce::get_best (node, _depth, _time);
-  *nodes = bruteforce::GLOBAL_STATE.nodes_visited;
-  *leaves = bruteforce::GLOBAL_STATE.leaves_visited;
-  *threads = bruteforce::GLOBAL_STATE.threads_created;
-  *jobs = bruteforce::GLOBAL_STATE.jobsdone;
+  int choice = bruteforce::get_best_strategy (node, _depth, _time);
+  *nodes = bruteforce::g_nodes_visited;
+  *leaves = bruteforce::g_leaves_visited;
+  *threads = bruteforce::g_threads_created;
+  *jobs = bruteforce::g_jobsdone;
   return choice;
 }
 

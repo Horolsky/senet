@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
     int nodes, leaves, threads, jobs;
 
     auto start = chrono::steady_clock::now();
-    int choice = e(s, &nodes, &leaves, &threads, &jobs);
+    int choice = e.test_call(s, &nodes, &leaves, &threads, &jobs);
     auto wtime = (chrono::steady_clock::now() - start);
     
     cout << "seed: " << s.seed() << endl;
