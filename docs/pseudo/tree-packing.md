@@ -1,5 +1,5 @@
-# Iterative optimisation of decision tree backward induction
-this optimisation focuses on specific expectiminimax algorithm but can be extrapolated to any decision tree backward induction problem
+# Iterative optimisation of backward induction of decision tree
+this optimisation focuses on specific expectiminimax algorithm but can be extrapolated to any problem of backward induction of decision tree
 
 ## Main concepts: 
 - n-ary heap storage for the last level of the decision tree
