@@ -78,7 +78,9 @@ def depth(node: int):   #indexation from 0
 
 ```
 
-## Emax
+## Tree-queue processing
+
+![Tree update](../drawio/tree_update.svg)
 
 ### Priority queue initialization
 ```python
