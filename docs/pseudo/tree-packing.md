@@ -4,7 +4,7 @@ this optimisation focuses on specific expectiminimax algorithm but can be extrap
 ## Main concepts: 
 - n-ary heap storage for the last level of the decision tree
 - backward induction process utilizes the strict indexation properties of n-ary heap
-- priority queue interface wraps the storage to facilitate the the levelwise tree update (BFS)
+- priority queue interface wraps the storage to facilitate the levelwise tree update (BFS)
 - subject specific: decision tree packing through the aggregate node type
 - subject specific: if tree is sparsed, the lacunae in heap can be reused for the forward work 
 
