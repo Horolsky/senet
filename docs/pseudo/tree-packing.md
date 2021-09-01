@@ -8,13 +8,13 @@ this optimisation focuses on specific expectiminimax algorithm but can be extrap
 - subject specific: decision tree packing through the aggregate node type
 - subject specific: if tree is sparsed, lacunae in heap can be reused for the forward work 
 
-## Advantages over the trivial recursive methods:
+### Advantages over the trivial recursive methods:
 - gives better intermediate result if work is not finished due to Zeitnot  
 - forward working  
 - more efficient parallelization  
 - efficient stack memory usage in case with deep low-branching algorithms  
 
-## Disadvantages
+### Disadvantages
 - memory greedy  
 - complex implementation  
 
@@ -31,58 +31,66 @@ Depth, element indexation and subnodes indexation starts from 0, i. e. heap[0] i
 NB: **n-ary heap** in some sources is named as *d-heap*, and binary heap as *B-heap*. 
 As we are using here `D` for depth and `B` for branching factor, the `B-heap` means *B-ary heap*.
 
-
 ## Process
-- allocate queue of `B^D` capacity  
-- build tree on initial launch and keep the last level in queue  
-- update one level in place per iteration  
+- allocate a storage of `B^D` capacity  
+- build a tree on initial launch and store the last level  
+- on game iteration update the stored data in place  
 - get expectimax values using the heap indexation  
-- use previously calculated values to return expectimax with `d = D-1` if the time exceeded  
+- if the time exceeded, use previously calculated values to return expectimax with `d = D-1`  
 - if the tree is sparsed, use lacunae to work forward (needs additional indexation bookkeeping)  
-- optionally shrink the queue on *Endspiels*, when `b` decrease is guaranteed
-- use a thread pool (*producer-consumer*) to iterate algorithm
+- optionally shrink the storage on *Endspiels*, when `b` decrease is guaranteed  
+- use a thread pool (*producer-consumer*) to iterate algorithm  
 
 ## Ply node vs Atomic Node
 As the game includes chance events, each game **ply** represents a tree with strategy node S at the root and chance nodes C as it's leafs.  
 The whole game decision tree can be represented either as an atomic tree with nodes of both S and C types, or as a molecular (packed) tree with aggregate nodes (Ply nodes).  
 Packed tree branching factor `B(Ply) = B(S) * B(C)`  
+Packed node technique helps to reduce memory usage, as C nodes differs from S node only by few bits, needed to store the chance index  
 
 ![Tree packing illustration](../drawio/tree_packing.svg)
 
-## Math properties of B-heap 
+## Data storage
+
+the tree leafs storage is a data structure that utilizes both B-heap and priority queue properties:  
+- fixed-size buffer with cyclic pointers to head/tail  
+- push/pop/peek methods  
+- random access by index, wrapped above the head/tail pointers  
+- B-heap indexation helps to bookkeep the parent/child connections in a tree  
+
+### Math properties of B-heap 
 - max n of leaves (working level) = B^D  
 - ratio of inner nodes to leafs:  
-    - R (depth: 0) = 1:B  
-    - R (depth: lim->inf) = 1:(B-1)  
+    - R (depth = 0) = 1:B  
+    - lim{depth -> inf} R (depth) = 1:(B-1)  
 - d(node) =~ log(node, B) + 1
 
-## B-Heap Indexation 
+### B-Heap Indexation 
 
 B-heap node position determining for tree with an arbitrary branching:
 
 ```python
 
-def parent_index(node: int):
-    return (node-1) // B
+def parent_index(node_index: int):
+    return (node_index-1) // B
 
-def child_index(node: int, i: int):
-    return B * node + 1 + i
+def child_index(node_index: int, i: int):
+    return B * node_index + 1 + i
 
-def depth(node: int):   #indexation from 0
+def depth(node_index: int):  
     d = 0
-    li = 0      #index of first node in level
-    while(li <= node):
-        li += (B^d)
+    lvl = 0
+    while(lvl <= node_index):
+        lvl += (B^d)
         d += 1
     return d-1
 
 ```
 
-## Tree-queue processing
+### Tree processing
 
 ![Tree update](../drawio/tree_update.svg)
 
-### Priority queue initialization
+#### Priority queue initialization
 ```python
 def init_queue(node: Node):
     d_queue = Queue(size=B^D) # depth bookkeeping
@@ -97,7 +105,7 @@ def init_queue(node: Node):
     return n_queue
 ```
 
-### Inplace leafs update
+#### Inplace leafs update
 ```python
 def cut_dead_leafs(tree: Queue):
     """
