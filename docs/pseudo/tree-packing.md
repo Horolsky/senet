@@ -5,14 +5,14 @@ this optimisation focuses on specific expectiminimax algorithm but can be extrap
 - n-ary heap storage for the last level of the decision tree
 - backward induction process utilizes the strict indexation properties of n-ary heap
 - priority queue interface wraps the storage to facilitate the levelwise tree update (BFS)
-- subject specific: decision tree packing through the aggregate node type
+- subject specific: decision tree packing using the aggregate node type
 - subject specific: if tree is sparsed, the lacunae in heap can be reused for the forward work 
 
 ### Advantages over the trivial recursive methods:
 - gives a better intermediate result if the work is not finished due to Zeitnot  
 - forward working  
 - more efficient parallelization  
-- efficient stack memory usage in case with deep low-branching algorithms  
+- efficient stack memory usage in case with the deep low-branching algorithms  
 
 ### Disadvantages
 - memory greedy  
@@ -25,11 +25,11 @@ this optimisation focuses on specific expectiminimax algorithm but can be extrap
 **C**: chance node type (dice to be thrown)  
 **P**: chance probability function
 
-Lower-case letters stands for local/dynamic values or instances of a type  
+Lower-case letters stands for the local/dynamic values or instances 
 Depth, element indexation and subnodes indexation starts from 0, i. e. heap[0] is a root element of zero depth
 
 NB: **n-ary heap** in some sources is named as *d-heap*, and binary heap as *B-heap*. 
-As we are using here `D` for depth and `B` for branching factor, the `B-heap` means *B-ary heap*.
+As we are using here `D` for the depth and `B` for the branching factor, the `B-heap` means *B-ary heap*.
 
 ## Ply node vs Atomic Node
 As the game includes chance events, each game **ply** represents a tree with strategy node S at the root and chance nodes C as it's leafs.  
