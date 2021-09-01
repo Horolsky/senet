@@ -108,7 +108,8 @@ def cut_dead_leafs(tree: Queue):
 
 def update_tree(n_queue: Queue):
     cut_dead_leafs(tree)
-    for i in range(B^(D-1)):
+    # the queue head is guaranteed to point to the beginning of the source branch
+    for _ in range(B^(D-1)):    
         for child in n_queue.pop(): 
             n_queue.push(child) 
     return n_queue
