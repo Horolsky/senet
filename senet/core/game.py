@@ -39,6 +39,8 @@ class Game():
                 res = False
             if set(test.board) != {Unit.X, Unit.Y, Unit.NONE}:
                 res = False
+            if sum([x for x in test.board if x == Unit.NONE]) < 20:
+                res = False
             return res
         except:
             return False
@@ -69,8 +71,8 @@ class Game():
         self.__running = False
         if self.__logging_game:
             self._gamelog.close("\ngame over")
-        del self.__agentX
-        del self.__agentY
+        self.__agentX = None
+        self.__agentY = None
         
     def stop(self): #in loop game stop
         self.__running = False
