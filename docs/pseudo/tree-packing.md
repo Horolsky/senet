@@ -1,21 +1,49 @@
-# Tree-packing algorithms
-Optimisation of iterative expectimax BFS using **n-ary heap** as priority queue  
+# Iterative optimisation of decision tree backward induction
+this optimisation focuses on specific expectiminimax algorithm but can be extrapolated to any decision tree backward induction problem
+
+## Main concepts: 
+- n-ary heap storage for the last level of the decision tree
+- backward induction process utilizes the strict indexation properties of n-ary heap
+- priority queue interface wraps the n-ary heap to facilitate the the levelwise tree update (BFS)
+- subject specific: decision tree packing through the aggregate node type
+- subject specific: if tree is sparsed, lacunae in heap can be reused for the forward work 
+
+## Advantages over the trivial recursive methods:
+- gives better intermediate result if work is not finished due to Zeitnot  
+- forward working  
+- more efficient parallelization  
+- efficient stack memory usage in case with deep low-branching algorithms  
+
+## Disadvantages
+- memory greedy  
+- complex implementation  
 
 ## Abbreviations & terms
 **D**: global decision tree depth  
 **B**: max node branching factor  
 **S**: strategy node type (choice to be made)  
-**C**: chance node type (dice to b thrown)  
+**C**: chance node type (dice to be thrown)  
 **P**: chance probability function
 
 Lower-case letters stands for local variables  
-Depth, element indexation and subnodes indexation starts from 0, i. e. heap[0] is root element of depth
+Depth, element indexation and subnodes indexation starts from 0, i. e. heap[0] is a root element of zero depth
 
 NB: **n-ary heap** in some sources is named as *d-heap*, and binary heap as *B-heap*. 
-As we are using D for depth and B for branching factor, here B-heap means heap of B-arity.
+As we are using here `D` for depth and `B` for branching factor, the `B-heap` means *B-ary heap*.
+
+
+## Process
+- allocate queue of `B^D` capacity  
+- build tree on initial launch and keep the last level in queue  
+- update one level in place per iteration  
+- get expectimax values using the heap indexation  
+- use previously calculated values to return expectimax with `d = D-1` if the time exceeded  
+- if the tree is sparsed, use lacunae to work forward (needs additional indexation bookkeeping)  
+- optionally shrink the queue on *Endspiels*, when `b` decrease is guaranteed
+- use a thread pool (*producer-consumer*) to iterate algorithm
 
 ## Ply node vs Atomic Node
-As the game includes chance events, each game **ply** represents a tree with strategy node at the root and chance nodes as it's leafs.  
+As the game includes chance events, each game **ply** represents a tree with strategy node S at the root and chance nodes C as it's leafs.  
 The whole game decision tree can be represented either as an atomic tree with nodes of both S and C types, or as a molecular (packed) tree with aggregate nodes (Ply nodes).  
 Packed tree branching factor `B(Ply) = B(S) * B(C)`  
 
@@ -27,18 +55,6 @@ Packed tree branching factor `B(Ply) = B(S) * B(C)`
     - R (depth: 0) = 1:B  
     - R (depth: lim->inf) = 1:(B-1)  
 - d(node) =~ log(node, B) + 1
-
-
-## Basic idea
-- use fixed-size queue with random access   
-- allocate queue of `B^D` capacity  
-- build tree on initial launch and keep the last level in queue  
-- update in place only one tree level on each iteration  
-- backtrack expectimax values using heap indexation  
-- use previously calculated values to return expectimax with `d = D-1` if time exceeded  
-- if tree is sparsed, use free space to work forward, (needs additional indexation bookkeeping)  
-- optionally shrink the queue on *Endspiels*, when `b` decrease is guaranteed  
-- use thread pool (*producer-consumer*) for state iteration (hic random access needed)
 
 ## B-Heap Indexation 
 
