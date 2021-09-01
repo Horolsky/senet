@@ -3,7 +3,7 @@ Optimisation of iterative expectimax BFS using **n-ary heap** as priority queue
 
 ## Abbreviations & terms
 **D**: global decision tree depth  
-**B**: max tree branching factor  
+**B**: max node branching factor  
 **S**: strategy node type (choice to be made)  
 **C**: chance node type (dice to b thrown)  
 **P**: chance probability function
@@ -17,6 +17,8 @@ As we are using D for depth and B for branching factor, here B-heap means heap o
 ## Ply node vs Atomic Node
 As the game includes chance events, each game **ply** represents a tree with strategy node at the root and chance nodes as it's leafs.  
 The whole game decision tree can be represented either as an atomic tree with nodes of both S and C types, or as a molecular (packed) tree with aggregate nodes (Ply nodes).  
+Packed tree branching factor `B(Ply) = B(S) * B(C)`  
+
 ![Tree packing illustration](../drawio/tree_packing.svg)
 
 ## Math properties of B-heap 
@@ -25,8 +27,6 @@ The whole game decision tree can be represented either as an atomic tree with no
     - R (depth: 0) = 1:B  
     - R (depth: lim->inf) = 1:(B-1)  
 - d(node) =~ log(node, B) + 1
-
-if different node types has different `b`, their subtree can be interpreted as single node for game-cycle and global tree with such aggregate nodes has `B = prod (b of each node level in cycle)` 
 
 
 ## Basic idea
@@ -56,7 +56,7 @@ def depth(node: int):   #indexation from 0
     d = 0
     li = 0      #index of first node in level
     while(li <= node):
-        li += (B**d)
+        li += (B^d)
         d += 1
     return d-1
 
@@ -67,8 +67,8 @@ def depth(node: int):   #indexation from 0
 ### Priority queue initialization
 ```python
 def init_queue(node: Node):
-    d_queue = Queue(size=B**D) # depth bookkeeping
-    n_queue = Queue(size=B**D) # working nodes storage
+    d_queue = Queue(size=B^D) # depth bookkeeping
+    n_queue = Queue(size=B^D) # working nodes storage
     d_queue.push(0)
     n_queue.push(node)
     while peek(d_queue) < D:
@@ -83,15 +83,16 @@ def init_queue(node: Node):
 ```python
 def cut_dead_leafs(tree: Queue):
     """
-    This subroutine updates inner head/size properties,
-    excluding unused brunches from previous iteration.
-    Working leafs group of size B**(D-1) would be used as source for new iteration.
-    Actual data in the container is not mutated
+    This subroutine updates the inner head/size properties,
+    cutting the unused brunches from previous iteration.
+    Working leafs group of size B^(D-1) would be used as a source for the new iteration.
+    This process affects only inner indexation mechanism of the container,
+    actual data is not mutated or deleted
     """
 
 def update_tree(n_queue: Queue):
     cut_dead_leafs(tree)
-    for i in range(B**(D-1)):
+    for i in range(B^(D-1)):
         for child in n_queue.pop(): 
             n_queue.push(child) 
     return n_queue
