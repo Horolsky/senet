@@ -37,7 +37,7 @@ The whole game decision tree can be represented either as an atomic tree with no
 Packed tree branching factor `B(Ply) = B(S) * B(C)`  
 Packed node technique helps to reduce memory usage, as C nodes differs from S node only by chance index.  
 
-![Tree packing illustration](../drawio/tree_packing.svg)
+![Tree packing illustration](drawio/tree_packing.svg)
 
 ## Data storage
 
@@ -78,7 +78,7 @@ def depth(node_index: int):
 
 ### Tree processing
 
-![Tree update](../drawio/tree_update.svg)
+![Tree update](drawio/tree_update.svg)
 
 #### Priority queue initialization
 ```python
