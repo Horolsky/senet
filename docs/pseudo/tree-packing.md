@@ -1,17 +1,23 @@
-# Tree-queue algorithms
+# Tree-packing algorithms
 Optimisation of iterative expectimax BFS using **n-ary heap** as priority queue  
 
 ## Abbreviations & terms
-**D**: global search tree depth  
+**D**: global decision tree depth  
 **B**: max tree branching factor  
 **S**: strategy node type (choice to be made)  
 **C**: chance node type (dice to b thrown)  
+**P**: chance probability function
 
 Lower-case letters stands for local variables  
 Depth, element indexation and subnodes indexation starts from 0, i. e. heap[0] is root element of depth
 
 NB: **n-ary heap** in some sources is named as *d-heap*, and binary heap as *B-heap*. 
 As we are using D for depth and B for branching factor, here B-heap means heap of B-arity.
+
+## Ply node vs Atomic Node
+As the game includes chance events, each game **ply** represents a tree with strategy node at the root and chance nodes as it's leafs.  
+The whole game decision tree can be represented either as an atomic tree with nodes of both S and C types, or as a molecular (packed) tree with aggregate nodes (Ply nodes).  
+![Tree packing illustration](../drawio/tree_packing.svg)
 
 ## Math properties of B-heap 
 - max n of leaves (working level) = B^D  
@@ -21,6 +27,7 @@ As we are using D for depth and B for branching factor, here B-heap means heap o
 - d(node) =~ log(node, B) + 1
 
 if different node types has different `b`, their subtree can be interpreted as single node for game-cycle and global tree with such aggregate nodes has `B = prod (b of each node level in cycle)` 
+
 
 ## Basic idea
 - use fixed-size queue with random access   
