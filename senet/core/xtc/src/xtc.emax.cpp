@@ -8,17 +8,18 @@ namespace xtc
 namespace bruteforce
 {
 
-static const int FRAME = 10;
-static Eval g_eval;
+const int FRAME = 10;
+Eval g_eval;
+int g_stopdepth;
+int g_timetowork;
 
-std::atomic<int> g_stopdepth;
-std::atomic<int> g_jobsdone;
-std::atomic<int> g_timetowork;
-std::atomic<int> g_threads_created;
-std::atomic<int> g_nodes_visited;
-std::atomic<int> g_leaves_visited;
-std::atomic<bool> g_stopflag;
-//
+bool g_stopflag;
+int g_jobsdone;
+int g_threads_created;
+
+std::atomic<int> a_nodes_visited;
+std::atomic<int> a_leaves_visited;
+
 int get_best_strategy (const StrategyNode &state, int stopdepth, int time);
 void threadwork (const ChanceNode &state, double *result, int depth);
 double expectation_recursive (const ChanceNode &chancenode, int depth);
@@ -32,9 +33,11 @@ get_best_strategy (const StrategyNode &state, int stopdepth, int time)
   g_stopdepth = stopdepth;
   g_timetowork = time;
 
-  g_nodes_visited = 0;
-  g_leaves_visited = 0;
   g_threads_created = 0;
+  
+  a_nodes_visited = 0;
+  a_leaves_visited = 0;
+  
 
   bool max = state.agent () != Unit::X;
   auto strats = state.strategies ();
@@ -57,7 +60,7 @@ get_best_strategy (const StrategyNode &state, int stopdepth, int time)
   int frames = g_timetowork / FRAME + 1;
   while (--frames > 0)
     {
-      if (g_jobsdone == g_threads_created)
+      if (g_jobsdone == strats.mobility ())
         break;
       std::this_thread::sleep_for (std::chrono::milliseconds (FRAME));
     }
@@ -79,10 +82,10 @@ expectation_recursive (const ChanceNode &chancenode, int depth)
   double expect = g_eval (chancenode);
   if (g_stopflag || depth >= g_stopdepth || (expect - (long)expect) == 0)
     {
-      g_leaves_visited++;
+      a_leaves_visited++;
       return expect;
     }
-  g_nodes_visited++;
+  a_nodes_visited++;
   expect = 0;
 
   for (int steps = 1; steps < Dice::P.size (); steps++)
@@ -162,8 +165,8 @@ Emax::test_call (const StrategyNode &node, int *nodes, int *leaves,
                   int *threads, int *jobs) const
 {
   int choice = bruteforce::get_best_strategy (node, _depth, _time);
-  *nodes = bruteforce::g_nodes_visited;
-  *leaves = bruteforce::g_leaves_visited;
+  *nodes = bruteforce::a_nodes_visited;
+  *leaves = bruteforce::a_leaves_visited;
   *threads = bruteforce::g_threads_created;
   *jobs = bruteforce::g_jobsdone;
   return choice;
