@@ -18,6 +18,7 @@ messages = {
       i - detailed info about the game
       o - show settings
       o <key> <value> - set option
+      stats - show stats on ai plays
 
     How to play:
     Pawns of two players are represented on the board as V and X
