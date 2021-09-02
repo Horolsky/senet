@@ -1,6 +1,6 @@
 import random
-from senet.core.enums import Unit
-from senet.core.ply import Ply
+from app.core.enums import Unit
+from app.core.ply import Ply
 
 class Agent:
     """

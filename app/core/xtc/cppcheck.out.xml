@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<results version="2">
+    <cppcheck version="1.90"/>
+    <errors>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="src/xtc.dice.cpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="src/xtc.dice.hpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.emax.cpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;State&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;State&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.emax.cpp" file="src/xtc.state.hpp" line="51" column="3"/>
+            <symbol>State</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.emax.cpp" file="src/xtc.state.hpp" line="126" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.emax.cpp" file="src/xtc.state.hpp" line="132" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.emax.cpp" file="src/xtc.state.hpp" line="133" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.emax.cpp" file="src/xtc.eval.hpp" line="33" column="3"/>
+            <symbol>Eval</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="src/xtc.emax.cpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.emax.hpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;State&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;State&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.emax.hpp" file="src/xtc.state.hpp" line="51" column="3"/>
+            <symbol>State</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.emax.hpp" file="src/xtc.state.hpp" line="126" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.emax.hpp" file="src/xtc.state.hpp" line="132" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.emax.hpp" file="src/xtc.state.hpp" line="133" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.emax.hpp" file="src/xtc.eval.hpp" line="33" column="3"/>
+            <symbol>Eval</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="src/xtc.emax.hpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.eval.cpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;State&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;State&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.eval.cpp" file="src/xtc.state.hpp" line="51" column="3"/>
+            <symbol>State</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.eval.cpp" file="src/xtc.state.hpp" line="126" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.eval.cpp" file="src/xtc.state.hpp" line="132" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.eval.cpp" file="src/xtc.state.hpp" line="133" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.eval.cpp" file="src/xtc.eval.hpp" line="33" column="3"/>
+            <symbol>Eval</symbol>
+        </error>
+        <error id="useStlAlgorithm" severity="style" msg="Consider using std::accumulate algorithm instead of a raw loop." verbose="Consider using std::accumulate algorithm instead of a raw loop." cwe="398">
+            <location file="src/xtc.eval.cpp" line="47" column="11"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="src/xtc.eval.cpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.eval.hpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;State&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;State&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.eval.hpp" file="src/xtc.state.hpp" line="51" column="3"/>
+            <symbol>State</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.eval.hpp" file="src/xtc.state.hpp" line="126" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.eval.hpp" file="src/xtc.state.hpp" line="132" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.eval.hpp" file="src/xtc.state.hpp" line="133" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file="src/xtc.eval.hpp" line="33" column="3"/>
+            <symbol>Eval</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="src/xtc.eval.hpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="src/xtc.fwd.hpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.state.cpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;State&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;State&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.state.cpp" file="src/xtc.state.hpp" line="51" column="3"/>
+            <symbol>State</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.state.cpp" file="src/xtc.state.hpp" line="126" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.state.cpp" file="src/xtc.state.hpp" line="132" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.state.cpp" file="src/xtc.state.hpp" line="133" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;seed&apos; is assigned a value that is never used." verbose="Variable &apos;seed&apos; is assigned a value that is never used." cwe="563">
+            <location file="src/xtc.state.cpp" line="10" column="31"/>
+            <symbol>seed</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="src/xtc.state.cpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.state.hpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;State&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;State&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file="src/xtc.state.hpp" line="51" column="3"/>
+            <symbol>State</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file="src/xtc.state.hpp" line="126" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file="src/xtc.state.hpp" line="132" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file="src/xtc.state.hpp" line="133" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="src/xtc.state.hpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="src/xtc.strategies.cpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;seed&apos; is assigned a value that is never used." verbose="Variable &apos;seed&apos; is assigned a value that is never used." cwe="563">
+            <location file="src/xtc.strategies.cpp" line="10" column="36"/>
+            <symbol>seed</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="src/xtc.strategies.cpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="src/xtc.strategies.hpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_dice.hpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;State&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;State&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_dice.hpp" file="src/xtc.state.hpp" line="51" column="3"/>
+            <symbol>State</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_dice.hpp" file="src/xtc.state.hpp" line="126" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_dice.hpp" file="src/xtc.state.hpp" line="132" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_dice.hpp" file="src/xtc.state.hpp" line="133" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_dice.hpp" file="src/xtc.eval.hpp" line="33" column="3"/>
+            <symbol>Eval</symbol>
+        </error>
+        <error id="useStlAlgorithm" severity="style" msg="Consider using std::accumulate algorithm instead of a raw loop." verbose="Consider using std::accumulate algorithm instead of a raw loop." cwe="398">
+            <location file="test/gtest_dice.hpp" line="14" column="14"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="test/gtest_dice.hpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_emax.hpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;State&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;State&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_emax.hpp" file="src/xtc.state.hpp" line="51" column="3"/>
+            <symbol>State</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_emax.hpp" file="src/xtc.state.hpp" line="126" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_emax.hpp" file="src/xtc.state.hpp" line="132" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_emax.hpp" file="src/xtc.state.hpp" line="133" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_emax.hpp" file="src/xtc.eval.hpp" line="33" column="3"/>
+            <symbol>Eval</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="test/gtest_emax.hpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_entry.cpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;State&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;State&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_entry.cpp" file="src/xtc.state.hpp" line="51" column="3"/>
+            <symbol>State</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_entry.cpp" file="src/xtc.state.hpp" line="126" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_entry.cpp" file="src/xtc.state.hpp" line="132" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_entry.cpp" file="src/xtc.state.hpp" line="133" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_entry.cpp" file="src/xtc.eval.hpp" line="33" column="3"/>
+            <symbol>Eval</symbol>
+        </error>
+        <error id="useStlAlgorithm" severity="style" msg="Consider using std::accumulate algorithm instead of a raw loop." verbose="Consider using std::accumulate algorithm instead of a raw loop." cwe="398">
+            <location file0="test/gtest_entry.cpp" file="test/gtest_dice.hpp" line="14" column="14"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="test/gtest_entry.cpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_eval.hpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;State&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;State&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_eval.hpp" file="src/xtc.state.hpp" line="51" column="3"/>
+            <symbol>State</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_eval.hpp" file="src/xtc.state.hpp" line="126" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_eval.hpp" file="src/xtc.state.hpp" line="132" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_eval.hpp" file="src/xtc.state.hpp" line="133" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_eval.hpp" file="src/xtc.eval.hpp" line="33" column="3"/>
+            <symbol>Eval</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="test/gtest_eval.hpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_helper.hpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;State&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;State&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_helper.hpp" file="src/xtc.state.hpp" line="51" column="3"/>
+            <symbol>State</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_helper.hpp" file="src/xtc.state.hpp" line="126" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_helper.hpp" file="src/xtc.state.hpp" line="132" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_helper.hpp" file="src/xtc.state.hpp" line="133" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_helper.hpp" file="src/xtc.eval.hpp" line="33" column="3"/>
+            <symbol>Eval</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="test/gtest_helper.hpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_logic.hpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;State&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;State&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_logic.hpp" file="src/xtc.state.hpp" line="51" column="3"/>
+            <symbol>State</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_logic.hpp" file="src/xtc.state.hpp" line="126" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_logic.hpp" file="src/xtc.state.hpp" line="132" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_logic.hpp" file="src/xtc.state.hpp" line="133" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_logic.hpp" file="src/xtc.eval.hpp" line="33" column="3"/>
+            <symbol>Eval</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="test/gtest_logic.hpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_state.hpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;State&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;State&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_state.hpp" file="src/xtc.state.hpp" line="51" column="3"/>
+            <symbol>State</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_state.hpp" file="src/xtc.state.hpp" line="126" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_state.hpp" file="src/xtc.state.hpp" line="132" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_state.hpp" file="src/xtc.state.hpp" line="133" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_state.hpp" file="src/xtc.eval.hpp" line="33" column="3"/>
+            <symbol>Eval</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="test/gtest_state.hpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Strategies&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_strategies.hpp" file="src/xtc.strategies.hpp" line="52" column="3"/>
+            <symbol>Strategies</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;State&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;State&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_strategies.hpp" file="src/xtc.state.hpp" line="51" column="3"/>
+            <symbol>State</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_strategies.hpp" file="src/xtc.state.hpp" line="126" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_strategies.hpp" file="src/xtc.state.hpp" line="132" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;ChanceNode&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_strategies.hpp" file="src/xtc.state.hpp" line="133" column="3"/>
+            <symbol>ChanceNode</symbol>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit." verbose="Class &apos;Eval&apos; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398">
+            <location file0="test/gtest_strategies.hpp" file="src/xtc.eval.hpp" line="33" column="3"/>
+            <symbol>Eval</symbol>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &apos;new_bits&apos; is assigned a value that is never used." verbose="Variable &apos;new_bits&apos; is assigned a value that is never used." cwe="563">
+            <location file0="test/gtest_strategies.hpp" file="lib/bitf/src/bitf_solid.hpp" line="147" column="17"/>
+            <symbol>new_bits</symbol>
+        </error>
+        <error id="syntaxError" severity="error" msg="syntax error" verbose="syntax error">
+            <location file="test/testlog.md" line="33" column="3"/>
+        </error>
+        <error id="unusedFunction" severity="style" msg="The function &apos;is_chance_node&apos; is never used." verbose="The function &apos;is_chance_node&apos; is never used." cwe="561">
+            <location file="src/xtc.state.cpp" line="83" column="0"/>
+            <symbol>is_chance_node</symbol>
+        </error>
+        <error id="unusedFunction" severity="style" msg="The function &apos;is_strategy_node&apos; is never used." verbose="The function &apos;is_strategy_node&apos; is never used." cwe="561">
+            <location file="src/xtc.state.cpp" line="89" column="0"/>
+            <symbol>is_strategy_node</symbol>
+        </error>
+        <error id="missingInclude" severity="information" msg="Cppcheck cannot find all the include files (use --check-config for details)" verbose="Cppcheck cannot find all the include files. Cppcheck can check the code without the include files found. But the results will probably be more accurate if all the include files are found. Please check your project&apos;s include directories and add all of them as include directories for Cppcheck. To see what files Cppcheck cannot find use --check-config."/>
+    </errors>
+</results>

@@ -1,12 +1,12 @@
 from array import array
 from random import choice
-from senet.core.agent import Agent
+from app.core.agent import Agent
 from time import perf_counter_ns
-from senet.utils.report import Report
-from senet.settings import SETTINGS
-from senet.core import Ply
-from senet.core.xtc import Emax, Eval
-from senet.core.enums import EvalFunc, EmaxAlgo, Unit
+from app.utils.report import Report
+from app.settings import SETTINGS
+from app.core import Ply
+from app.core.xtc import Emax, Eval
+from app.core.enums import EvalFunc, EmaxAlgo, Unit
 
 EVALUATION_FUNCS = {
     "basic": EvalFunc.BASIC,

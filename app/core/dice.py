@@ -1,5 +1,5 @@
 from array import ArrayType, array
-from senet.core.xtc import Dice as _Dice
+from app.core.xtc import Dice as _Dice
 
 class Dice:
         def __init__(self) -> None:

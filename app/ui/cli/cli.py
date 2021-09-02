@@ -1,10 +1,10 @@
-from senet.core.enums import Unit
-from senet.core import Game, Agent
-from senet.ai import AIplayer
+from app.core.enums import Unit
+from app.core import Game, Agent
+from app.ai import AIplayer
 from .msg_cli import msgout#messages as msg
-from senet.utils import singleton, STATS
-from senet.settings import SETTINGS
-from senet.ui.rules import rules
+from app.utils import singleton, STATS
+from app.settings import SETTINGS
+from app.ui.rules import rules
 
 
 class cli(metaclass=singleton):

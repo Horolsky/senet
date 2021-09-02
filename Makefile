@@ -1,8 +1,8 @@
 test_xtc:
-	make -C senet/core/xtc test
+	make -C app/core/xtc test
 
 setup_xtc:
-	make -C senet/core/xtc setup
+	make -C app/core/xtc setup
 
 test_py:
 	python3 -m unittest tests

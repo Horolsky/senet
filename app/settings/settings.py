@@ -1,4 +1,4 @@
-from senet.utils import singleton
+from app.utils import singleton
 from os.path import isfile#, isdir
 #from os import mkdir
 from json import load, dumps
@@ -18,7 +18,7 @@ class settings(metaclass=singleton):
         """
         reset settings to default conditions
         """
-        template = "senet/settings/settings.json" 
+        template = "app/settings/settings.json" 
         copyfile(template, self._fpath)
     def __getall(self):
         f = open(self._fpath, "r") 

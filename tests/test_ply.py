@@ -1,7 +1,7 @@
-from senet.core.enums import Action, Unit
+from app.core.enums import Action, Unit
 import unittest
-from senet.core.xtc import State,StrategyNode
-from senet.core import Ply
+from app.core.xtc import State,StrategyNode
+from app.core import Ply
 
 class TestState(unittest.TestCase):
 

@@ -1,13 +1,13 @@
 import random as r
 from time import perf_counter
-from senet.ai.ai import AIplayer
+from app.ai.ai import AIplayer
 from typing import Tuple, Union
-from senet.core.enums import Unit
-from senet.core.xtc import State as _State
-from senet.core import Ply, Dice
+from app.core.enums import Unit
+from app.core.xtc import State as _State
+from app.core import Ply, Dice
 from .agent import Agent
-from senet.utils import Report
-from senet.settings import SETTINGS
+from app.utils import Report
+from app.settings import SETTINGS
 from json import dumps
 from datetime import datetime
 

@@ -1,4 +1,4 @@
-from senet.ui import cli
+from app.ui import cli
 import unittest
 
 class TestAutoplay(unittest.TestCase):

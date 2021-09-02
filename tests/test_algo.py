@@ -1,7 +1,7 @@
-from senet.core.enums import *
+from app.core.enums import *
 import unittest
-from senet.core.xtc import State, Eval, Emax
-from senet.core import Ply
+from app.core.xtc import State, Eval, Emax
+from app.core import Ply
 
 class TestEmax(unittest.TestCase):
 
