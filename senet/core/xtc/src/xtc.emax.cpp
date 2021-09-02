@@ -55,7 +55,6 @@ get_best_strategy (const StrategyNode &state, int stopdepth, int time)
       threads[i]
           = std::thread (threadwork, chancenode, expectations + i, 0);
       g_threads_created++;
-      // expectations[i] = expectation_recursive (chancenode, 0);
     }
 
   int frames = g_timetowork / FRAME + 1;

@@ -5,6 +5,7 @@
 #include "../src/xtc.strategies.hpp"
 #include "../src/xtc.eval.hpp"
 #include "../src/xtc.emax.hpp"
+#include "../src/xtc.auto.hpp"
 #include "gtest/gtest.h"
 
 using namespace xtc;
