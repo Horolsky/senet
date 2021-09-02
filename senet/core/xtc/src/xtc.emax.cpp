@@ -8,7 +8,7 @@ namespace xtc
 namespace bruteforce
 {
 
-const int FRAME = 10;
+const int FRAME = 2;
 Eval g_eval;
 int g_stopdepth;
 int g_timetowork;
@@ -42,7 +42,7 @@ get_best_strategy (const StrategyNode &state, int stopdepth, int time)
   bool max = state.agent () != Unit::X;
   auto strats = state.strategies ();
   if (strats.seed () == 0)
-    throw std::logic_error ("corrupted node");
+    throw std::logic_error ("corrupted node, seed: " + std::to_string(state.seed()));
   if (strats.mobility () < 2)
     return 0;
 
@@ -55,12 +55,13 @@ get_best_strategy (const StrategyNode &state, int stopdepth, int time)
       threads[i]
           = std::thread (threadwork, chancenode, expectations + i, 0);
       g_threads_created++;
+      // expectations[i] = expectation_recursive (chancenode, 0);
     }
 
   int frames = g_timetowork / FRAME + 1;
   while (--frames > 0)
     {
-      if (g_jobsdone == strats.mobility ())
+      if (g_jobsdone >= strats.mobility ())
         break;
       std::this_thread::sleep_for (std::chrono::milliseconds (FRAME));
     }
@@ -100,7 +101,7 @@ expectation_recursive (const ChanceNode &chancenode, int depth)
         }
       if (strats.seed () == 0)
         {
-          throw std::logic_error ("corrupted node");
+          throw std::logic_error ("corrupted node, seed: " + std::to_string(choicenode.seed()));
         }
       for (int i = 0; i < strats.mobility (); i++)
         {
