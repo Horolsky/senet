@@ -42,7 +42,7 @@ class AIplayer(Agent):
         self.__emax = Emax(Eval(self._eval_func.value, self._coefs), self._emax_algo.value, depth, self._timer*1000)
         if self.__log:
             header = f"seed;t, ns;t, ~sec;agent: {agent.name}, timer: {self._timer}, depth: {depth}, eval: {self._eval_func}, coefs: {self._coefs}\n"
-            self._report = Report(f"ai-{agent.name}", None, "csv", "logs/ai", header)
+            self._report = Report(f"ai-{agent.name}", "csv", "logs/ai", header)
 
     def __del__(self):
         if self.__log:

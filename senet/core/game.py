@@ -1,4 +1,5 @@
 import random as r
+from time import perf_counter
 from senet.ai.ai import AIplayer
 from typing import Tuple, Union
 from senet.core.enums import Unit
@@ -11,7 +12,7 @@ from json import dumps
 from datetime import datetime
 
 BRIEFLOG_HEADERS = [
-    "end time",
+    "duration",
     "timer",
     "first move",
     "agent 1",
@@ -60,10 +61,10 @@ class Game():
         self.__onmove = onmove
         self.__onvictory = onvictory
         self.__logging_brief = SETTINGS.get("logs/brief")
-        self.__game_timestamp = None
+        self.__game_starttime = None
         self.__dice = Dice()
         if self.__logging_brief:
-            self._brieflog = Report(prefix, str(datetime.now()), "csv", "logs/brief", ';'.join(BRIEFLOG_HEADERS)+"\n", False)
+            self._brieflog = Report(prefix, "csv", "logs/brief", ';'.join(BRIEFLOG_HEADERS)+"\n", False)
         else:
             self._brieflog = None
     
@@ -111,8 +112,8 @@ class Game():
             
         if self.__logging_game:
             headers = f"N;{agentX._name} vs {agentY._name}: agent;steps;utility;seed\n"
-            self._gamelog = Report("game", None, "csv", "logs/games", headers)
-        self.__game_timestamp = str(datetime.now())
+            self._gamelog = Report("game", "csv", "logs/games", headers)
+        self.__game_starttime = perf_counter()
         self.__onmove()
         self.__run()
         self.__stop()
@@ -137,7 +138,7 @@ class Game():
                 
     def __record_to_brieflog(self):
         if self._brieflog == None:
-            self._brieflog = Report("senet_log", str(datetime.now()), "csv", "logs/brief", ';'.join(BRIEFLOG_HEADERS)+"\n", False)
+            self._brieflog = Report("senet_log", "csv", "logs/brief", ';'.join(BRIEFLOG_HEADERS)+"\n", False)
 
         winner = self.ply.event.agent
         
@@ -148,7 +149,7 @@ class Game():
                 score += 1
         timer = SETTINGS.get("game/timer")
         first = SETTINGS.get("game/first")
-        msg = f"{self.__game_timestamp};{timer};{first};"
+        msg = f"{(perf_counter() - self.__game_starttime)};{timer};{first};"
         msg += self.__agentX.brieflog_msg
         msg += self.__agentY.brieflog_msg
         msg += f"{winner.name};{score}\n"

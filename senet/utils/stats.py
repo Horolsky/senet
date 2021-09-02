@@ -11,9 +11,9 @@ stats_header = "game cumulative statistics"
 class Stats(metaclass=singleton):
     _src = {
         "brief": [],
-        "games": [],
-        "ai": [],
-        "meub": []
+        # "games": [],
+        # "ai": [],
+        # "meub": []
     }
     _df = {
         "brief": None,
@@ -89,8 +89,8 @@ class Stats(metaclass=singleton):
                 record2.update({f"{trgattrs[i+1]}": group[i2]})
 
             plays = len(data)
-            wins = len(data[data["winner"] == "Y"]) / plays
-            score = sum(data[data["winner"] == "Y"]["score"]) / sum(data["score"])
+            wins = len(data[data["winner"] == "X"]) / plays
+            score = sum(data[data["winner"] == "X"]["score"]) / sum(data["score"])
             record1.update({
                 "Plays": plays,
                 "Wins": round(wins, 3),
