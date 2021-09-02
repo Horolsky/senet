@@ -7,7 +7,7 @@ if __name__ == "__main__":
     try:
         from senet import launch
         launch("cli")
-    except:
+    except ModuleNotFoundError:
         confirm = input("core extension module is missing, run installation process [Y/n]?\n")
         if confirm in ['Y', 'y']:
             system("""

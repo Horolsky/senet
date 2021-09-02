@@ -36,7 +36,7 @@
         "game": {
             "value": false,
             "type": "flag",
-            "options": [ true, false ],
+            "options": [ false ],
             "descr": [
                 "saving game log to csv file",
                 "files are stored in logs/games"
@@ -45,7 +45,7 @@
         "ai": {
             "value": false,
             "type": "flag",
-            "options": [ true, false ],
+            "options": [ false ],
             "descr": [
                 "saving ai working log to csv file",
                 "files are stored in logs/ai"
@@ -56,7 +56,7 @@
         "depth": {
             "value": 1,
             "type": "number",
-            "options": [0,12],
+            "options": [0,7],
             "descr": [
                 "search depth of ai agents in autoplay"
             ]
@@ -64,7 +64,7 @@
         "eval": {
             "value": "basic",
             "type": "flag",
-            "options": [ "basic", "linear", "polynomial" ],
+            "options": [ "basic" ],
             "descr": [
                 "state evaluation function of X ai player"
             ]
@@ -81,7 +81,7 @@
         "emax": {
             "value": "recursive",
             "type": "flag",
-            "options": [ "recursive", "iterative" ],
+            "options": [ "recursive" ],
             "descr": [
                 "expectimax algorithm of X ai player"
             ]
@@ -91,7 +91,7 @@
         "depth": {
             "value": 1,
             "type": "number",
-            "options": [0,12],
+            "options": [0,7],
             "descr": [
                 "search depth of ai agents in autoplay"
             ]
@@ -99,7 +99,7 @@
         "eval": {
             "value": "basic",
             "type": "flag",
-            "options": [ "basic", "linear", "polynomial" ],
+            "options": [ "basic" ],
             "descr": [
                 "state evaluation function of Y ai player"
             ]
@@ -116,7 +116,7 @@
         "emax": {
             "value": "recursive",
             "type": "flag",
-            "options": [ "recursive", "iterative" ],
+            "options": [ "recursive" ],
             "descr": [
                 "expectimax algorithm of Y ai player"
             ]
@@ -126,7 +126,7 @@
         "pawns": {
             "value": 5,
             "type": "number",
-            "options": [ 3, 7 ],
+            "options": [ 5 ],
             "descr": [
                 "number of pawns on game start"
             ]

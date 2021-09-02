@@ -30,7 +30,8 @@ class AIplayer(Agent):
         if len(coefs) != 4:
             raise AttributeError("coefs size is exactly 4")
         
-        self.__log = SETTINGS.get("logs/ai")
+        self.__log = False #SETTINGS.get("logs/ai")
+        #TODO: logging
         self._agent = agent
         self._name = "AI"
         self._timer = SETTINGS.get("game/timer")

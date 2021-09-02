@@ -87,8 +87,9 @@ class Game():
         @param agentX: Agent
         @param agentY: Agent
         """
-        self.__logging_game = SETTINGS.get("logs/game")
+        self.__logging_game = False #SETTINGS.get("logs/game")
         self.__logging_brief = SETTINGS.get("logs/brief")
+        #TODO: fix logging
 
         self.__agentX = agentX
         self.__agentY = agentY
