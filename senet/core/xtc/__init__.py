@@ -23,7 +23,7 @@ def __load_src():
     for header  in __HDR:
         if not cppyy.include(header):
             raise ImportError(f"unable to load {header}")
-        
+    
     cppyy.load_library(f"{PATH}/build/senet_xtc-0.0.1-x86_64-Linux.so")
     
     __internal = {}
@@ -43,7 +43,8 @@ def __load_std():
 
     globals().update(_std)
         
-__load_src()
-__load_std()
-
-# __all__ = ['__internal']
+try:
+    __load_src()
+    __load_std()
+except:
+        raise ModuleNotFoundError("xtc")
