@@ -226,7 +226,7 @@ StrategyNode::choice (int choice, Strategies strategies) const
   if (strategies.seed () == 0UL)
     strategies = this->strategies ();
   if (strategies.mobility () > 0 && !strategies.contains (choice))
-    throw std::logic_error ("illegal move");
+    throw std::logic_error ("seed: " + std::to_string(seed()) + ", illegal move: "+std::to_string(choice));
 
   Unit agent = static_cast<Unit> (_data.agent);
   Unit enemy = static_cast<Unit> (_data.agent ^ 1);
@@ -291,7 +291,7 @@ StrategyNode::choice (int choice, Strategies strategies) const
       new_state.update_board (House::BEAUTY, agent);
       break;
     default:
-      throw std::logic_error ("corrupted game logic");
+      throw std::logic_error ("corrupted game logic, seed: " + std::to_string(seed()));
       // new_state._data.seed = 0UL; // corrupted logic
       break;
     }
