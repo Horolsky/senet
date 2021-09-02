@@ -1,14 +1,11 @@
 from os import mkdir
-from os.path import isdir
+from os.path import isdir, isfile
 from datetime import datetime
 class Report:
-    def __init__(self, prefix, timestamp=None, ext="txt", path="logs", msg=0, hold=True):
+    def __init__(self, prefix, ext="txt", path="logs", msg=0, hold=True):
         """
         logging game events to file
         """
-        if str(timestamp) is not str:
-            timestamp = str(datetime.now())
-        timestamp = timestamp.replace(":", "").replace("-", "").replace(" ", "-")[:15]
         
         if type(prefix) is not str:
             raise TypeError("invalid file prefix arg")
@@ -24,13 +21,16 @@ class Report:
             if not isdir(subdir):
                 mkdir(subdir)
         self._hold = hold
-        self._fname = f"{path}/{prefix}-{timestamp}.{ext}"
-        self._file = open(self._fname, "a")
-        #init msg
-        if type(msg) is str:
-            self._file.write(msg)
-        if not self._hold:
-                self._file.close()
+        self._fname = f"{path}/{prefix}.{ext}"
+        if isfile(self._fname):
+            self._file = open(self._fname, "a")
+        else:
+            self._file = open(self._fname, "a")
+            #init msg
+            if type(msg) is str:
+                self._file.write(msg)
+            if not self._hold:
+                    self._file.close()
 
     def __del__(self):
         self._file.close()

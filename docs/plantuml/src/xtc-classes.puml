@@ -1,0 +1,92 @@
+@startuml xtc-classes
+    
+    package "game object classes"
+    {
+        class Unit <<(E, White)>>
+        class Action <<(E, White)>>
+        class State <<(O, White)>>
+        class StrategyNode <<(O, White)>>
+        class ChanceNode <<(O, White)>>
+        class Strategies <<(O, White)>>
+        class Dice <<(O, White)>>
+    }
+    package "algorithmic functors" 
+    {
+        class Eval <<(F, White)>>
+        class Emax <<(F, White)>>
+    }
+
+    class Unit 
+    {
+        X
+        Y
+        NONE   
+    }
+    class Action 
+    {
+        SKIP
+        MOVE
+        RETREAT
+        SWAPBACK
+        DROW
+        ATTACK
+        ATTACK_HOUSE
+        ESCAPE
+        PANIC
+        NONE
+        ERROR
+    }
+    class Dice
+    {
+        +int roll()
+        +int[4] sticks
+    }
+    class Strategies
+    {
+        +Unit agent
+        +int mobility
+        +int[] indici
+        +Action[] actions
+    }
+    class State
+    {
+        +Unit agent
+        +int steps
+        +Unit[30] board
+    }
+    class StrategyNode
+    {
+        +Strategies strategies
+        ___
+        +ChanceNode choice(int index)
+    }
+    class ChanceNode
+    {
+        +StrategyNode chance(int chance)
+    }
+    'FUNCTORS
+    class Eval
+    {
+        +constructor()
+        +call(State state)
+    }
+    class Emax
+    {
+        +constructor()
+        +call(StrategyNode state)
+    }
+
+    State *-left- Unit
+    StrategyNode *-- Strategies
+    Strategies *-left- Action
+    ChanceNode *-- Dice
+
+    StrategyNode *-[hidden]- Action
+
+    
+    State <|-- StrategyNode
+    State <|-- ChanceNode
+    
+    
+    
+@enduml

@@ -1,5 +1,10 @@
 import random as r
-from senet.xtc import Ply
+from time import perf_counter
+from senet.ai.ai import AIplayer
+from typing import Tuple, Union
+from senet.core.enums import Unit
+from senet.core.xtc import State as _State
+from senet.core import Ply, Dice
 from .agent import Agent
 from senet.utils import Report
 from senet.settings import SETTINGS
@@ -7,8 +12,7 @@ from json import dumps
 from datetime import datetime
 
 BRIEFLOG_HEADERS = [
-    "end time",
-    "rules",
+    "duration",
     "timer",
     "first move",
     "agent 1",
@@ -24,32 +28,30 @@ BRIEFLOG_HEADERS = [
     ]
 
 class Game():
-    @staticmethod
-    def check_agent(agent):
-        for attr in ("choose_movement", "_agent", "_name"):
-            if not hasattr(agent, attr):
-                return False  
-        return True
+    
     @staticmethod
     def check_seed(seed):
         if type(seed) is not int:
             return False
-        test = Ply(seed)
-        res = True
-        if test.agent not in (1,2):
-            res = False
-        if test.steps not in [1,2,3,4,5]:
-            res = False
-        if test.utility in (0, 1):
-            res = False
-        return res
+        try:
+            test = Ply(seed=seed)
+            res = True
+            if test.expectation in (0, 1):
+                res = False
+            if set(test.board) != {Unit.X, Unit.Y, Unit.NONE}:
+                res = False
+            if sum([x for x in test.board if x == Unit.NONE]) < 20:
+                res = False
+            return res
+        except:
+            return False
         
     def __init__(self, onmove, onvictory, prefix="senet_games"):
         """
         game logic manager
         """
         self.__running = False
-        self.__state = None       
+        self.__ply = None       
         self.__sticks = None
         self.__turn = None
         if not callable(onmove):
@@ -59,9 +61,10 @@ class Game():
         self.__onmove = onmove
         self.__onvictory = onvictory
         self.__logging_brief = SETTINGS.get("logs/brief")
-        self.__game_timestamp = None
+        self.__game_starttime = None
+        self.__dice = Dice()
         if self.__logging_brief:
-            self._brieflog = Report(prefix, str(datetime.now()), "csv", "logs/brief", ';'.join(BRIEFLOG_HEADERS)+"\n", False)
+            self._brieflog = Report(prefix, "csv", "logs/brief", ';'.join(BRIEFLOG_HEADERS)+"\n", False)
         else:
             self._brieflog = None
     
@@ -69,50 +72,56 @@ class Game():
         self.__running = False
         if self.__logging_game:
             self._gamelog.close("\ngame over")
-        self.__agent1 = None
-        self.__agent2 = None
+        self.__agentX = None
+        self.__agentY = None
         
     def stop(self): #in loop game stop
         self.__running = False
-        if self.__state:
-            return self.__state.seed
+        if self.__ply:
+            return self.__ply.seed
     
-    def start(self, agent1, agent2, rules, first=1, seed=10066320): #start_game
+    def start(self, agentX: Agent, agentY: Agent, first: Unit, seed=0): #start_game
         """
         start new or restart current game
-        @param first: int
-        @param agent1: Agent
-        @param agent2: Agent
+        @param first: Unit
+        @param agentX: Agent
+        @param agentY: Agent
         """
-        self.__logging_game = SETTINGS.get("logs/game")
+        self.__logging_game = False #SETTINGS.get("logs/game")
         self.__logging_brief = SETTINGS.get("logs/brief")
-        self._rules = rules
+        #TODO: fix logging
 
-        #agents duck typing
-        if not Game.check_agent(agent1) or not Game.check_agent(agent2):
-            raise TypeError("invalid agent objects") 
-        self.__agent1 = agent1
-        self.__agent2 = agent2
+        self.__agentX = agentX
+        self.__agentY = agentY
         self.__running = True
         self.__turn = 0
         
-        self.__state = Ply(seed, rules, "basic")
-        if seed == 10066320:
-            self.__sticks = Game.throw_sticks()
-            self.__state.steps = Game.get_steps(self.__sticks)
-            self.__state.agent = first
         
+        if seed == 0:
+            chance = self.__dice.roll()
+            self.__sticks = tuple(self.__dice.sticks)    
+            self.__ply = Ply(chance=chance, agent=first)
+        else:
+            s = _State(seed)
+            chance = s.steps()
+            if chance == 0:
+                chance = self.__dice.roll()
+                self.__sticks = tuple(self.__dice.sticks)  
+                self.__ply = Ply(state=s,chance=chance, agent=first)
+            else:
+                self.__ply = Ply(seed=seed)
+            
         if self.__logging_game:
-            headers = f"N;{agent1._name} vs {agent2._name}: {rules};agent;steps;utility;seed\n"
-            self._gamelog = Report("game", None, "csv", "logs/games", headers)
-        self.__game_timestamp = str(datetime.now())
+            headers = f"N;{agentX._name} vs {agentY._name}: agent;steps;utility;seed\n"
+            self._gamelog = Report("game", "csv", "logs/games", headers)
+        self.__game_starttime = perf_counter()
         self.__onmove()
         self.__run()
         self.__stop()
     
     def __run(self):
         if self.__logging_game:
-            self._gamelog.write(f"{self.__turn};{self.state.to_csv()}")
+            self._gamelog.write(f"{self.__turn};{self.ply.to_csv()}")
             
         while self.__running:
             self.__running = self.__move()
@@ -120,44 +129,31 @@ class Game():
                 break
             self.__onmove()
             if self.__logging_game:
-                self._gamelog.write(f"\n{self.__turn};{self.state.to_csv()}")
+                self._gamelog.write(f"\n{self.__turn};{self.ply.to_csv()}")
             #END GAME CONDITION
-            if 5 in self.state.bench:
-                self.__onvictory(self.state.event[1]) #sending agent n to callback
+            if self.ply.state.is_terminal_node():
+                self.__onvictory(self.ply.event.agent) #sending agent n to callback
                 if self.__logging_brief:
                     self.__record_to_brieflog()
                 break
                 
     def __record_to_brieflog(self):
         if self._brieflog == None:
-            self._brieflog = Report("senet_log", str(datetime.now()), "csv", "logs/brief", ';'.join(BRIEFLOG_HEADERS)+"\n", False)
+            self._brieflog = Report("senet_log", "csv", "logs/brief", ';'.join(BRIEFLOG_HEADERS)+"\n", False)
 
-        winner = self.state.event[1]
-        looser = winner % 2 + 1
-        score = sum(self.state.board) // looser
-        agent1, agent2 = self.__agent1._name, self.__agent2._name
+        winner = self.ply.event.agent
+        
+        
+        score = 0 
+        for cell in self.ply.board:
+            if cell != Unit.NONE:
+                score += 1
         timer = SETTINGS.get("game/timer")
         first = SETTINGS.get("game/first")
-        msg = f"{self.__game_timestamp};{self._rules};{timer};{first};"
-        depth1, eval1, coefs1, depth2, eval2, coefs2 = [None for _ in range(6)]
-
-
-        if agent1.lower() == "ai":
-            depth1 = str(self.__agent1._depth)
-            eval1 = self.__agent1._eval_func
-            if self.__agent1._eval_func == "linear":
-                coefs1 = str(self.__agent1._coefs)
-            elif self.__agent1._eval_func == "basic":
-                coefs1 = "[1,0,0,0]"
-        if agent2.lower() == "ai":
-            depth2 = str(self.__agent2._depth)
-            eval2 = self.__agent2._eval_func
-            if self.__agent2._eval_func == "linear":
-                coefs2 = str(self.__agent2._coefs)
-            elif self.__agent2._eval_func == "basic":
-                coefs2 = "[1,0,0,0]"
-        msg += f"{agent1};{depth1};{eval1};{coefs1};{agent2};{depth2};{eval2};{coefs2};"
-        msg += f"{winner};{score}\n"
+        msg = f"{(perf_counter() - self.__game_starttime)};{timer};{first};"
+        msg += self.__agentX.brieflog_msg
+        msg += self.__agentY.brieflog_msg
+        msg += f"{winner.name};{score}\n"
 
         self._brieflog.write(msg)
 
@@ -168,21 +164,17 @@ class Game():
         returns True on success,
         False on failure
         """ 
-        cell = self.agent.choose_movement(self.state)
+        choice = self.agent.choose_movement(self.ply)
         if self.__running == False:
             return False
-        newstate = self.state.increment(cell)
-        if newstate is None:
+        if choice not in self.ply.strategies.indici:
             return False
-        elif 3 in newstate.board:
-            return False
-        else:
-            newsticks = Game.throw_sticks()
-            newstate.steps = Game.get_steps(newsticks) 
-            self.__sticks = newsticks
-            self.__state = newstate
-            self.__turn += 1
-            return True
+        chance = self.__dice.roll()
+        self.__sticks = tuple(self.__dice.sticks)
+        newply = self.ply.increment(choice, chance)
+        self.__ply = newply
+        self.__turn += 1
+        return True    
     
     @property
     def agent(self):
@@ -190,22 +182,22 @@ class Game():
         an instance of the core.agent class, holding a callback for a movement request
         represents the current agent (player)
         """
-        return (self.__agent1, self.__agent2)[self.state.agent-1]
-    
+        return (self.__agentX, self.__agentY)[int(self.ply.agent.value)]
+    @property
     def enemy(self):
         """
         an instance of the core.agent class, holding a callback for a movement request
         represents an enemy of the current agent (player)
         """
-        return (self.__agent1, self.__agent2)[self.state.enemy-1]
+        return (self.__agentX, self.__agentY)[int(self.ply.enemy.value)]
     
     @property
-    def state(self):
+    def ply(self):
         """
         an instance of the core.state class
         """
         if self.running:
-            return self.__state
+            return self.__ply
     
     @property
     def running(self):
@@ -221,13 +213,6 @@ class Game():
     @property
     def sticks(self):
         return self.__sticks
-
-    @staticmethod
-    def throw_sticks():
-        """
-        return a 4x binary tuple, representing random senet sticks 
-        """
-        return tuple([r.randrange(2) for _ in range(4)])
     
     @staticmethod
     def get_steps(sticks):

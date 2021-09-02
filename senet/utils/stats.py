@@ -11,9 +11,9 @@ stats_header = "game cumulative statistics"
 class Stats(metaclass=singleton):
     _src = {
         "brief": [],
-        "games": [],
-        "ai": [],
-        "meub": []
+        # "games": [],
+        # "ai": [],
+        # "meub": []
     }
     _df = {
         "brief": None,
@@ -46,13 +46,11 @@ class Stats(metaclass=singleton):
             return False
         brief = self._df["brief"]
         src = brief[(brief["agent 1"] == "AI") & (brief["agent 2"] == "AI")]
-        #src = src[src["agent 1"] == "AI"]
-        #src = src[src["agent 2"] == "AI"]
+        
         trgattrs=[
             "A",      # "Pos",
             "F",        # "First",
             "T",        # "Timer",
-            "R",        # "Rules",
             "D",        # "Depth",
             "E",     # "Eval",
             "C",        # "Coefs",
@@ -67,7 +65,6 @@ class Stats(metaclass=singleton):
         srcattrs = [
             "first move",
             "timer",
-            "rules",
             "depth 1",
             "eval 1",
             "coefs 1",
@@ -81,19 +78,19 @@ class Stats(metaclass=singleton):
             data = superset.get_group(group)
             if "human" in group:
                 continue
-            record1 = {"A": "V"}
-            record2 = {"A": "X"}
-            for i in range(3):
+            record1 = {"A": "X"}
+            record2 = {"A": "Y"}
+            for i in range(2):
                 record1.update({f"{trgattrs[i+1]}": group[i]})
                 record2.update({f"{trgattrs[i+1]}": group[i]})
-            for i in range(3,9):
-                i2 = (i+3,i-3)[i>5]
+            for i in range(2,8):
+                i2 = (i+3,i-3)[i>4]
                 record1.update({f"{trgattrs[i+1]}": group[i]})
                 record2.update({f"{trgattrs[i+1]}": group[i2]})
 
             plays = len(data)
-            wins = len(data[data["winner"] == 1]) / plays
-            score = sum(data[data["winner"] == 1]["score"]) / sum(data["score"])
+            wins = len(data[data["winner"] == "X"]) / plays
+            score = sum(data[data["winner"] == "X"]["score"]) / sum(data["score"])
             record1.update({
                 "Plays": plays,
                 "Wins": round(wins, 3),
