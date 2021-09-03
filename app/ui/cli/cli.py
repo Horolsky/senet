@@ -134,24 +134,24 @@ class cli(metaclass=singleton):
                 self.msgout("shut down")
                 self.__running = False
             # msg request
-            if cmd in ['h', 'r', 'i']:
+            elif cmd in ['h', 'r', 'i']:
                 self.msgout(cmd)
                 continue
-            if cmd in [ 'b', 'm', 'u' ] and self.game.running:
+            elif cmd in [ 'b', 'm', 'u' ] and self.game.running:
                 self.msgout(cmd)
                 continue
-            if cmd == 'o':
+            elif cmd == 'o':
                 if len(tks) == 1:
                     self.print_options()
                 elif len(tks) > 1:
                     self.toggle_option(tks[1:])
                 continue
-            if cmd == "stats":
+            elif cmd == "stats":
                 msgout("GAME STATS")
                 msgout("A: Agent, F: first move, T: timer, D: depth, E: eval func, C: coefs, ~: opponents params\n")
                 STATS.show_brief()
             #game actions
-            if cmd == 'a':
+            elif cmd == 'a':
                 if self.game.running:
                     self.msgout("to start autoplay break the current game")
                 else:
@@ -160,7 +160,7 @@ class cli(metaclass=singleton):
                         self.msgout("warn")
                     #break
                 continue
-            if cmd == 's':
+            elif cmd == 's':
                 if self.game.running:
                     self.msgout("confirm_s")
                     conf = input("\nhuman: ").lower()
@@ -172,14 +172,21 @@ class cli(metaclass=singleton):
                     if not success:
                         self.msgout("warn")
                 #break
-            if cmd[0] in "0123456789" and self.game.running:
-                m = self.get_index(tks)
-                if m in self.game.ply.strategies.indici:
-                    movement = m
-                    break # return movement for in-game loop
-                else:
-                    self.msgout("choosen movement is impossible")
+            elif cmd[0] in "0123456789" and self.game.running:
+                try:
+                    m = self.get_index(tks)
+                    if m in self.game.ply.strategies.indici:
+                        movement = m
+                        break # return movement for in-game loop
+                    else:
+                        self.msgout("choosen movement is impossible")
+                        continue
+                except:
+                    self.msgout("warn")
                     continue
+            else:
+                self.msgout("warn")
+                continue
         return movement
 
     def _on_victory(self, agent):

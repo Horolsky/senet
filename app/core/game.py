@@ -40,7 +40,7 @@ class Game():
                 res = False
             if set(test.board) != {Unit.X, Unit.Y, Unit.NONE}:
                 res = False
-            if sum([x for x in test.board if x == Unit.NONE]) < 20:
+            if test.board.count(Unit.NONE) < 20:
                 res = False
             return res
         except:
