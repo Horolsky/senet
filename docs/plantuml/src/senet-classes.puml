@@ -1,0 +1,53 @@
+@startuml app-classes
+    
+    package app
+    {
+    package core
+    {
+        class Agent <<(O, White)>>
+        class Ply <<(O, White) xtc.State wrapper>>
+        class Game <<(O, White)>>
+        class Emax <<(F, White) core.xtc>>
+    }
+    class AIPlayer <<(O, White)>>
+    class HumanPlayer <<(O, White)>>
+    class CLI <<(S, White) >>
+    }
+
+    class Ply 
+    {
+        +Ply(int seed)
+        +Ply(Unit agent, int steps, int[30] board)
+        +Ply increment(int choice, int chance)
+
+        +Strategies strategies
+        +Unit agent
+        +int steps
+        +Unit[30] board
+    }
+    class Agent
+    {
+        +Agent(options)
+        +int choose_movement(Ply)
+    }
+    class Game
+    {
+        +void start(Agent X, Agent Y, int seed)
+        +void stop()
+        +Ply state
+    }
+    class CLI
+    {
+        +prompt(string command)
+    }
+
+    AIPlayer --|> Agent
+    HumanPlayer --|> Agent
+
+    AIPlayer <--> Emax : strategy request
+    HumanPlayer <-left-> CLI  : strategy request
+    Game <-up-> CLI : io loop
+
+    Game *-right- Agent
+    Game *-down- Ply
+@enduml

@@ -1,0 +1,20 @@
+@startuml game-process
+entity Ply
+control Game
+actor Agent
+
+hnote over Game: initialize
+Ply <-- Game: request initial state
+Ply -> Game: initial state
+
+Game --> Agent: action request
+Game <- Agent: action response
+Ply <-- Game: request new state
+Ply -> Game: new state
+hnote over Game: check game state,\nnotify subscribers
+Game --> Agent: another action request
+Game <- Agent: another action response
+Ply <-- Game: state increment signal 
+Ply -> Game: new state
+hnote over Game: check game state,\nnotify subscribers
+@enduml

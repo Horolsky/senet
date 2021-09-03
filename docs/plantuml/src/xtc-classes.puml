@@ -8,10 +8,11 @@
         class StrategyNode <<(O, White)>>
         class ChanceNode <<(O, White)>>
         class Strategies <<(O, White)>>
-        class Dice <<(O, White)>>
+        
     }
-    package "algorithmic functors" 
+    package "algorithmic functors and utils" 
     {
+        class Dice <<(O, White)>>
         class Eval <<(F, White)>>
         class Emax <<(F, White)>>
     }
@@ -33,16 +34,16 @@
         ATTACK_HOUSE
         ESCAPE
         PANIC
-        NONE
-        ERROR
     }
     class Dice
     {
+        +Dice()
         +int roll()
         +int[4] sticks
     }
     class Strategies
     {
+        +Strategies(int seed)
         +Unit agent
         +int mobility
         +int[] indici
@@ -50,14 +51,20 @@
     }
     class State
     {
+        {static} int build_seed(Unit agent, int steps, int[30] board)
+        +State(int seed)        
+
         +Unit agent
         +int steps
         +Unit[30] board
+
+        +bool is_chance_node
+        +bool is_strategy_node
+        +bool is_terminal_node
     }
     class StrategyNode
     {
         +Strategies strategies
-        ___
         +ChanceNode choice(int index)
     }
     class ChanceNode
@@ -67,25 +74,27 @@
     'FUNCTORS
     class Eval
     {
-        +constructor()
+        +Eval(options)
         +call(State state)
     }
     class Emax
     {
-        +constructor()
+        +Emax(options)
         +call(StrategyNode state)
     }
 
-    State *-left- Unit
-    StrategyNode *-- Strategies
-    Strategies *-left- Action
-    ChanceNode *-- Dice
-
-    StrategyNode *-[hidden]- Action
-
+    ' State *-left- Unit
+    ' StrategyNode *-- Strategies
+    ' Strategies *-right- Action
+    ChanceNode *-[hidden]- Action
+    Action *-left[hidden]- Strategies
+    Strategies *-left[hidden]- Unit
     
     State <|-- StrategyNode
     State <|-- ChanceNode
+
+    Eval *-up[hidden]- Dice
+    Emax *-up[hidden]- Eval
     
     
     

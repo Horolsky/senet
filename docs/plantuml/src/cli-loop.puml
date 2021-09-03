@@ -1,0 +1,21 @@
+@startuml cli-loop
+database Settings
+control Game
+control CLI
+actor User
+
+hnote over CLI: initialize
+CLI --> User: command request
+CLI <- User: response "set option"
+Settings <- CLI: set option
+
+CLI --> User: command request
+CLI <- User: response "start game"
+Game <-- CLI: init game
+Settings <-- Game: options request
+Settings -> Game: options response
+hnote over Game: start
+hnote over Game: game over
+Game --> CLI: return control
+CLI --> User: command request
+@enduml
