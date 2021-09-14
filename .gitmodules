@@ -1,0 +1,3 @@
+[submodule "app/core/xtc/lib/bitf"]
+	path = app/core/xtc/lib/bitf
+	url = https://github.com/Horolsky/bitf.git

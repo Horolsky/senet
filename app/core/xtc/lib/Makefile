@@ -1,7 +1,7 @@
 BITFSRC	    := https://github.com/Horolsky/bitf.git
 
 bitf:
-	git clone $(BITFSRC)
+	git submodule add $(BITFSRC)
 
 update: bitf
 	git -C bitf pull
